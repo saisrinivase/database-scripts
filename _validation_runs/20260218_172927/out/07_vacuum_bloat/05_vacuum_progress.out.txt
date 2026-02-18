@@ -1,0 +1,3 @@
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/07_vacuum_bloat/05_vacuum_progress.sql:22: ERROR:  column p.max_dead_tuples does not exist
+LINE 15:     p.max_dead_tuples,
+             ^

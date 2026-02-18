@@ -1,0 +1,17 @@
+ schema_name |     table_name     |          foreign_key_name           | fk_columns  |                                                      suggested_index_sql                                                       
+-------------+--------------------+-------------------------------------+-------------+--------------------------------------------------------------------------------------------------------------------------------
+ perf        | addresses          | addresses_user_id_fkey              | user_id     | CREATE INDEX CONCURRENTLY idx_addresses_addresses_user_id_fkey ON perf.addresses (user_id);
+ perf        | categories         | categories_tenant_id_fkey           | tenant_id   | CREATE INDEX CONCURRENTLY idx_categories_categories_tenant_id_fkey ON perf.categories (tenant_id);
+ perf        | job_runs           | job_runs_job_id_fkey                | job_id      | CREATE INDEX CONCURRENTLY idx_job_runs_job_runs_job_id_fkey ON perf.job_runs (job_id);
+ perf        | notifications      | notifications_user_id_fkey          | user_id     | CREATE INDEX CONCURRENTLY idx_notifications_notifications_user_id_fkey ON perf.notifications (user_id);
+ perf        | order_items        | order_items_product_id_fkey         | product_id  | CREATE INDEX CONCURRENTLY idx_order_items_order_items_product_id_fkey ON perf.order_items (product_id);
+ perf        | orders             | orders_tenant_id_fkey               | tenant_id   | CREATE INDEX CONCURRENTLY idx_orders_orders_tenant_id_fkey ON perf.orders (tenant_id);
+ perf        | product_categories | product_categories_category_id_fkey | category_id | CREATE INDEX CONCURRENTLY idx_product_categories_product_categories_category_id_fkey ON perf.product_categories (category_id);
+ perf        | products           | products_tenant_id_fkey             | tenant_id   | CREATE INDEX CONCURRENTLY idx_products_products_tenant_id_fkey ON perf.products (tenant_id);
+ perf        | sessions           | sessions_user_id_fkey               | user_id     | CREATE INDEX CONCURRENTLY idx_sessions_sessions_user_id_fkey ON perf.sessions (user_id);
+ perf        | shipments          | shipments_order_id_fkey             | order_id    | CREATE INDEX CONCURRENTLY idx_shipments_shipments_order_id_fkey ON perf.shipments (order_id);
+ perf        | support_tickets    | support_tickets_user_id_fkey        | user_id     | CREATE INDEX CONCURRENTLY idx_support_tickets_support_tickets_user_id_fkey ON perf.support_tickets (user_id);
+ perf        | ticket_comments    | ticket_comments_ticket_id_fkey      | ticket_id   | CREATE INDEX CONCURRENTLY idx_ticket_comments_ticket_comments_ticket_id_fkey ON perf.ticket_comments (ticket_id);
+ perf        | users              | users_tenant_id_fkey                | tenant_id   | CREATE INDEX CONCURRENTLY idx_users_users_tenant_id_fkey ON perf.users (tenant_id);
+(13 rows)
+

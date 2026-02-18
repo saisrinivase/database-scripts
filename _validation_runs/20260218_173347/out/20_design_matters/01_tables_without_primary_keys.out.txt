@@ -1,0 +1,9 @@
+ schema_name |       table_name        | total_size 
+-------------+-------------------------+------------
+ dba_metrics | index_size_snapshots    | 48 kB
+ dba_metrics | connection_snapshots    | 16 kB
+ dba_metrics | table_size_snapshots    | 16 kB
+ dba_metrics | database_size_snapshots | 16 kB
+ dba_metrics | wal_snapshots           | 16 kB
+(5 rows)
+

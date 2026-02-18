@@ -1,0 +1,72 @@
+Pager usage is off.
+[V1 seed] Recreating migration_v1_lab schema...
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/27_migration_validation/02_seed_v1_test_issues.sql:17: NOTICE:  drop cascades to 7 other objects
+DETAIL:  drop cascades to table migration_v1_lab.orders_no_pk
+drop cascades to table migration_v1_lab.parent_accounts
+drop cascades to table migration_v1_lab.child_transactions
+drop cascades to table migration_v1_lab.product_catalog
+drop cascades to table migration_v1_lab.sales_orders
+drop cascades to table migration_v1_lab.stale_stats_table
+drop cascades to table migration_v1_lab.dml_bloat_table
+DROP SCHEMA
+CREATE SCHEMA
+[V1 seed] Creating table without primary key...
+CREATE TABLE
+INSERT 0 10000
+[V1 seed] Creating unowned sequence...
+CREATE SEQUENCE
+ nextval 
+---------
+       1
+       2
+       3
+       4
+       5
+       6
+       7
+       8
+       9
+      10
+      11
+      12
+      13
+      14
+      15
+      16
+      17
+      18
+      19
+      20
+(20 rows)
+
+[V1 seed] Creating FK without supporting index...
+CREATE TABLE
+CREATE TABLE
+INSERT 0 10000
+INSERT 0 120000
+[V1 seed] Creating duplicate indexes...
+CREATE TABLE
+INSERT 0 50000
+CREATE INDEX
+CREATE INDEX
+[V1 seed] Creating uppercase object name...
+CREATE TABLE
+INSERT 0 1000
+[V1 seed] Creating stale-stats table...
+CREATE TABLE
+ALTER TABLE
+INSERT 0 60000
+[V1 seed] Creating dead-tuple pressure table...
+CREATE TABLE
+ALTER TABLE
+INSERT 0 25000
+DELETE 13000
+[V1 seed] Refreshing planner stats (without vacuum cleanup)...
+ANALYZE
+ANALYZE
+ANALYZE
+ANALYZE
+ANALYZE
+ANALYZE
+ANALYZE
+[V1 seed] Seed complete.

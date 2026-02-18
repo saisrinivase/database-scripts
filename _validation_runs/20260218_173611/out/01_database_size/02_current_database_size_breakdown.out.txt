@@ -1,0 +1,5 @@
+ database_total_bytes | database_total_pretty | table_heap_bytes | table_heap_pretty | indexes_bytes | indexes_pretty | toast_bytes | toast_pretty 
+----------------------+-----------------------+------------------+-------------------+---------------+----------------+-------------+--------------
+            436623039 | 416 MB                |          2277376 | 2224 kB           |     425123840 | 405 MB         |      172032 | 168 kB
+(1 row)
+

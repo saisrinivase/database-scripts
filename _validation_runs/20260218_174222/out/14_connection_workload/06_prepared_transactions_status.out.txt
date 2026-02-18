@@ -1,0 +1,4 @@
+ transaction | gid | prepared | owner | database | prepared_age 
+-------------+-----+----------+-------+----------+--------------
+(0 rows)
+

@@ -1,0 +1,4 @@
+ parent_schema | parent_table | partition_schema | partition_name | index_count 
+---------------+--------------+------------------+----------------+-------------
+(0 rows)
+

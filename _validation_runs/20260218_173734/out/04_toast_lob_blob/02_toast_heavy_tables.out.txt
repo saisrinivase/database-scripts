@@ -1,0 +1,38 @@
+   schema_name    |       table_name        | table_total_bytes | table_total_pretty | toast_bytes | toast_pretty | toast_pct 
+------------------+-------------------------+-------------------+--------------------+-------------+--------------+-----------
+ perf             | support_tickets         |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+ dba_metrics      | wal_snapshots           |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+ dba_metrics      | database_size_snapshots |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+ dba_metrics      | connection_snapshots    |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+ perf             | job_runs                |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+ perf             | jobs                    |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+ perf             | notifications           |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+ perf             | ticket_comments         |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+ perf             | documents               |             24576 | 24 kB              |        8192 | 8192 bytes   |     33.33
+ perf             | audit_log               |             24576 | 24 kB              |        8192 | 8192 bytes   |     33.33
+ perf             | tenants                 |             32768 | 32 kB              |        8192 | 8192 bytes   |     25.00
+ dba_metrics      | index_size_snapshots    |             49152 | 48 kB              |        8192 | 8192 bytes   |     16.67
+ dba_metrics      | table_size_snapshots    |             49152 | 48 kB              |        8192 | 8192 bytes   |     16.67
+ perf             | categories              |             98304 | 96 kB              |        8192 | 8192 bytes   |      8.33
+ perf             | feature_flags           |            122880 | 120 kB             |        8192 | 8192 bytes   |      6.67
+ migration_v1_lab | sales_orders            |            131072 | 128 kB             |        8192 | 8192 bytes   |      6.25
+ migration_v1_lab | parent_accounts         |            811008 | 792 kB             |        8192 | 8192 bytes   |      1.01
+ migration_v1_lab | orders_no_pk            |            892928 | 872 kB             |        8192 | 8192 bytes   |      0.92
+ perf             | addresses               |           1613824 | 1576 kB            |        8192 | 8192 bytes   |      0.51
+ perf             | products                |           2285568 | 2232 kB            |        8192 | 8192 bytes   |      0.36
+ migration_v1_lab | dml_bloat_table         |           4349952 | 4248 kB            |        8192 | 8192 bytes   |      0.19
+ public           | demo_users              |           4505600 | 4400 kB            |        8192 | 8192 bytes   |      0.18
+ perf             | users                   |           4833280 | 4720 kB            |        8192 | 8192 bytes   |      0.17
+ migration_v1_lab | product_catalog         |           6176768 | 6032 kB            |        8192 | 8192 bytes   |      0.13
+ migration_v1_lab | stale_stats_table       |           7954432 | 7768 kB            |        8192 | 8192 bytes   |      0.10
+ perf             | shipments               |          19038208 | 18 MB              |        8192 | 8192 bytes   |      0.04
+ perf             | app_events              |          99270656 | 95 MB              |        8192 | 8192 bytes   |      0.01
+ perf             | order_items             |         122626048 | 117 MB             |           0 | 0 bytes      |      0.00
+ perf             | orders                  |          78512128 | 75 MB              |           0 | 0 bytes      |      0.00
+ migration_v1_lab | child_transactions      |          11051008 | 11 MB              |           0 | 0 bytes      |      0.00
+ perf             | payments                |          87080960 | 83 MB              |           0 | 0 bytes      |      0.00
+ perf             | inventory               |           3497984 | 3416 kB            |           0 | 0 bytes      |      0.00
+ perf             | product_categories      |           2703360 | 2640 kB            |           0 | 0 bytes      |      0.00
+ perf             | sessions                |           1376256 | 1344 kB            |           0 | 0 bytes      |      0.00
+(34 rows)
+

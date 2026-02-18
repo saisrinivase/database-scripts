@@ -1,0 +1,3 @@
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/28_pgss_resource_attribution/01_pgss_query_resource_percent.sql:51: ERROR:  column s.blk_read_time does not exist
+LINE 13:         coalesce(s.blk_read_time, 0) AS blk_read_time,
+                          ^

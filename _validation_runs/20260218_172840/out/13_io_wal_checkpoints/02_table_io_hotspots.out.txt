@@ -1,0 +1,26 @@
+ schema_name |     table_name     | heap_blks_read | heap_blks_hit | idx_blks_read | idx_blks_hit | toast_blks_read | toast_blks_hit | tidx_blks_read | tidx_blks_hit | total_size 
+-------------+--------------------+----------------+---------------+---------------+--------------+-----------------+----------------+----------------+---------------+------------
+ perf        | tenants            |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 32 kB
+ perf        | users              |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 4720 kB
+ perf        | products           |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 2232 kB
+ perf        | payments           |              0 |             0 |             0 |            0 |                 |                |                |               | 83 MB
+ perf        | categories         |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 96 kB
+ perf        | product_categories |              0 |             0 |             0 |            0 |                 |                |                |               | 2640 kB
+ perf        | orders             |              0 |             0 |             0 |            0 |                 |                |                |               | 75 MB
+ perf        | order_items        |              0 |             0 |             0 |            0 |                 |                |                |               | 117 MB
+ perf        | shipments          |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 18 MB
+ perf        | app_events         |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 95 MB
+ perf        | audit_log          |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 24 kB
+ perf        | documents          |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 24 kB
+ perf        | addresses          |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 1576 kB
+ perf        | sessions           |              0 |             0 |             0 |            0 |                 |                |                |               | 1344 kB
+ perf        | feature_flags      |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 120 kB
+ perf        | inventory          |              0 |             0 |             0 |            0 |                 |                |                |               | 3416 kB
+ perf        | support_tickets    |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 16 kB
+ perf        | ticket_comments    |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 16 kB
+ perf        | notifications      |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 16 kB
+ perf        | jobs               |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 16 kB
+ perf        | job_runs           |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 16 kB
+ public      | demo_users         |              0 |             0 |             0 |            0 |               0 |              0 |              0 |             0 | 4400 kB
+(22 rows)
+

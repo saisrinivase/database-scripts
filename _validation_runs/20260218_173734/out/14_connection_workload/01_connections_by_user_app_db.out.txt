@@ -1,0 +1,9 @@
+           database_name           | user_name | application_name | state  | connection_count 
+-----------------------------------+-----------+------------------+--------+------------------
+                                   |           |                  |        |                7
+ appdb                             | saiendla  | dbvis            | idle   |                2
+ postgres                          | saiendla  | dbvis            | idle   |                1
+ script_validation_20260218_172749 | saiendla  | psql             | active |                1
+                                   | saiendla  |                  |        |                1
+(5 rows)
+

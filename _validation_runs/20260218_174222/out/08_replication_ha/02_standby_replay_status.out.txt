@@ -1,0 +1,5 @@
+ is_standby | last_received_lsn | last_replayed_lsn | last_replay_timestamp | replay_delay 
+------------+-------------------+-------------------+-----------------------+--------------
+ f          |                   |                   |                       | 
+(1 row)
+

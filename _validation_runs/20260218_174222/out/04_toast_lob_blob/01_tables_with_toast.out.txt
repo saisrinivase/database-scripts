@@ -1,0 +1,31 @@
+   schema_name    |       table_name        | toast_table_name | toast_total_bytes | toast_total_pretty 
+------------------+-------------------------+------------------+-------------------+--------------------
+ perf             | tenants                 | pg_toast_16391   |              8192 | 8192 bytes
+ perf             | users                   | pg_toast_16404   |              8192 | 8192 bytes
+ perf             | products                | pg_toast_16424   |              8192 | 8192 bytes
+ perf             | categories              | pg_toast_16444   |              8192 | 8192 bytes
+ perf             | shipments               | pg_toast_16544   |              8192 | 8192 bytes
+ perf             | app_events              | pg_toast_16562   |              8192 | 8192 bytes
+ perf             | audit_log               | pg_toast_16576   |              8192 | 8192 bytes
+ perf             | documents               | pg_toast_16590   |              8192 | 8192 bytes
+ perf             | addresses               | pg_toast_16604   |              8192 | 8192 bytes
+ perf             | feature_flags           | pg_toast_16640   |              8192 | 8192 bytes
+ perf             | support_tickets         | pg_toast_16665   |              8192 | 8192 bytes
+ perf             | ticket_comments         | pg_toast_16685   |              8192 | 8192 bytes
+ perf             | notifications           | pg_toast_16704   |              8192 | 8192 bytes
+ perf             | jobs                    | pg_toast_16724   |              8192 | 8192 bytes
+ perf             | job_runs                | pg_toast_16738   |              8192 | 8192 bytes
+ dba_metrics      | table_size_snapshots    | pg_toast_25389   |              8192 | 8192 bytes
+ public           | demo_users              | pg_toast_16841   |              8192 | 8192 bytes
+ dba_metrics      | index_size_snapshots    | pg_toast_25399   |              8192 | 8192 bytes
+ dba_metrics      | connection_snapshots    | pg_toast_25410   |              8192 | 8192 bytes
+ dba_metrics      | database_size_snapshots | pg_toast_25380   |              8192 | 8192 bytes
+ dba_metrics      | wal_snapshots           | pg_toast_25418   |              8192 | 8192 bytes
+ migration_v1_lab | parent_accounts         | pg_toast_25767   |              8192 | 8192 bytes
+ migration_v1_lab | orders_no_pk            | pg_toast_25757   |              8192 | 8192 bytes
+ migration_v1_lab | product_catalog         | pg_toast_25793   |              8192 | 8192 bytes
+ migration_v1_lab | stale_stats_table       | pg_toast_25818   |              8192 | 8192 bytes
+ migration_v1_lab | sales_orders            | pg_toast_25809   |              8192 | 8192 bytes
+ migration_v1_lab | dml_bloat_table         | pg_toast_25828   |              8192 | 8192 bytes
+(27 rows)
+

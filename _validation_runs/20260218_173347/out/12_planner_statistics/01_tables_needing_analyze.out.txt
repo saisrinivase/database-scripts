@@ -1,0 +1,7 @@
+ schema_name |       table_name        | n_live_tup | n_mod_since_analyze | mods_vs_live_pct | last_analyze | last_autoanalyze 
+-------------+-------------------------+------------+---------------------+------------------+--------------+------------------
+ dba_metrics | database_size_snapshots |         14 |                  14 |           100.00 |              | 
+ dba_metrics | connection_snapshots    |          8 |                   8 |           100.00 |              | 
+ dba_metrics | wal_snapshots           |          2 |                   2 |           100.00 |              | 
+(3 rows)
+

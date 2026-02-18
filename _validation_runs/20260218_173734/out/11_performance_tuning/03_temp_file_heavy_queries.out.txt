@@ -1,0 +1,14 @@
+       queryid       | calls | temp_blks_read | temp_blks_written | temp_bytes_written | temp_written_pretty |  mean_exec_time   |                            query_snippet                             
+---------------------+-------+----------------+-------------------+--------------------+---------------------+-------------------+----------------------------------------------------------------------
+ 7127220720807722591 |     1 |            206 |               206 |            1687552 | 1648 kB             |        566.599292 | INSERT INTO migration_v1_lab.child_transactions (account_id, amount)+
+                     |       |                |                   |                    |                     |                   | SELECT                                                              +
+                     |       |                |                   |                    |                     |                   |     ($1 + (random() * $2)::int)::bigint,                            +
+                     |       |                |                   |                    |                     |                   |     round((random() * $3)::numeric, $4)                             +
+                     |       |                |                   |                    |                     |                   | FROM generate_series($5, $6)
+ 7127220720807722591 |     1 |            206 |               206 |            1687552 | 1648 kB             | 614.6653319999999 | INSERT INTO migration_v1_lab.child_transactions (account_id, amount)+
+                     |       |                |                   |                    |                     |                   | SELECT                                                              +
+                     |       |                |                   |                    |                     |                   |     ($1 + (random() * $2)::int)::bigint,                            +
+                     |       |                |                   |                    |                     |                   |     round((random() * $3)::numeric, $4)                             +
+                     |       |                |                   |                    |                     |                   | FROM generate_series($5, $6)
+(2 rows)
+

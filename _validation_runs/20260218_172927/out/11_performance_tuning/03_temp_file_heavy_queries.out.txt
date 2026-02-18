@@ -1,0 +1,4 @@
+ queryid | calls | temp_blks_read | temp_blks_written | temp_bytes_written | temp_written_pretty | mean_exec_time | query_snippet 
+---------+-------+----------------+-------------------+--------------------+---------------------+----------------+---------------
+(0 rows)
+

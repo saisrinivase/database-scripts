@@ -1,0 +1,16 @@
+/*
+Purpose: Show write-heavy tables with dead tuple pressure (bloat risk).
+Area: Optimizing Data Modification
+Usage: Candidate list for VACUUM tuning and batch rewrite strategies.
+*/
+SELECT
+    schemaname AS schema_name,
+    relname AS table_name,
+    n_live_tup,
+    n_dead_tup,
+    round(100.0 * n_dead_tup / NULLIF(n_live_tup + n_dead_tup, 0), 2) AS dead_tuple_pct,
+    (n_tup_ins + n_tup_upd + n_tup_del) AS total_writes,
+    pg_size_pretty(pg_total_relation_size(relid)) AS total_size
+FROM pg_stat_user_tables
+WHERE n_dead_tup > 0
+ORDER BY dead_tuple_pct DESC NULLS LAST, total_writes DESC;

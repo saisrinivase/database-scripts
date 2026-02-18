@@ -1,0 +1,4 @@
+ schema_name | table_name | reloptions 
+-------------+------------+------------
+(0 rows)
+

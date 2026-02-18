@@ -1,0 +1,21 @@
+/*
+Purpose: Capture table-level size and tuple estimates for growth trending.
+Area: Capacity Forecasting
+Usage: Schedule periodically; can be heavy on very large catalogs.
+*/
+INSERT INTO dba_metrics.table_size_snapshots (
+    captured_at,
+    schema_name,
+    table_name,
+    total_bytes,
+    estimated_live_rows,
+    estimated_dead_rows
+)
+SELECT
+    now() AS captured_at,
+    s.schemaname AS schema_name,
+    s.relname AS table_name,
+    pg_total_relation_size(s.relid) AS total_bytes,
+    s.n_live_tup AS estimated_live_rows,
+    s.n_dead_tup AS estimated_dead_rows
+FROM pg_stat_user_tables s;

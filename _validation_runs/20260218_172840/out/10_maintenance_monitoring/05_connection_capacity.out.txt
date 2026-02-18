@@ -1,0 +1,5 @@
+ max_connections | total_connections | active_connections | idle_connections | idle_in_txn_connections | pct_used 
+-----------------+-------------------+--------------------+------------------+-------------------------+----------
+             100 |                10 |                  1 |                1 |                       0 |    10.00
+(1 row)
+

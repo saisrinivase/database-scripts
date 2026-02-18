@@ -1,0 +1,4 @@
+ table_schema | table_name | trigger_name | function_schema | function_name | tgenabled | trigger_def 
+--------------+------------+--------------+-----------------+---------------+-----------+-------------
+(0 rows)
+

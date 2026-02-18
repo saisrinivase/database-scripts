@@ -1,0 +1,10 @@
+           database_name           | xact_commit | xact_rollback | blks_read | blks_hit  | temp_files | temp_bytes | deadlocks | blk_read_time | blk_write_time | numbackends | recommendation 
+-----------------------------------+-------------+---------------+-----------+-----------+------------+------------+-----------+---------------+----------------+-------------+----------------
+ pgbench_test                      |     5349076 |             2 |  14208247 | 141642558 |          6 | 4008443904 |         0 |             0 |              0 |           0 | Normal/Mild
+ hypopg_lab                        |        8345 |             0 |      4016 |    317740 |          0 |          0 |         0 |             0 |              0 |           0 | Normal/Mild
+ appdb                             |        9026 |             9 |      1541 |    326331 |          0 |          0 |         0 |             0 |              0 |           2 | Normal/Mild
+ postgres                          |        8921 |             8 |      1476 |    387174 |          0 |          0 |         0 |             0 |              0 |           2 | Normal/Mild
+ perf_test                         |        8357 |             2 |      1103 |    316607 |          0 |          0 |         0 |             0 |              0 |           0 | Normal/Mild
+ script_validation_20260218_172749 |         840 |            20 |       295 |    389324 |          0 |          0 |         0 |             0 |              0 |           1 | Normal/Mild
+(6 rows)
+

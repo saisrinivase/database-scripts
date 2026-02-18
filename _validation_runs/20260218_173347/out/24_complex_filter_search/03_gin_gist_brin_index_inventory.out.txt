@@ -1,0 +1,4 @@
+ schema_name | table_name | index_name | access_method | index_size 
+-------------+------------+------------+---------------+------------
+(0 rows)
+

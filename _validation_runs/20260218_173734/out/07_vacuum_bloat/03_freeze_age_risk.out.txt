@@ -1,0 +1,38 @@
+   schema_name    |       table_name        | relfrozenxid_age | toast_relfrozenxid_age | total_size 
+------------------+-------------------------+------------------+------------------------+------------
+ perf             | tenants                 |          5333186 |                5333186 | 32 kB
+ perf             | audit_log               |          5333176 |                5333176 | 24 kB
+ perf             | documents               |          5333175 |                5333175 | 24 kB
+ perf             | support_tickets         |          5333170 |                5333170 | 16 kB
+ perf             | ticket_comments         |          5333169 |                5333169 | 16 kB
+ perf             | notifications           |          5333168 |                5333168 | 16 kB
+ perf             | jobs                    |          5333167 |                5333167 | 16 kB
+ perf             | job_runs                |          5333166 |                5333166 | 16 kB
+ perf             | users                   |          5333150 |                5333185 | 4720 kB
+ perf             | products                |          5333149 |                5333184 | 2232 kB
+ perf             | payments                |          5333148 |                        | 83 MB
+ perf             | categories              |          5333147 |                5333183 | 96 kB
+ perf             | product_categories      |          5333146 |                        | 2640 kB
+ perf             | orders                  |          5333145 |                        | 75 MB
+ perf             | order_items             |          5333145 |                        | 117 MB
+ perf             | shipments               |          5333144 |                5333178 | 18 MB
+ perf             | addresses               |          5333143 |                5333174 | 1576 kB
+ perf             | app_events              |          5333143 |                5333177 | 95 MB
+ perf             | sessions                |          5333142 |                        | 1344 kB
+ perf             | feature_flags           |          5333141 |                5333172 | 120 kB
+ perf             | inventory               |          5333140 |                        | 3416 kB
+ public           | demo_users              |          5333122 |                5333123 | 4400 kB
+ dba_metrics      | database_size_snapshots |              144 |                    144 | 16 kB
+ dba_metrics      | table_size_snapshots    |              143 |                    143 | 48 kB
+ dba_metrics      | index_size_snapshots    |              142 |                    142 | 48 kB
+ dba_metrics      | connection_snapshots    |              141 |                    141 | 16 kB
+ dba_metrics      | wal_snapshots           |              140 |                    140 | 16 kB
+ migration_v1_lab | orders_no_pk            |               81 |                     82 | 872 kB
+ migration_v1_lab | parent_accounts         |               76 |                     78 | 792 kB
+ migration_v1_lab | child_transactions      |               75 |                        | 11 MB
+ migration_v1_lab | product_catalog         |               73 |                     74 | 6032 kB
+ migration_v1_lab | sales_orders            |               70 |                     70 | 128 kB
+ migration_v1_lab | stale_stats_table       |               66 |                     68 | 7768 kB
+ migration_v1_lab | dml_bloat_table         |               63 |                     46 | 4248 kB
+(34 rows)
+

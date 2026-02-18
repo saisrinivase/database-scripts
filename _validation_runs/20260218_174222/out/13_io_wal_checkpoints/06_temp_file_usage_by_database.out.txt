@@ -1,0 +1,10 @@
+           database_name           | temp_files | temp_bytes | temp_pretty | xact_commit | xact_rollback | stats_reset 
+-----------------------------------+------------+------------+-------------+-------------+---------------+-------------
+ pgbench_test                      |          6 | 4008443904 | 3823 MB     |     5349092 |             2 | 
+ postgres                          |          3 |    5040000 | 4922 kB     |        9325 |             8 | 
+ script_validation_20260218_172749 |          2 |    3360000 | 3281 kB     |        1788 |            24 | 
+ perf_test                         |          0 |          0 | 0 bytes     |        8373 |             2 | 
+ appdb                             |          0 |          0 | 0 bytes     |        9042 |             9 | 
+ hypopg_lab                        |          0 |          0 | 0 bytes     |        8365 |             0 | 
+(6 rows)
+

@@ -1,0 +1,11 @@
+         backend_type         | backend_count 
+------------------------------+---------------
+ io worker                    |             3
+ client backend               |             2
+ autovacuum launcher          |             1
+ background writer            |             1
+ checkpointer                 |             1
+ logical replication launcher |             1
+ walwriter                    |             1
+(7 rows)
+

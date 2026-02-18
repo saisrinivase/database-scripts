@@ -1,0 +1,3 @@
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/13_io_wal_checkpoints/05_checkpoint_pressure_indicators.sql:18: ERROR:  column "checkpoints_timed" does not exist
+LINE 7:     checkpoints_timed,
+            ^

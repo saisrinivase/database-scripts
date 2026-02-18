@@ -1,0 +1,12 @@
+           database_name           | size_bytes  | size_pretty 
+-----------------------------------+-------------+-------------
+ pgbench_test                      | 32018454207 | 30 GB
+ script_validation_20260218_172749 |   436573887 | 416 MB
+ perf_test                         |   436410047 | 416 MB
+ hypopg_lab                        |    36173503 | 34 MB
+ postgres                          |     8140479 | 7950 kB
+ appdb                             |     8066751 | 7878 kB
+ template1                         |     8033983 | 7846 kB
+ template0                         |     7791119 | 7609 kB
+(8 rows)
+

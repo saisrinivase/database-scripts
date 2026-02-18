@@ -1,0 +1,12 @@
+ wait_event_type |      wait_event      | state  | session_count 
+-----------------+----------------------+--------+---------------
+ Activity        | IoWorkerMain         |        |             3
+ Activity        | AutovacuumMain       |        |             1
+ Activity        | BgwriterHibernate    |        |             1
+ Activity        | LogicalLauncherMain  |        |             1
+ Activity        | WalWriterMain        |        |             1
+ Client          | ClientRead           | idle   |             1
+ CPU/None        | CPU/None             | active |             1
+ Timeout         | CheckpointWriteDelay |        |             1
+(8 rows)
+

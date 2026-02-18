@@ -1,0 +1,40 @@
+# Internals Coverage Matrix
+
+Purpose: Map administration topics to PostgreSQL internals sources and ready-to-run scripts.
+
+## Topic Coverage
+
+| Topic | Core Internals Sources | Primary Scripts |
+|---|---|---|
+| Instance baseline | `version()`, `pg_postmaster_start_time()`, `pg_settings` | `00_environment/01_server_instance_overview.sql` |
+| Extension baseline | `pg_extension`, `pg_namespace` | `00_environment/02_extensions_installed.sql` |
+| Catalog object footprint | `pg_class`, `pg_namespace` | `00_environment/03_database_catalog_overview.sql`, `16_internals_deep_dive/03_system_catalog_size_profile.sql` |
+| Database size | `pg_database`, `pg_database_size()` | `01_database_size/01_databases_size.sql` |
+| Tablespace size | `pg_tablespace`, `pg_tablespace_size()` | `01_database_size/03_tablespaces_size.sql` |
+| Table/index/TOAST composition | `pg_class`, `pg_relation_size()`, `pg_indexes_size()` | `02_table_storage/01_table_size_breakdown.sql`, `16_internals_deep_dive/05_fsm_vm_toast_size_breakdown.sql` |
+| Index usage/utilization | `pg_stat_user_indexes`, `pg_index` | `03_index_analysis/01_index_size_and_usage.sql`, `03_index_analysis/02_unused_indexes_candidates.sql` |
+| Duplicate index internals | `pg_index` metadata vectors | `03_index_analysis/03_duplicate_indexes.sql` |
+| TOAST internals | `pg_class.reltoastrelid` | `04_toast_lob_blob/01_tables_with_toast.sql`, `04_toast_lob_blob/02_toast_heavy_tables.sql` |
+| Large object (BLOB/LOB) footprint | `pg_largeobject` | `04_toast_lob_blob/03_large_objects_summary.sql`, `04_toast_lob_blob/04_top_large_objects.sql` |
+| Partition metadata | `pg_inherits`, `pg_get_partkeydef()` | `05_partitioning/01_partitioned_tables_overview.sql` |
+| Session/lock internals | `pg_stat_activity`, `pg_blocking_pids()` | `06_activity_locks/01_active_sessions.sql`, `06_activity_locks/02_blocking_and_blocked_sessions.sql` |
+| Vacuum/bloat internals | `pg_stat_user_tables`, `relfrozenxid`, `pg_stat_progress_vacuum` | `07_vacuum_bloat/01_table_bloat_estimate.sql`, `07_vacuum_bloat/03_freeze_age_risk.sql`, `07_vacuum_bloat/05_vacuum_progress.sql` |
+| Replication state | `pg_stat_replication`, `pg_is_in_recovery()` | `08_replication_ha/01_primary_replication_status.sql`, `08_replication_ha/02_standby_replay_status.sql` |
+| Replication slot retention | `pg_replication_slots`, LSN diff functions | `08_replication_ha/03_replication_slots_health.sql` |
+| WAL internals | `pg_stat_wal`, `pg_stat_archiver`, LSN functions | `08_replication_ha/04_wal_generation_rate.sql`, `13_io_wal_checkpoints/04_wal_archiver_health.sql` |
+| Security/privilege internals | `pg_roles`, `pg_auth_members`, `pg_default_acl`, `information_schema` | `09_security_roles/*.sql` |
+| Checkpoints and writer internals | `pg_stat_bgwriter` | `10_maintenance_monitoring/01_bgwriter_checkpoint_stats.sql`, `13_io_wal_checkpoints/05_checkpoint_pressure_indicators.sql` |
+| Query-level performance | `pg_stat_statements`, `pg_stat_user_functions` | `11_performance_tuning/*.sql` |
+| Planner stats health | `pg_stat_user_tables`, `pg_stats`, `pg_statistic_ext` | `12_planner_statistics/*.sql` |
+| I/O internals | `pg_stat_database`, `pg_statio_*`, `pg_stat_io` | `13_io_wal_checkpoints/*.sql` |
+| Connection behavior internals | `pg_stat_activity`, `pg_roles`, `pg_prepared_xacts` | `14_connection_workload/*.sql` |
+| Capacity trend internals | Snapshot tables + runtime stats views | `15_capacity_forecasting/*.sql` |
+| XID/multixact aging | `pg_database.datfrozenxid`, `datminmxid`, `pg_class.relfrozenxid` | `16_internals_deep_dive/01_database_xid_multixact_age.sql`, `16_internals_deep_dive/06_visibility_and_freeze_profile.sql` |
+| Storage file mapping | `pg_relation_filenode()`, `pg_relation_filepath()` | `16_internals_deep_dive/02_relation_filenode_mapping.sql` |
+| Dependency graph internals | `pg_depend` | `16_internals_deep_dive/04_dependency_fanout_objects.sql` |
+
+## Gaps to Expand Next
+
+- Backup/restore validation (`pg_backup_start`, archive restore checks, recovery verification).
+- DDL/event auditing baselines (event triggers and schema drift history).
+- Per-application service-level dashboards (latency/error budgets from SQL counters).

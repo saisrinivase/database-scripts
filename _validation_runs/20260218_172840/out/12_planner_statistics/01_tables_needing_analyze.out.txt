@@ -1,0 +1,4 @@
+ schema_name | table_name | n_live_tup | n_mod_since_analyze | mods_vs_live_pct | last_analyze | last_autoanalyze 
+-------------+------------+------------+---------------------+------------------+--------------+------------------
+(0 rows)
+

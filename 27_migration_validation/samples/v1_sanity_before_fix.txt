@@ -1,0 +1,24 @@
+Pager usage is off.
+DROP TABLE
+CREATE TABLE
+INSERT 0 7
+Title is "V1 Sanity Check Results".
+                                                                      V1 Sanity Check Results
+             check_name              | status | observed_value | expected_value |                                  recommendation                                   
+-------------------------------------+--------+----------------+----------------+-----------------------------------------------------------------------------------
+ DEAD_TUPLE_PRESSURE_CLEAR           | FAIL   | 1              | 0              | Run VACUUM (ANALYZE) and keep autovacuum enabled.
+ FK_INDEX_PRESENT_child_transactions | FAIL   | missing        | present        | Create index on migration_v1_lab.child_transactions(account_id).
+ NO_DUPLICATE_SKU_INDEX              | FAIL   | 2              | 1              | Drop one duplicate index on migration_v1_lab.product_catalog(sku).
+ NO_UPPERCASE_OBJECTS_IN_LAB         | FAIL   | 2              | 0              | Rename objects to lowercase unless quoted identifiers are intentionally required.
+ PK_PRESENT_orders_no_pk             | FAIL   | missing        | present        | Add primary key on migration_v1_lab.orders_no_pk(order_id).
+ SEQUENCE_OWNED_BY_COLUMN            | FAIL   | unowned        | owned          | Run ALTER SEQUENCE ... OWNED BY ... to bind sequence lifecycle.
+ STALE_STATS_TABLE_HEALTH            | FAIL   | 1              | 0              | Run ANALYZE and keep autoanalyze enabled.
+(7 rows)
+
+Title is "V1 Sanity Summary".
+                     V1 Sanity Summary
+ total_checks | passed_checks | failed_checks | all_passed 
+--------------+---------------+---------------+------------
+            7 |             0 |             7 | NO
+(1 row)
+

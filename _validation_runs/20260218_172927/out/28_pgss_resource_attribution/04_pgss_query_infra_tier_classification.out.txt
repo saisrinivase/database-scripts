@@ -1,0 +1,3 @@
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/28_pgss_resource_attribution/04_pgss_query_infra_tier_classification.sql:43: ERROR:  column s.blk_read_time does not exist
+LINE 11:         greatest(s.total_exec_time - coalesce(s.blk_read_tim...
+                                                       ^

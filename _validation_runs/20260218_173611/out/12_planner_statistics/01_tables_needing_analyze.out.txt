@@ -1,0 +1,9 @@
+ schema_name |       table_name        | n_live_tup | n_mod_since_analyze | mods_vs_live_pct | last_analyze |       last_autoanalyze        
+-------------+-------------------------+------------+---------------------+------------------+--------------+-------------------------------
+ dba_metrics | index_size_snapshots    |        102 |                  34 |            33.33 |              | 2026-02-18 17:29:34.45373-05
+ dba_metrics | table_size_snapshots    |         81 |                  27 |            33.33 |              | 2026-02-18 17:29:34.451723-05
+ dba_metrics | database_size_snapshots |         21 |                  21 |           100.00 |              | 
+ dba_metrics | connection_snapshots    |         14 |                  14 |           100.00 |              | 
+ dba_metrics | wal_snapshots           |          3 |                   3 |           100.00 |              | 
+(5 rows)
+

@@ -1,0 +1,4 @@
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/28_pgss_resource_attribution/03_pgss_resource_percent_by_user.sql:64: ERROR:  function round(double precision, integer) does not exist
+LINE 58:     round(100.0 * a.total_exec_time / NULLIF(t.all_exec, 0),...
+             ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.

@@ -1,0 +1,26 @@
+ schema_name |     table_name     | relation_options 
+-------------+--------------------+------------------
+ perf        | addresses          | 
+ perf        | app_events         | 
+ perf        | audit_log          | 
+ perf        | categories         | 
+ perf        | documents          | 
+ perf        | feature_flags      | 
+ perf        | inventory          | 
+ perf        | job_runs           | 
+ perf        | jobs               | 
+ perf        | notifications      | 
+ perf        | order_items        | 
+ perf        | orders             | 
+ perf        | payments           | 
+ perf        | product_categories | 
+ perf        | products           | 
+ perf        | sessions           | 
+ perf        | shipments          | 
+ perf        | support_tickets    | 
+ perf        | tenants            | 
+ perf        | ticket_comments    | 
+ perf        | users              | 
+ public      | demo_users         | 
+(22 rows)
+

@@ -1,0 +1,18 @@
+ schema_name |      table_name      |     column_name     | null_frac | n_distinct  | correlation  | mcv_count | histogram_bins 
+-------------+----------------------+---------------------+-----------+-------------+--------------+-----------+----------------
+ dba_metrics | index_size_snapshots | captured_at         |         0 |           2 |            1 |         2 |               
+ dba_metrics | index_size_snapshots | idx_scan            |         0 |           1 |            1 |         1 |               
+ dba_metrics | index_size_snapshots | index_bytes         |         0 |  -0.3382353 |  0.041569646 |        23 |               
+ dba_metrics | index_size_snapshots | index_name          |         0 |        -0.5 |  -0.16169791 |        34 |               
+ dba_metrics | index_size_snapshots | schema_name         |         0 |           2 |    0.9221285 |         2 |               
+ dba_metrics | index_size_snapshots | table_name          |         0 | -0.32352942 |  -0.15192579 |        22 |               
+ dba_metrics | table_size_snapshots | captured_at         |         0 |           2 |            1 |         2 |               
+ dba_metrics | table_size_snapshots | estimated_dead_rows |         0 |           1 |            1 |         1 |               
+ dba_metrics | table_size_snapshots | estimated_live_rows |         0 | -0.12962963 |    0.8909853 |         1 |              6
+ dba_metrics | table_size_snapshots | schema_name         |         0 |           3 |    0.6920907 |         3 |               
+ dba_metrics | table_size_snapshots | table_name          |         0 |        -0.5 | -0.118886985 |        27 |               
+ dba_metrics | table_size_snapshots | total_bytes         |         0 | -0.33333334 |   0.18322851 |        18 |               
+ public      | demo_users           | id                  |         0 |          -1 |            1 |           |            101
+ public      | demo_users           | username            |         0 |           3 |   0.33481345 |         3 |               
+(14 rows)
+

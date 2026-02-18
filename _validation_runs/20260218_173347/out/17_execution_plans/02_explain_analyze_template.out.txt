@@ -1,0 +1,11 @@
+                                      QUERY PLAN                                       
+---------------------------------------------------------------------------------------
+ Result  (cost=0.00..0.01 rows=1 width=4) (actual time=0.001..0.001 rows=1.00 loops=1)
+   Output: 1
+ Query Identifier: -3688696628780506391
+ Planning:
+   Buffers: shared hit=3
+ Planning Time: 0.066 ms
+ Execution Time: 0.032 ms
+(7 rows)
+

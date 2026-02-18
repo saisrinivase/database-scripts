@@ -1,0 +1,31 @@
+ schema_name |       table_name        | seq_scan | idx_scan | n_live_tup | seq_scan_pct | total_size 
+-------------+-------------------------+----------+----------+------------+--------------+------------
+ dba_metrics | table_size_snapshots    |        3 |          |         81 |              | 16 kB
+ dba_metrics | database_size_snapshots |        3 |          |         21 |              | 16 kB
+ perf        | orders                  |        0 |        0 |          0 |              | 75 MB
+ dba_metrics | connection_snapshots    |        0 |          |         14 |              | 16 kB
+ perf        | product_categories      |        0 |        0 |          0 |              | 2640 kB
+ perf        | ticket_comments         |        0 |        0 |          0 |              | 16 kB
+ perf        | tenants                 |        0 |        0 |          0 |              | 32 kB
+ perf        | addresses               |        0 |        0 |          0 |              | 1576 kB
+ perf        | job_runs                |        0 |        0 |          0 |              | 16 kB
+ perf        | products                |        0 |        0 |          0 |              | 2232 kB
+ perf        | sessions                |        0 |        0 |          0 |              | 1344 kB
+ perf        | audit_log               |        0 |        0 |          0 |              | 24 kB
+ dba_metrics | index_size_snapshots    |        0 |          |        102 |              | 48 kB
+ perf        | documents               |        0 |        0 |          0 |              | 24 kB
+ perf        | users                   |        0 |        0 |          0 |              | 4720 kB
+ perf        | order_items             |        0 |        0 |          0 |              | 117 MB
+ perf        | payments                |        0 |        0 |          0 |              | 83 MB
+ perf        | app_events              |        0 |        0 |          0 |              | 95 MB
+ public      | demo_users              |        0 |        0 |          0 |              | 4400 kB
+ perf        | inventory               |        0 |        0 |          0 |              | 3416 kB
+ perf        | jobs                    |        0 |        0 |          0 |              | 16 kB
+ perf        | feature_flags           |        0 |        0 |          0 |              | 120 kB
+ perf        | notifications           |        0 |        0 |          0 |              | 16 kB
+ dba_metrics | wal_snapshots           |        0 |          |          3 |              | 16 kB
+ perf        | shipments               |        0 |        0 |          0 |              | 18 MB
+ perf        | categories              |        0 |        0 |          0 |              | 96 kB
+ perf        | support_tickets         |        0 |        0 |          0 |              | 16 kB
+(27 rows)
+

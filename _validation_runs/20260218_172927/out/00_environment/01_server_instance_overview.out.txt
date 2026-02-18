@@ -1,0 +1,5 @@
+           database_name           | login_role |                                                        server_version                                                        | server_version_num |     postmaster_start_time     |    instance_uptime     |         data_directory          |                   config_file                   |                  hba_file                   
+-----------------------------------+------------+------------------------------------------------------------------------------------------------------------------------------+--------------------+-------------------------------+------------------------+---------------------------------+-------------------------------------------------+---------------------------------------------
+ script_validation_20260218_172749 | saiendla   | PostgreSQL 18.0 (Homebrew) on aarch64-apple-darwin25.0.0, compiled by Apple clang version 17.0.0 (clang-1700.3.19.1), 64-bit | 180000             | 2026-02-10 09:32:09.191307-05 | 8 days 07:57:18.572048 | /opt/homebrew/var/postgresql@18 | /opt/homebrew/var/postgresql@18/postgresql.conf | /opt/homebrew/var/postgresql@18/pg_hba.conf
+(1 row)
+
