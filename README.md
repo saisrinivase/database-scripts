@@ -1,4 +1,4 @@
-# PostgreSQL Administration Script Library (360-Degree)
+# saisrinivase - PostgreSQL Administration Scripts (360-Degree)
 
 Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 
