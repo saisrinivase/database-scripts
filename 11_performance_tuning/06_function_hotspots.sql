@@ -13,3 +13,14 @@ SELECT
 FROM pg_stat_user_functions
 ORDER BY total_time DESC
 LIMIT 100;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | function_name | calls | total_time | self_time | mean_time 
+-------------+---------------+-------+------------+-----------+-----------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

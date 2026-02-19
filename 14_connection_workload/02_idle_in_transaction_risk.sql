@@ -19,3 +19,14 @@ SELECT
 FROM pg_stat_activity
 WHERE state = 'idle in transaction'
 ORDER BY xact_age DESC NULLS LAST;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ pid | database_name | user_name | application_name | client_addr | xact_start | state_change | xact_age | idle_in_txn_age | wait_event_type | wait_event | query_snippet 
+-----+---------------+-----------+------------------+-------------+------------+--------------+----------+-----------------+-----------------+------------+---------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

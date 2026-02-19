@@ -71,3 +71,15 @@ SELECT
     ) AS suggested_index_sql
 FROM missing
 ORDER BY seq_tup_read DESC, est_rows DESC, schema_name, table_name, column_name;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+   schema_name    | table_name | column_name | est_rows | seq_scan | idx_scan | seq_tup_read | n_distinct  |                                       suggested_index_sql                                        
+------------------+------------+-------------+----------+----------+----------+--------------+-------------+--------------------------------------------------------------------------------------------------
+ migration_v2_lab | order_fact | account_id  |   300000 |       11 |        0 |      1200000 | -0.14875667 | CREATE INDEX CONCURRENTLY idx_order_fact_account_id ON migration_v2_lab.order_fact (account_id);
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

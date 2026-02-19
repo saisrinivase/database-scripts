@@ -14,3 +14,14 @@ LEFT JOIN pg_namespace n
 JOIN pg_roles r
     ON r.oid = d.defaclrole
 ORDER BY schema_name NULLS FIRST, owner_role, object_type;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | owner_role | object_type | default_acl 
+-------------+------------+-------------+-------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

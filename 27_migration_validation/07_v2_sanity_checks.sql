@@ -320,3 +320,39 @@ SELECT
     count(*) FILTER (WHERE status = 'FAIL') AS failed_checks,
     CASE WHEN count(*) FILTER (WHERE status = 'FAIL') = 0 THEN 'YES' ELSE 'NO' END AS all_passed
 FROM tmp_v2_sanity_results;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+Pager usage is off.
+DROP TABLE
+CREATE TABLE
+CREATE FUNCTION
+INSERT 0 11
+Title is "V2 Sanity Check Results".
+                                                                               V2 Sanity Check Results
+                    check_name                     | status | observed_value | expected_value |                                    recommendation                                    
+---------------------------------------------------+--------+----------------+----------------+--------------------------------------------------------------------------------------
+ DEAD_TUPLE_PRESSURE_CLEAR                         | PASS   | 0              | 0              | Run VACUUM (ANALYZE) and keep autovacuum enabled.
+ EMPTY_STRING_MISMATCH_CLEAR                       | PASS   | 0              | 0              | Normalize Oracle-style empty strings to NULL where semantics require NULL.
+ FILTER_INDEX_PRESENT_order_fact_filter_key        | PASS   | present        | present        | Create index on migration_v2_lab.order_fact(filter_key).
+ FK_INDEX_PRESENT_child_events_account_id          | PASS   | present        | present        | Create index on migration_v2_lab.child_events(account_id).
+ NO_DUPLICATE_sales_catalog_item_ref               | PASS   | 1              | 1              | Drop one duplicate index on migration_v2_lab.sales_catalog(item_ref).
+ NO_UPPERCASE_OBJECTS_IN_V2_SCHEMA                 | PASS   | 0              | 0              | Rename uppercase quoted objects unless intentionally required.
+ NUMERIC_MAPPING_RISK_CLEAR                        | PASS   | 0              | 0              | Map out-of-int4 values to bigint/numeric target columns.
+ PK_PRESENT_customer_staging_no_pk                 | PASS   | present        | present        | Add primary key on migration_v2_lab.customer_staging_no_pk(staging_id).
+ SEARCH_INDEX_PRESENT_order_fact_lower_search_text | PASS   | present        | present        | Create functional index on lower(search_text) for case-insensitive search workloads.
+ SEQUENCE_OWNED_orphan_order_seq                   | PASS   | owned          | owned          | Attach sequence ownership using ALTER SEQUENCE ... OWNED BY ... .
+ STALE_STATS_TABLE_HEALTH                          | PASS   | 0              | 0              | Run ANALYZE and keep autoanalyze enabled.
+(11 rows)
+
+Title is "V2 Sanity Summary".
+                     V2 Sanity Summary
+ total_checks | passed_checks | failed_checks | all_passed 
+--------------+---------------+---------------+------------
+           11 |            11 |             0 | YES
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

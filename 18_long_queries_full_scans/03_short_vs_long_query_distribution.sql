@@ -29,3 +29,18 @@ ORDER BY
         WHEN 'Long (100ms-1s)' THEN 3
         ELSE 4
     END;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+      bucket       | statement_count | total_calls | total_exec_time_ms 
+-------------------+-----------------+-------------+--------------------
+ Short (<10ms)     |             346 |    38060766 | 21136572.523184724
+ Medium (10-100ms) |              27 |          95 | 2270.3437449999997
+ Long (100ms-1s)   |              15 |          45 |  9995.503952999998
+ Very long (>1s)   |               1 |           1 |        1674.504167
+(4 rows)
+
+
+SAMPLE_OUTPUT_END */

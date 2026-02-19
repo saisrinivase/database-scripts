@@ -57,3 +57,15 @@ FROM user_types t
 LEFT JOIN col_usage c ON c.type_oid = t.type_oid
 LEFT JOIN enum_labels e ON e.type_oid = t.type_oid
 ORDER BY t.schema_name, t.type_kind, t.type_name;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+   schema_name    |     type_name     | type_kind | typcategory | used_in_column_count |     enum_labels      
+------------------+-------------------+-----------+-------------+----------------------+----------------------
+ migration_v2_lab | order_status_enum | ENUM      | E           |                    0 | NEW, PAID, CANCELLED
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

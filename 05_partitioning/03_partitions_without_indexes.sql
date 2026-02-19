@@ -29,3 +29,14 @@ LEFT JOIN child_index_count ci
     ON ci.indrelid = c.oid
 WHERE coalesce(ci.index_count, 0) = 0
 ORDER BY parent_schema, parent_table, partition_schema, partition_name;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ parent_schema | parent_table | partition_schema | partition_name | index_count 
+---------------+--------------+------------------+----------------+-------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

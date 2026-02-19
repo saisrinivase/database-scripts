@@ -20,3 +20,11 @@ SELECT
     count(*)::int AS connection_count
 FROM pg_stat_activity
 GROUP BY datname, usename, application_name, state;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+INSERT 0 5
+
+SAMPLE_OUTPUT_END */

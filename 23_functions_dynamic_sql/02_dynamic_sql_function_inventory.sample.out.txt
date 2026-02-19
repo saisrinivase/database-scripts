@@ -1,4 +1,0 @@
- schema_name | function_name | function_args | language_name | security_definer | has_dynamic_sql 
--------------+---------------+---------------+---------------+------------------+-----------------
-(0 rows)
-

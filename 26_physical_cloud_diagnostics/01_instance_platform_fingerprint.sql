@@ -18,3 +18,15 @@ SELECT
         WHEN version() ILIKE '%azure%' THEN 'Azure PostgreSQL hint'
         ELSE 'Self-managed or unknown managed service'
     END AS platform_hint;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+                                                        version_string                                                        | server_version_num |         data_directory          |                   config_file                   |                  hba_file                   |     postmaster_start_time     |       uptime        |              platform_hint              
+------------------------------------------------------------------------------------------------------------------------------+--------------------+---------------------------------+-------------------------------------------------+---------------------------------------------+-------------------------------+---------------------+-----------------------------------------
+ PostgreSQL 18.0 (Homebrew) on aarch64-apple-darwin25.0.0, compiled by Apple clang version 17.0.0 (clang-1700.3.19.1), 64-bit | 180000             | /opt/homebrew/var/postgresql@18 | /opt/homebrew/var/postgresql@18/postgresql.conf | /opt/homebrew/var/postgresql@18/pg_hba.conf | 2026-02-10 09:32:09.191307-05 | 8 days 08:11:05.223 | Self-managed or unknown managed service
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

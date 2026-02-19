@@ -16,3 +16,14 @@ LEFT JOIN pg_inherits i
 WHERE pc.relkind = 'p'
 GROUP BY pn.nspname, pc.relname, pc.oid
 ORDER BY partition_count DESC, parent_schema, partitioned_table;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ parent_schema | partitioned_table | partition_key | partition_count 
+---------------+-------------------+---------------+-----------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

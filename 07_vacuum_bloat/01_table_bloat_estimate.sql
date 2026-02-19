@@ -26,3 +26,14 @@ SELECT
 FROM stats
 WHERE n_dead_tup > 0
 ORDER BY est_bloat_bytes DESC NULLS LAST;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | table_name | total_bytes | total_pretty | n_live_tup | n_dead_tup | dead_tuple_pct | est_bloat_bytes | est_bloat_pretty 
+-------------+------------+-------------+--------------+------------+------------+----------------+-----------------+------------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

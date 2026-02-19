@@ -1,5 +1,0 @@
- object_type |           object_identity            |         risk_flag          |                             recommendation                              
--------------+--------------------------------------+----------------------------+-------------------------------------------------------------------------
- INDEX       | migration_v2_lab."QuotedOrders_pkey" | QUOTED_IDENTIFIER_REQUIRED | Consider renaming to lower_snake_case to reduce query/tooling friction.
-(1 row)
-

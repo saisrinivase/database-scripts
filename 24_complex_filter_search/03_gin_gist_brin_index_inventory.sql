@@ -22,3 +22,14 @@ WHERE n.nspname !~ '^pg_'
   AND n.nspname <> 'information_schema'
   AND am.amname IN ('gin', 'gist', 'brin')
 ORDER BY access_method, pg_relation_size(i.oid) DESC;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | table_name | index_name | access_method | index_size 
+-------------+------------+------------+---------------+------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

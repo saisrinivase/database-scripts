@@ -16,3 +16,14 @@ SELECT
 FROM pg_stat_user_tables
 WHERE n_tup_upd > 0
 ORDER BY hot_update_pct ASC NULLS LAST, n_tup_upd DESC;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | table_name | n_tup_upd | n_tup_hot_upd | hot_update_pct | total_size 
+-------------+------------+-----------+---------------+----------------+------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

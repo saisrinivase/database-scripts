@@ -15,3 +15,14 @@ WHERE c.relkind IN ('r', 'm', 'p')
   AND n.nspname <> 'information_schema'
   AND c.reloptions IS NOT NULL
 ORDER BY n.nspname, c.relname;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | table_name | reloptions 
+-------------+------------+------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

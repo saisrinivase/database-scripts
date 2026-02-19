@@ -32,3 +32,15 @@ SELECT
     ) AS starter_pk_sql
 FROM candidates
 ORDER BY total_bytes DESC, schema_name, table_name;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name |   table_name    | est_rows | total_size |                             starter_pk_sql                              
+-------------+-----------------+----------+------------+-------------------------------------------------------------------------
+ public      | pgbench_history |  5331130 | 270 MB     | ALTER TABLE public.pgbench_history ADD COLUMN id bigserial PRIMARY KEY;
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

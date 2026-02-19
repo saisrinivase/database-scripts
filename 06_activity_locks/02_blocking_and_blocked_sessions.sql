@@ -21,3 +21,14 @@ CROSS JOIN LATERAL unnest(pg_blocking_pids(blocked.pid)) AS p(blocker_pid)
 JOIN pg_stat_activity blocker
     ON blocker.pid = p.blocker_pid
 ORDER BY blocked_query_age DESC NULLS LAST;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ blocked_pid | blocked_user | blocked_app | blocked_state | blocked_query_age | blocked_query | blocker_pid | blocker_user | blocker_app | blocker_state | blocker_query_age | blocker_query 
+-------------+--------------+-------------+---------------+-------------------+---------------+-------------+--------------+-------------+---------------+-------------------+---------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

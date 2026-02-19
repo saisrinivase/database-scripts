@@ -65,3 +65,15 @@ FROM (
     SELECT * FROM proc_risks
 ) x
 ORDER BY object_type, object_identity;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ object_type |           object_identity            |         risk_flag          |                             recommendation                              
+-------------+--------------------------------------+----------------------------+-------------------------------------------------------------------------
+ INDEX       | migration_v2_lab."QuotedOrders_pkey" | QUOTED_IDENTIFIER_REQUIRED | Consider renaming to lower_snake_case to reduce query/tooling friction.
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

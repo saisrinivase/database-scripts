@@ -20,3 +20,14 @@ WHERE c.relkind = 'r'
   AND n.nspname <> 'information_schema'
   AND pg_catalog.format_type(a.atttypid, a.atttypmod) IN ('tsvector', 'tsquery')
 ORDER BY schema_name, table_name, column_name;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | table_name | column_name | data_type 
+-------------+------------+-------------+-----------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

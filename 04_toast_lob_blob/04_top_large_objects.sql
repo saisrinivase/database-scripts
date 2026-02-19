@@ -12,3 +12,14 @@ FROM pg_largeobject
 GROUP BY loid
 ORDER BY large_object_bytes DESC
 LIMIT 100;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ loid | large_object_bytes | large_object_pretty | chunk_count 
+------+--------------------+---------------------+-------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

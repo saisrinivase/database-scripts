@@ -19,3 +19,11 @@ SELECT
     s.n_live_tup AS estimated_live_rows,
     s.n_dead_tup AS estimated_dead_rows
 FROM pg_stat_user_tables s;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+INSERT 0 34
+
+SAMPLE_OUTPUT_END */

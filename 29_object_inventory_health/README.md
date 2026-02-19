@@ -38,4 +38,4 @@ Purpose: Deep object-centric administration scripts so teams can quickly choose 
 - These scripts are read-only diagnostics.
 - `18_object_query_hotspots_pgss.sql` requires `pg_stat_statements`; script returns guidance if extension is missing.
 - Oracle `PACKAGE` and `SYNONYM` are modeled as mapping guidance because they are not native PostgreSQL object types.
-- Each script has a colocated sample output file: `<script>.sample.out.txt`.
+- Each script includes an embedded sample output section at the bottom.

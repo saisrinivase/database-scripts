@@ -258,3 +258,35 @@ SELECT
         ELSE 'NO'
     END AS all_passed
 FROM tmp_v1_sanity_results;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+Pager usage is off.
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/27_migration_validation/04_v1_sanity_checks.sql:16: NOTICE:  table "tmp_v1_sanity_results" does not exist, skipping
+DROP TABLE
+CREATE TABLE
+INSERT 0 7
+Title is "V1 Sanity Check Results".
+                                                                      V1 Sanity Check Results
+             check_name              | status | observed_value | expected_value |                                  recommendation                                   
+-------------------------------------+--------+----------------+----------------+-----------------------------------------------------------------------------------
+ DEAD_TUPLE_PRESSURE_CLEAR           | PASS   | 0              | 0              | Run VACUUM (ANALYZE) and keep autovacuum enabled.
+ FK_INDEX_PRESENT_child_transactions | PASS   | present        | present        | Create index on migration_v1_lab.child_transactions(account_id).
+ NO_DUPLICATE_SKU_INDEX              | PASS   | 1              | 1              | Drop one duplicate index on migration_v1_lab.product_catalog(sku).
+ NO_UPPERCASE_OBJECTS_IN_LAB         | PASS   | 0              | 0              | Rename objects to lowercase unless quoted identifiers are intentionally required.
+ PK_PRESENT_orders_no_pk             | PASS   | present        | present        | Add primary key on migration_v1_lab.orders_no_pk(order_id).
+ SEQUENCE_OWNED_BY_COLUMN            | PASS   | owned          | owned          | Run ALTER SEQUENCE ... OWNED BY ... to bind sequence lifecycle.
+ STALE_STATS_TABLE_HEALTH            | PASS   | 0              | 0              | Run ANALYZE and keep autoanalyze enabled.
+(7 rows)
+
+Title is "V1 Sanity Summary".
+                     V1 Sanity Summary
+ total_checks | passed_checks | failed_checks | all_passed 
+--------------+---------------+---------------+------------
+            7 |             7 |             0 | YES
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

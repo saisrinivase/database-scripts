@@ -17,3 +17,11 @@ SELECT
     wal_bytes,
     stats_reset
 FROM pg_stat_wal;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+INSERT 0 1
+
+SAMPLE_OUTPUT_END */

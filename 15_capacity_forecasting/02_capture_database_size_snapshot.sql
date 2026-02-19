@@ -10,3 +10,11 @@ SELECT
     pg_database_size(datname) AS size_bytes
 FROM pg_database
 WHERE datallowconn;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+INSERT 0 7
+
+SAMPLE_OUTPUT_END */

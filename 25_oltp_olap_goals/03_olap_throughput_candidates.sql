@@ -18,3 +18,33 @@ WHERE mean_exec_time >= 200
    OR temp_blks_written > 0
 ORDER BY total_exec_time DESC
 LIMIT 200;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+       queryid        |  calls  |  total_exec_time   |   mean_exec_time   | shared_blks_read | temp_blks_written |  rows   |                            query_snippet                             
+----------------------+---------+--------------------+--------------------+------------------+-------------------+---------+----------------------------------------------------------------------
+  1144016440436625022 | 5332823 | 20318063.253471453 | 3.8100014295381928 |         10664795 |                 0 | 5332823 | UPDATE pgbench_accounts SET abalance = abalance + $1 WHERE aid = $2
+   450201137788272562 |       1 |        1674.504167 |        1674.504167 |            29989 |                 0 |       0 | ANALYZE
+  7127220720807722591 |       3 | 1671.8794149999999 |  557.2931383333333 |                3 |               618 |  360000 | INSERT INTO migration_v1_lab.child_transactions (account_id, amount)+
+                      |         |                    |                    |                  |                   |         | SELECT                                                              +
+                      |         |                    |                    |                  |                   |         |     ($1 + (random() * $2)::int)::bigint,                            +
+                      |         |                    |                    |                  |                   |         |     round((random() * $3)::numeric, $4)                             +
+                      |         |                    |                    |                  |                   |         | FROM generate_series($5, $6)
+  7127220720807722591 |       3 |        1636.255042 |  545.4183473333334 |                3 |               618 |  360000 | INSERT INTO migration_v1_lab.child_transactions (account_id, amount)+
+                      |         |                    |                    |                  |                   |         | SELECT                                                              +
+                      |         |                    |                    |                  |                   |         |     ($1 + (random() * $2)::int)::bigint,                            +
+                      |         |                    |                    |                  |                   |         |     round((random() * $3)::numeric, $4)                             +
+                      |         |                    |                    |                  |                   |         | FROM generate_series($5, $6)
+ -4598960938853719316 |       3 |          835.59025 |  278.5300833333333 |                3 |                 0 |   75000 | INSERT INTO migration_v1_lab.dml_bloat_table (payload)              +
+                      |         |                    |                    |                  |                   |         | SELECT repeat(md5(gs::text), $1)                                    +
+                      |         |                    |                    |                  |                   |         | FROM generate_series($2, $3) AS gs
+ -4598960938853719316 |       3 |  832.4192909999999 | 277.47309699999994 |                3 |                 0 |   75000 | INSERT INTO migration_v1_lab.dml_bloat_table (payload)              +
+                      |         |                    |                    |                  |                   |         | SELECT repeat(md5(gs::text), $1)                                    +
+                      |         |                    |                    |                  |                   |         | FROM generate_series($2, $3) AS gs
+ -5398677000037045473 |       1 |         802.498625 |         802.498625 |            53105 |                 0 |       0 | CREATE DATABASE script_validation_20260218_172749 TEMPLATE perf_test
+(7 rows)
+
+
+SAMPLE_OUTPUT_END */

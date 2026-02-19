@@ -43,3 +43,14 @@ JOIN pg_namespace n
     ON n.oid = c.relnamespace
 ORDER BY p.pid;
 \endif
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ pid | schema_name | table_name | phase | heap_blks_total | heap_blks_scanned | heap_blks_vacuumed | index_vacuum_count | max_dead_tuple_bytes | dead_tuple_bytes | num_dead_item_ids 
+-----+-------------+------------+-------+-----------------+-------------------+--------------------+--------------------+----------------------+------------------+-------------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

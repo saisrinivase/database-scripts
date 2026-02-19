@@ -21,3 +21,21 @@ WHERE name IN (
     'plan_cache_mode'
 )
 ORDER BY name;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+            name            |      setting       | unit |       source       | boot_val |     reset_val      
+----------------------------+--------------------+------+--------------------+----------+--------------------
+ compute_query_id           | auto               |      | default            | auto     | auto
+ jit                        | on                 |      | default            | on       | on
+ log_min_duration_statement | -1                 | ms   | default            | -1       | -1
+ plan_cache_mode            | auto               |      | default            | auto     | auto
+ shared_preload_libraries   | pg_stat_statements |      | configuration file |          | pg_stat_statements
+ track_activity_query_size  | 1024               | B    | default            | 1024     | 1024
+ track_io_timing            | off                |      | default            | off      | off
+(7 rows)
+
+
+SAMPLE_OUTPUT_END */

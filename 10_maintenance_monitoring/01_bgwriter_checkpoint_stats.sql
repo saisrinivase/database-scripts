@@ -39,3 +39,15 @@ SELECT
     stats_reset AS bgwriter_stats_reset
 FROM pg_stat_bgwriter;
 \endif
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ checkpoints_timed | checkpoints_req | checkpoint_write_time | checkpoint_sync_time | buffers_checkpoint | slru_written | buffers_clean | maxwritten_clean | buffers_backend | buffers_backend_fsync | buffers_alloc |   checkpointer_stats_reset    |     bgwriter_stats_reset      
+-------------------+-----------------+-----------------------+----------------------+--------------------+--------------+---------------+------------------+-----------------+-----------------------+---------------+-------------------------------+-------------------------------
+               827 |              59 |               2788826 |                48655 |              29293 |          211 |        244345 |             2422 |                 |                       |      10846387 | 2026-01-31 20:40:48.109778-05 | 2026-01-31 20:40:48.109778-05
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

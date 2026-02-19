@@ -43,3 +43,30 @@ ALTER TABLE migration_v1_lab.dml_bloat_table
 VACUUM (ANALYZE) migration_v1_lab.dml_bloat_table;
 
 \echo [V1 fix] Fix complete.
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+Pager usage is off.
+[V1 fix] Adding primary key to orders_no_pk...
+ALTER TABLE
+[V1 fix] Attaching orphan sequence ownership...
+ALTER SEQUENCE
+[V1 fix] Adding FK supporting index...
+CREATE INDEX
+[V1 fix] Removing duplicate index...
+DROP INDEX
+[V1 fix] Normalizing uppercase table name...
+ALTER TABLE
+[V1 fix] Normalizing uppercase identity sequence name...
+ALTER SEQUENCE
+[V1 fix] Re-enabling autovacuum and refreshing stats...
+ALTER TABLE
+ANALYZE
+[V1 fix] Cleaning dead tuples from pressure table...
+ALTER TABLE
+VACUUM
+[V1 fix] Fix complete.
+
+SAMPLE_OUTPUT_END */

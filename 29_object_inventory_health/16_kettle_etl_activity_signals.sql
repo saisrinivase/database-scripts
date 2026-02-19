@@ -58,3 +58,14 @@ SELECT
     format('create_role=%s create_db=%s replication=%s', rolcreaterole, rolcreatedb, rolreplication)
 FROM etl_roles
 ORDER BY signal_type, signal_id;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ signal_type | signal_id | principal | database_name | application_name | state | wait_event_type | wait_event | duration | details 
+-------------+-----------+-----------+---------------+------------------+-------+-----------------+------------+----------+---------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

@@ -18,3 +18,14 @@ FROM pg_stat_activity
 WHERE xact_start IS NOT NULL
   AND now() - xact_start >= interval '5 minutes'
 ORDER BY xact_age DESC;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ pid | user_name | application_name | client_addr | xact_start | xact_age | state | wait_event_type | wait_event | query_snippet 
+-----+-----------+------------------+-------------+------------+----------+-------+-----------------+------------+---------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

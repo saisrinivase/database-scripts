@@ -20,3 +20,22 @@ WHERE name IN (
     'tcp_keepalives_count'
 )
 ORDER BY name;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+                name                 | setting | unit |       source       
+-------------------------------------+---------+------+--------------------
+ idle_in_transaction_session_timeout | 0       | ms   | default
+ lock_timeout                        | 0       | ms   | default
+ max_connections                     | 100     |      | configuration file
+ statement_timeout                   | 0       | ms   | default
+ superuser_reserved_connections      | 3       |      | default
+ tcp_keepalives_count                | 0       |      | default
+ tcp_keepalives_idle                 | 0       | s    | default
+ tcp_keepalives_interval             | 0       | s    | default
+(8 rows)
+
+
+SAMPLE_OUTPUT_END */

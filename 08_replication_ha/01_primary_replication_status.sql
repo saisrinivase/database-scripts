@@ -20,3 +20,14 @@ SELECT
     replay_lag
 FROM pg_stat_replication
 ORDER BY byte_lag DESC NULLS LAST;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ pid | user_name | application_name | client_addr | state | sync_state | sent_lsn | write_lsn | flush_lsn | replay_lsn | byte_lag | write_lag | flush_lag | replay_lag 
+-----+-----------+------------------+-------------+-------+------------+----------+-----------+-----------+------------+----------+-----------+-----------+------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

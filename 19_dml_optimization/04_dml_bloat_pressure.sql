@@ -14,3 +14,14 @@ SELECT
 FROM pg_stat_user_tables
 WHERE n_dead_tup > 0
 ORDER BY dead_tuple_pct DESC NULLS LAST, total_writes DESC;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | table_name | n_live_tup | n_dead_tup | dead_tuple_pct | total_writes | total_size 
+-------------+------------+------------+------------+----------------+--------------+------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

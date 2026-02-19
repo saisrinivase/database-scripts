@@ -20,3 +20,14 @@ WHERE n.nspname !~ '^pg_'
   AND l.lanname = 'plpgsql'
   AND p.prosrc ILIKE '%EXECUTE %'
 ORDER BY schema_name, function_name;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | function_name | function_args | language_name | security_definer | has_dynamic_sql 
+-------------+---------------+---------------+---------------+------------------+-----------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

@@ -16,3 +16,14 @@ SELECT
     safe_wal_size
 FROM pg_replication_slots
 ORDER BY retained_wal_bytes DESC NULLS LAST;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ slot_name | slot_type | active | temporary | restart_lsn | confirmed_flush_lsn | retained_wal_bytes | retained_wal_pretty | wal_status | safe_wal_size 
+-----------+-----------+--------+-----------+-------------+---------------------+--------------------+---------------------+------------+---------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

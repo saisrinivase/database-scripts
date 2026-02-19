@@ -23,3 +23,16 @@ LEFT JOIN role_conn c
     ON c.role_name = r.rolname
 WHERE r.rolcanlogin
 ORDER BY pct_of_role_limit DESC NULLS LAST, current_connections DESC;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ role_name | rolconnlimit | current_connections | pct_of_role_limit 
+-----------+--------------+---------------------+-------------------
+ saiendla  |           -1 |                   5 |                  
+ postgres  |           -1 |                   0 |                  
+(2 rows)
+
+
+SAMPLE_OUTPUT_END */

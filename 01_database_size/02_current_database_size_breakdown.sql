@@ -24,3 +24,15 @@ SELECT
     sum(CASE WHEN b.reltoastrelid = 0 THEN 0 ELSE pg_total_relation_size(b.reltoastrelid) END) AS toast_bytes,
     pg_size_pretty(sum(CASE WHEN b.reltoastrelid = 0 THEN 0 ELSE pg_total_relation_size(b.reltoastrelid) END)) AS toast_pretty
 FROM base b;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ database_total_bytes | database_total_pretty | table_heap_bytes | table_heap_pretty | indexes_bytes | indexes_pretty | toast_bytes | toast_pretty 
+----------------------+-----------------------+------------------+-------------------+---------------+----------------+-------------+--------------
+            468506303 | 447 MB                |         24412160 | 23 MB             |     434102272 | 414 MB         |      221184 | 216 kB
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

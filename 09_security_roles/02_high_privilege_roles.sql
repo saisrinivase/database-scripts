@@ -17,3 +17,16 @@ WHERE rolsuper
    OR rolbypassrls
    OR rolcreaterole
 ORDER BY role_name;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ role_name | is_superuser | can_replicate | bypasses_row_level_security | can_create_roles | can_create_databases | can_login 
+-----------+--------------+---------------+-----------------------------+------------------+----------------------+-----------
+ postgres  | t            | t             | f                           | t                | t                    | t
+ saiendla  | t            | t             | t                           | t                | t                    | t
+(2 rows)
+
+
+SAMPLE_OUTPUT_END */

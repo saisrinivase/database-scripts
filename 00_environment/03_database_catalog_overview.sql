@@ -47,3 +47,19 @@ WITH object_counts AS (
 SELECT object_type, object_count
 FROM object_counts
 ORDER BY object_type;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+    object_type     | object_count 
+--------------------+--------------
+ indexes            |           43
+ partitioned tables |            0
+ schemas            |            4
+ tables             |           34
+ views              |            2
+(5 rows)
+
+
+SAMPLE_OUTPUT_END */

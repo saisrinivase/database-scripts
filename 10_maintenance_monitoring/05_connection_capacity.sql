@@ -23,3 +23,15 @@ SELECT
     round(100.0 * act.total_connections / NULLIF(cfg.max_connections, 0), 2) AS pct_used
 FROM cfg
 CROSS JOIN act;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ max_connections | total_connections | active_connections | idle_connections | idle_in_txn_connections | pct_used 
+-----------------+-------------------+--------------------+------------------+-------------------------+----------
+             100 |                12 |                  1 |                3 |                       0 |    12.00
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

@@ -50,3 +50,15 @@ GROUP BY
     indisprimary
 HAVING count(*) > 1
 ORDER BY total_duplicate_bytes DESC;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | table_name |                             duplicate_indexes                              | total_duplicate_bytes | total_duplicate_pretty 
+-------------+------------+----------------------------------------------------------------------------+-----------------------+------------------------
+ public      | demo_users | {demo_users_username_idx,demo_users_username_idx1,idx_demo_users_username} |               1105920 | 1080 kB
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

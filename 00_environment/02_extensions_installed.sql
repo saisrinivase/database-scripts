@@ -12,3 +12,16 @@ FROM pg_extension e
 JOIN pg_namespace n
     ON n.oid = e.extnamespace
 ORDER BY e.extname;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+   extension_name   | extension_version | extension_schema | extension_owner 
+--------------------+-------------------+------------------+-----------------
+ pg_stat_statements | 1.12              | public           | saiendla
+ plpgsql            | 1.0               | pg_catalog       | saiendla
+(2 rows)
+
+
+SAMPLE_OUTPUT_END */

@@ -83,3 +83,15 @@ WHERE NOT EXISTS (
     FROM wrappers
 )
 ORDER BY object_type, object_name, server_name, relation_name;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ object_type | object_name | owner_name | server_name | relation_name | mapping_count |                     notes                      
+-------------+-------------+------------+-------------+---------------+---------------+------------------------------------------------
+ FDW_STATUS  | (none)      |            |             |               |               | No FDW wrapper/server/foreign table configured
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

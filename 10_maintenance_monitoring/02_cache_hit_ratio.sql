@@ -23,3 +23,15 @@ SELECT
           NULLIF(table_io.idx_hit + table_io.idx_read + coalesce(index_io.idx_hit, 0) + coalesce(index_io.idx_read, 0), 0), 2) AS index_cache_hit_pct
 FROM table_io
 CROSS JOIN index_io;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ table_cache_hit_pct | index_cache_hit_pct 
+---------------------+---------------------
+              100.00 |              100.00
+(1 row)
+
+
+SAMPLE_OUTPUT_END */

@@ -18,3 +18,14 @@ SELECT
 FROM pg_stat_user_tables s
 WHERE pg_total_relation_size(s.relid) >= 512::bigint * 1024 * 1024
 ORDER BY seq_scan_pct DESC NULLS LAST, total_bytes DESC;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | table_name | seq_scan | idx_scan | seq_scan_pct | total_bytes | total_pretty | estimated_live_rows 
+-------------+------------+----------+----------+--------------+-------------+--------------+---------------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

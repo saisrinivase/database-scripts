@@ -15,3 +15,14 @@ WHERE schemaname !~ '^pg_'
   AND schemaname <> 'information_schema'
   AND null_frac >= 0.80
 ORDER BY null_frac DESC, schemaname, tablename, attname;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | table_name | column_name | null_frac | n_distinct | correlation 
+-------------+------------+-------------+-----------+------------+-------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

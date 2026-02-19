@@ -24,3 +24,14 @@ WHERE NOT t.tgisinternal
   AND tn.nspname !~ '^pg_'
   AND tn.nspname <> 'information_schema'
 ORDER BY table_schema, table_name, trigger_name;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ table_schema | table_name | trigger_name | function_schema | function_name | tgenabled | trigger_def 
+--------------+------------+--------------+-----------------+---------------+-----------+-------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

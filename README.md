@@ -6,7 +6,6 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 
 - Coverage: 31 operational areas.
 - Current SQL scripts: 159.
-- Current colocated sample outputs: 159 (`*.sample.out.txt`, one per script).
 - Style: every script includes `Purpose`, `Area`, and `Usage` headers.
 - Goal: enable any DBA/engineer to open an area folder and run purpose-specific scripts quickly.
 
@@ -63,10 +62,10 @@ See `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/VERSIO
 
 ## Sample Output Convention
 
-- Every SQL script has a colocated sample output file with the same prefix.
-- Pattern: `<script>.sql` + `<script>.sample.out.txt`.
-- Example: `01_database_size/01_databases_size.sql` and `01_database_size/01_databases_size.sample.out.txt`.
-- Historical full-run outputs are still retained in `_validation_runs/` for audit purposes.
+- Every SQL script includes an embedded sample output section at the bottom.
+- Section markers: `/* SAMPLE_OUTPUT_BEGIN` ... `SAMPLE_OUTPUT_END */`.
+- Sample output is for quick understanding; values vary by environment and runtime state.
+- Historical full-run outputs are retained in `_validation_runs/` for audit purposes.
 
 ## Operational Notes
 

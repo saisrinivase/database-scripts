@@ -45,3 +45,22 @@ CREATE TABLE IF NOT EXISTS dba_metrics.wal_snapshots (
     wal_bytes numeric,
     stats_reset timestamptz
 );
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/15_capacity_forecasting/01_create_capacity_repository.sql:6: NOTICE:  schema "dba_metrics" already exists, skipping
+CREATE SCHEMA
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/15_capacity_forecasting/01_create_capacity_repository.sql:12: NOTICE:  relation "database_size_snapshots" already exists, skipping
+CREATE TABLE
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/15_capacity_forecasting/01_create_capacity_repository.sql:21: NOTICE:  relation "table_size_snapshots" already exists, skipping
+CREATE TABLE
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/15_capacity_forecasting/01_create_capacity_repository.sql:30: NOTICE:  relation "index_size_snapshots" already exists, skipping
+CREATE TABLE
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/15_capacity_forecasting/01_create_capacity_repository.sql:39: NOTICE:  relation "connection_snapshots" already exists, skipping
+CREATE TABLE
+psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/15_capacity_forecasting/01_create_capacity_repository.sql:47: NOTICE:  relation "wal_snapshots" already exists, skipping
+CREATE TABLE
+
+SAMPLE_OUTPUT_END */

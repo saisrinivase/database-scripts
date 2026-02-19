@@ -20,3 +20,14 @@ JOIN pg_class c
 JOIN pg_namespace cns
     ON cns.oid = c.relnamespace
 ORDER BY partition_bytes DESC;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ parent_schema | parent_table | partition_schema | partition_name | partition_bytes | partition_pretty 
+---------------+--------------+------------------+----------------+-----------------+------------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */

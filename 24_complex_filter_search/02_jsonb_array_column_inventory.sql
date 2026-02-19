@@ -23,3 +23,19 @@ WHERE c.relkind = 'r'
       OR pg_catalog.format_type(a.atttypid, a.atttypmod) LIKE '%[]'
   )
 ORDER BY schema_name, table_name, column_name;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name |  table_name   | column_name | data_type 
+-------------+---------------+-------------+-----------
+ perf        | app_events    | payload     | jsonb
+ perf        | audit_log     | details     | jsonb
+ perf        | job_runs      | metrics     | jsonb
+ perf        | jobs          | meta        | jsonb
+ perf        | notifications | payload     | jsonb
+(5 rows)
+
+
+SAMPLE_OUTPUT_END */

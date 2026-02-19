@@ -19,3 +19,11 @@ SELECT
     pg_relation_size(s.indexrelid) AS index_bytes,
     s.idx_scan
 FROM pg_stat_user_indexes s;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+INSERT 0 43
+
+SAMPLE_OUTPUT_END */

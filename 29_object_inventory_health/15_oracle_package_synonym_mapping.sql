@@ -50,3 +50,16 @@ SELECT
     coalesce(string_agg(format('%I.%I', schema_name, view_name), ', ' ORDER BY schema_name, view_name), 'none')
 FROM (SELECT schema_name, view_name FROM synonym_like_views ORDER BY schema_name, view_name LIMIT 10) v
 ORDER BY oracle_object;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ oracle_object |             postgres_mapping             | candidate_count |                             recommendation                              |                                          sample_objects                                          
+---------------+------------------------------------------+-----------------+-------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------
+ PACKAGE       | schema + function/procedure API grouping |               2 | Use schema-scoped naming and grants to emulate package contracts.       | migration_v2_lab, public
+ SYNONYM       | view or search_path aliasing pattern     |               3 | Use views for stable aliases; avoid brittle global search_path changes. | migration_v2_lab.vw_high_value_orders, public.pg_stat_statements, public.pg_stat_statements_info
+(2 rows)
+
+
+SAMPLE_OUTPUT_END */

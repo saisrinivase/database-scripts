@@ -60,3 +60,14 @@ WHERE NOT EXISTS (
       ) = f.conkey
 )
 ORDER BY f.schema_name, f.table_name, f.conname;
+
+
+/* SAMPLE_OUTPUT_BEGIN
+Sample output (captured from local validation run; values may vary by environment).
+
+ schema_name | table_name | foreign_key_name | fk_columns | suggested_index_sql 
+-------------+------------+------------------+------------+---------------------
+(0 rows)
+
+
+SAMPLE_OUTPUT_END */
