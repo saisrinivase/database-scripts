@@ -31,12 +31,16 @@ WHERE coalesce(ci.index_count, 0) = 0
 ORDER BY parent_schema, parent_table, partition_schema, partition_name;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- parent_schema | parent_table | partition_schema | partition_name | index_count 
----------------+--------------+------------------+----------------+-------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--   parent_schema   |      parent_table       | partition_schema |        partition_name        | index_count 
+-- ------------------+-------------------------+------------------+------------------------------+-------------
+--  migration_v2_lab | partitioned_events_pkey | migration_v2_lab | partitioned_events_2025_pkey |           0
+--  migration_v2_lab | partitioned_events_pkey | migration_v2_lab | partitioned_events_2026_pkey |           0
+-- (2 rows)
+-- 
+-- SAMPLE_OUTPUT_END

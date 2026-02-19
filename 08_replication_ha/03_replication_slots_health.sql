@@ -18,12 +18,18 @@ FROM pg_replication_slots
 ORDER BY retained_wal_bytes DESC NULLS LAST;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- slot_name | slot_type | active | temporary | restart_lsn | confirmed_flush_lsn | retained_wal_bytes | retained_wal_pretty | wal_status | safe_wal_size 
------------+-----------+--------+-----------+-------------+---------------------+--------------------+---------------------+------------+---------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  slot_name | slot_type | active | temporary | restart_lsn | confirmed_flush_lsn | retained_wal_bytes | retained_wal_pretty | wal_status | safe_wal_size 
+-- -----------+-----------+--------+-----------+-------------+---------------------+--------------------+---------------------+------------+---------------
+-- (0 rows)
+-- 
+-- 
+-- Interpretation:
+-- - No replication rows were found in this capture.
+-- - This is expected on standalone instances or when replication features are not configured.
+-- SAMPLE_OUTPUT_END

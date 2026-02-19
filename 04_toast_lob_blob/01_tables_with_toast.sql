@@ -21,39 +21,39 @@ WHERE c.relkind IN ('r', 'm')
 ORDER BY toast_total_bytes DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-   schema_name    |       table_name        | toast_table_name | toast_total_bytes | toast_total_pretty 
-------------------+-------------------------+------------------+-------------------+--------------------
- perf             | tenants                 | pg_toast_16391   |              8192 | 8192 bytes
- perf             | users                   | pg_toast_16404   |              8192 | 8192 bytes
- perf             | products                | pg_toast_16424   |              8192 | 8192 bytes
- perf             | categories              | pg_toast_16444   |              8192 | 8192 bytes
- perf             | shipments               | pg_toast_16544   |              8192 | 8192 bytes
- perf             | app_events              | pg_toast_16562   |              8192 | 8192 bytes
- perf             | audit_log               | pg_toast_16576   |              8192 | 8192 bytes
- perf             | documents               | pg_toast_16590   |              8192 | 8192 bytes
- perf             | addresses               | pg_toast_16604   |              8192 | 8192 bytes
- perf             | feature_flags           | pg_toast_16640   |              8192 | 8192 bytes
- perf             | support_tickets         | pg_toast_16665   |              8192 | 8192 bytes
- perf             | ticket_comments         | pg_toast_16685   |              8192 | 8192 bytes
- perf             | notifications           | pg_toast_16704   |              8192 | 8192 bytes
- perf             | jobs                    | pg_toast_16724   |              8192 | 8192 bytes
- perf             | job_runs                | pg_toast_16738   |              8192 | 8192 bytes
- dba_metrics      | table_size_snapshots    | pg_toast_25389   |              8192 | 8192 bytes
- public           | demo_users              | pg_toast_16841   |              8192 | 8192 bytes
- dba_metrics      | index_size_snapshots    | pg_toast_25399   |              8192 | 8192 bytes
- dba_metrics      | connection_snapshots    | pg_toast_25410   |              8192 | 8192 bytes
- dba_metrics      | database_size_snapshots | pg_toast_25380   |              8192 | 8192 bytes
- dba_metrics      | wal_snapshots           | pg_toast_25418   |              8192 | 8192 bytes
- migration_v1_lab | parent_accounts         | pg_toast_26271   |              8192 | 8192 bytes
- migration_v1_lab | orders_no_pk            | pg_toast_26261   |              8192 | 8192 bytes
- migration_v1_lab | product_catalog         | pg_toast_26297   |              8192 | 8192 bytes
- migration_v1_lab | sales_orders            | pg_toast_26313   |              8192 | 8192 bytes
- migration_v1_lab | stale_stats_table       | pg_toast_26322   |              8192 | 8192 bytes
- migration_v1_lab | dml_bloat_table         | pg_toast_26332   |              8192 | 8192 bytes
-(27 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--    schema_name    |       table_name        | toast_table_name | toast_total_bytes | toast_total_pretty 
+-- ------------------+-------------------------+------------------+-------------------+--------------------
+--  migration_v1_lab | orders_no_pk            | pg_toast_27382   |              8192 | 8192 bytes
+--  migration_v1_lab | parent_accounts         | pg_toast_27392   |              8192 | 8192 bytes
+--  migration_v1_lab | product_catalog         | pg_toast_27418   |              8192 | 8192 bytes
+--  migration_v2_lab | issue_manifest          | pg_toast_27479   |              8192 | 8192 bytes
+--  migration_v1_lab | stale_stats_table       | pg_toast_27443   |              8192 | 8192 bytes
+--  migration_v1_lab | sales_orders            | pg_toast_27434   |              8192 | 8192 bytes
+--  migration_v1_lab | dml_bloat_table         | pg_toast_27453   |              8192 | 8192 bytes
+--  migration_v2_lab | customer_staging_no_pk  | pg_toast_27491   |              8192 | 8192 bytes
+--  dba_metrics      | database_size_snapshots | pg_toast_27311   |              8192 | 8192 bytes
+--  dba_metrics      | table_size_snapshots    | pg_toast_27320   |              8192 | 8192 bytes
+--  dba_metrics      | index_size_snapshots    | pg_toast_27330   |              8192 | 8192 bytes
+--  dba_metrics      | connection_snapshots    | pg_toast_27341   |              8192 | 8192 bytes
+--  dba_metrics      | wal_snapshots           | pg_toast_27349   |              8192 | 8192 bytes
+--  migration_v2_lab | parent_accounts         | pg_toast_27502   |              8192 | 8192 bytes
+--  migration_v2_lab | child_events            | pg_toast_27514   |              8192 | 8192 bytes
+--  migration_v2_lab | sales_catalog           | pg_toast_27533   |              8192 | 8192 bytes
+--  migration_v2_lab | bloat_pressure_table    | pg_toast_27572   |              8192 | 8192 bytes
+--  migration_v2_lab | quoted_orders           | pg_toast_27549   |              8192 | 8192 bytes
+--  migration_v2_lab | stale_stats_table       | pg_toast_27560   |              8192 | 8192 bytes
+--  migration_v2_lab | customer_contact_compat | pg_toast_27584   |              8192 | 8192 bytes
+--  migration_v2_lab | trigger_audit_demo      | pg_toast_27626   |              8192 | 8192 bytes
+--  migration_v2_lab | partitioned_events_2025 | pg_toast_27665   |              8192 | 8192 bytes
+--  migration_v2_lab | order_fact              | pg_toast_27603   |              8192 | 8192 bytes
+--  migration_v2_lab | partitioned_events_2026 | pg_toast_27675   |              8192 | 8192 bytes
+--  migration_v2_lab | mv_daily_order_volume   | pg_toast_27645   |              8192 | 8192 bytes
+-- (25 rows)
+-- 
+-- SAMPLE_OUTPUT_END

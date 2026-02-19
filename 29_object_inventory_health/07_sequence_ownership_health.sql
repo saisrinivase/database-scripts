@@ -51,23 +51,31 @@ LEFT JOIN pg_attribute a
 ORDER BY ownership_status DESC, s.schema_name, s.sequence_name;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-   schema_name    |              sequence_name              | owner_name | owned_by_schema  |     owned_by_table      | owned_by_column | ownership_status | recommended_action 
-------------------+-----------------------------------------+------------+------------------+-------------------------+-----------------+------------------+--------------------
- migration_v2_lab | amount_mapping_risk_id_seq              | saiendla   | migration_v2_lab | amount_mapping_risk     | id              | OWNED            | OK
- migration_v2_lab | bloat_pressure_table_id_seq             | saiendla   | migration_v2_lab | bloat_pressure_table    | id              | OWNED            | OK
- migration_v2_lab | child_events_event_id_seq               | saiendla   | migration_v2_lab | child_events            | event_id        | OWNED            | OK
- migration_v2_lab | customer_contact_compat_customer_id_seq | saiendla   | migration_v2_lab | customer_contact_compat | customer_id     | OWNED            | OK
- migration_v2_lab | order_fact_order_id_seq                 | saiendla   | migration_v2_lab | order_fact              | order_id        | OWNED            | OK
- migration_v2_lab | orphan_order_seq                        | saiendla   | migration_v2_lab | customer_staging_no_pk  | staging_id      | OWNED            | OK
- migration_v2_lab | partitioned_events_event_id_seq         | saiendla   | migration_v2_lab | partitioned_events      | event_id        | OWNED            | OK
- migration_v2_lab | quoted_orders_quoted_order_id_seq       | saiendla   | migration_v2_lab | quoted_orders           | quoted_order_id | OWNED            | OK
- migration_v2_lab | sales_catalog_catalog_id_seq            | saiendla   | migration_v2_lab | sales_catalog           | catalog_id      | OWNED            | OK
- migration_v2_lab | stale_stats_table_id_seq                | saiendla   | migration_v2_lab | stale_stats_table       | id              | OWNED            | OK
- migration_v2_lab | trigger_audit_demo_id_seq               | saiendla   | migration_v2_lab | trigger_audit_demo      | id              | OWNED            | OK
-(11 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--    schema_name    |              sequence_name              | owner_name | owned_by_schema  |     owned_by_table      | owned_by_column | ownership_status | recommended_action 
+-- ------------------+-----------------------------------------+------------+------------------+-------------------------+-----------------+------------------+--------------------
+--  migration_v1_lab | child_transactions_txn_id_seq           | saiendla   | migration_v1_lab | child_transactions      | txn_id          | OWNED            | OK
+--  migration_v1_lab | dml_bloat_table_id_seq                  | saiendla   | migration_v1_lab | dml_bloat_table         | id              | OWNED            | OK
+--  migration_v1_lab | orphan_seq                              | saiendla   | migration_v1_lab | orders_no_pk            | order_id        | OWNED            | OK
+--  migration_v1_lab | product_catalog_product_id_seq          | saiendla   | migration_v1_lab | product_catalog         | product_id      | OWNED            | OK
+--  migration_v1_lab | sales_orders_sales_order_id_seq         | saiendla   | migration_v1_lab | sales_orders            | sales_order_id  | OWNED            | OK
+--  migration_v1_lab | stale_stats_table_id_seq                | saiendla   | migration_v1_lab | stale_stats_table       | id              | OWNED            | OK
+--  migration_v2_lab | amount_mapping_risk_id_seq              | saiendla   | migration_v2_lab | amount_mapping_risk     | id              | OWNED            | OK
+--  migration_v2_lab | bloat_pressure_table_id_seq             | saiendla   | migration_v2_lab | bloat_pressure_table    | id              | OWNED            | OK
+--  migration_v2_lab | child_events_event_id_seq               | saiendla   | migration_v2_lab | child_events            | event_id        | OWNED            | OK
+--  migration_v2_lab | customer_contact_compat_customer_id_seq | saiendla   | migration_v2_lab | customer_contact_compat | customer_id     | OWNED            | OK
+--  migration_v2_lab | order_fact_order_id_seq                 | saiendla   | migration_v2_lab | order_fact              | order_id        | OWNED            | OK
+--  migration_v2_lab | orphan_order_seq                        | saiendla   | migration_v2_lab | customer_staging_no_pk  | staging_id      | OWNED            | OK
+--  migration_v2_lab | partitioned_events_event_id_seq         | saiendla   | migration_v2_lab | partitioned_events      | event_id        | OWNED            | OK
+--  migration_v2_lab | quoted_orders_quoted_order_id_seq       | saiendla   | migration_v2_lab | quoted_orders           | quoted_order_id | OWNED            | OK
+--  migration_v2_lab | sales_catalog_catalog_id_seq            | saiendla   | migration_v2_lab | sales_catalog           | catalog_id      | OWNED            | OK
+--  migration_v2_lab | stale_stats_table_id_seq                | saiendla   | migration_v2_lab | stale_stats_table       | id              | OWNED            | OK
+--  migration_v2_lab | trigger_audit_demo_id_seq               | saiendla   | migration_v2_lab | trigger_audit_demo      | id              | OWNED            | OK
+-- (17 rows)
+-- 
+-- SAMPLE_OUTPUT_END

@@ -14,14 +14,16 @@ JOIN pg_namespace n
 ORDER BY e.extname;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-   extension_name   | extension_version | extension_schema | extension_owner 
---------------------+-------------------+------------------+-----------------
- pg_stat_statements | 1.12              | public           | saiendla
- plpgsql            | 1.0               | pg_catalog       | saiendla
-(2 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--    extension_name   | extension_version | extension_schema | extension_owner 
+-- --------------------+-------------------+------------------+-----------------
+--  pg_stat_statements | 1.12              | public           | saiendla
+--  plpgsql            | 1.0               | pg_catalog       | saiendla
+-- (2 rows)
+-- 
+-- SAMPLE_OUTPUT_END

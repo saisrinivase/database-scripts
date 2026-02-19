@@ -62,12 +62,18 @@ WHERE NOT EXISTS (
 ORDER BY f.schema_name, f.table_name, f.conname;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name | table_name | foreign_key_name | fk_columns | suggested_index_sql 
--------------+------------+------------------+------------+---------------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name | table_name | foreign_key_name | fk_columns | suggested_index_sql 
+-- -------------+------------+------------------+------------+---------------------
+-- (0 rows)
+-- 
+-- 
+-- Interpretation:
+-- - No matching rows were returned at capture time.
+-- - Rerun during peak workload or after seeding representative test cases for non-zero examples.
+-- SAMPLE_OUTPUT_END

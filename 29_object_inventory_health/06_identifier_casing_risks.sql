@@ -67,13 +67,16 @@ FROM (
 ORDER BY object_type, object_identity;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- object_type |           object_identity            |         risk_flag          |                             recommendation                              
--------------+--------------------------------------+----------------------------+-------------------------------------------------------------------------
- INDEX       | migration_v2_lab."QuotedOrders_pkey" | QUOTED_IDENTIFIER_REQUIRED | Consider renaming to lower_snake_case to reduce query/tooling friction.
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  object_type |           object_identity            |         risk_flag          |                             recommendation                              
+-- -------------+--------------------------------------+----------------------------+-------------------------------------------------------------------------
+--  INDEX       | migration_v1_lab."SalesOrders_pkey"  | QUOTED_IDENTIFIER_REQUIRED | Consider renaming to lower_snake_case to reduce query/tooling friction.
+--  INDEX       | migration_v2_lab."QuotedOrders_pkey" | QUOTED_IDENTIFIER_REQUIRED | Consider renaming to lower_snake_case to reduce query/tooling friction.
+-- (2 rows)
+-- 
+-- SAMPLE_OUTPUT_END

@@ -85,19 +85,21 @@ ORDER BY
     privilege_type;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- object_type |  object_schema   |        object_name        | grantee | privilege_type | is_grantable | risk_level |                  recommendation                  
--------------+------------------+---------------------------+---------+----------------+--------------+------------+--------------------------------------------------
- ROUTINE     | migration_v2_lab | fn_calc_fee               | PUBLIC  | EXECUTE        | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
- ROUTINE     | migration_v2_lab | fn_set_updated_at         | PUBLIC  | EXECUTE        | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
- ROUTINE     | migration_v2_lab | prc_tag_high_value_orders | PUBLIC  | EXECUTE        | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
- ROUTINE     | public           | pg_stat_statements        | PUBLIC  | EXECUTE        | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
- TABLE       | public           | pg_stat_statements        | PUBLIC  | SELECT         | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
- ROUTINE     | public           | pg_stat_statements_info   | PUBLIC  | EXECUTE        | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
- TABLE       | public           | pg_stat_statements_info   | PUBLIC  | SELECT         | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
-(7 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  object_type |  object_schema   |        object_name        | grantee | privilege_type | is_grantable | risk_level |                  recommendation                  
+-- -------------+------------------+---------------------------+---------+----------------+--------------+------------+--------------------------------------------------
+--  ROUTINE     | migration_v2_lab | fn_calc_fee               | PUBLIC  | EXECUTE        | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
+--  ROUTINE     | migration_v2_lab | fn_set_updated_at         | PUBLIC  | EXECUTE        | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
+--  ROUTINE     | migration_v2_lab | prc_tag_high_value_orders | PUBLIC  | EXECUTE        | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
+--  ROUTINE     | public           | pg_stat_statements        | PUBLIC  | EXECUTE        | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
+--  TABLE       | public           | pg_stat_statements        | PUBLIC  | SELECT         | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
+--  ROUTINE     | public           | pg_stat_statements_info   | PUBLIC  | EXECUTE        | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
+--  TABLE       | public           | pg_stat_statements_info   | PUBLIC  | SELECT         | NO           | HIGH       | Consider REVOKE from PUBLIC and grant via roles.
+-- (7 rows)
+-- 
+-- SAMPLE_OUTPUT_END

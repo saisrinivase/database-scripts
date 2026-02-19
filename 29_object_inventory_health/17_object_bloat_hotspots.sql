@@ -47,14 +47,16 @@ WHERE total_bytes >= 64::bigint * 1024 * 1024
 ORDER BY dead_tuple_pct DESC, total_bytes DESC, schema_name, table_name;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name |    table_name    | total_size | n_live_tup | n_dead_tup | dead_tuple_pct | seq_scan | idx_scan | vacuum_count | autovacuum_count |          last_vacuum          |        last_autovacuum        |     bloat_flag     
--------------+------------------+------------+------------+------------+----------------+----------+----------+--------------+------------------+-------------------------------+-------------------------------+--------------------
- public      | pgbench_accounts | 30 GB      |  200000029 |    4232485 |           2.07 |        2 | 10665646 |            1 |                0 | 2026-01-31 21:17:24.785585-05 |                               | LOW_BLOAT_PRESSURE
- public      | pgbench_history  | 270 MB     |    5331130 |          0 |           0.00 |        0 |          |            1 |                6 | 2026-01-31 21:17:26.345526-05 | 2026-01-31 21:47:10.021717-05 | LOW_BLOAT_PRESSURE
-(2 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name |    table_name    | total_size | n_live_tup | n_dead_tup | dead_tuple_pct | seq_scan | idx_scan | vacuum_count | autovacuum_count |          last_vacuum          |        last_autovacuum        |     bloat_flag     
+-- -------------+------------------+------------+------------+------------+----------------+----------+----------+--------------+------------------+-------------------------------+-------------------------------+--------------------
+--  public      | pgbench_accounts | 30 GB      |  200000029 |    4232485 |           2.07 |        2 | 10665646 |            1 |                0 | 2026-01-31 21:17:24.785585-05 |                               | LOW_BLOAT_PRESSURE
+--  public      | pgbench_history  | 270 MB     |    5331130 |          0 |           0.00 |        0 |          |            1 |                6 | 2026-01-31 21:17:26.345526-05 | 2026-01-31 21:47:10.021717-05 | LOW_BLOAT_PRESSURE
+-- (2 rows)
+-- 
+-- SAMPLE_OUTPUT_END

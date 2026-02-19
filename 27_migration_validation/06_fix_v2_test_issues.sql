@@ -125,47 +125,49 @@ ANALYZE migration_v2_lab.quoted_orders;
 \echo [V2 fix] Fix complete.
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
 
-Pager usage is off.
-[V2 fix] Adding primary key to customer_staging_no_pk...
-DO
-[V2 fix] Owning sequence by table column...
-ALTER TABLE
-ALTER SEQUENCE
-[V2 fix] Creating FK supporting index...
-CREATE INDEX
-[V2 fix] Removing duplicate index...
-DROP INDEX
-[V2 fix] Normalizing uppercase object names...
-DO
-ALTER SEQUENCE
-[V2 fix] Refreshing stale statistics path...
-ALTER TABLE
-ANALYZE
-[V2 fix] Clearing dead tuple pressure...
-ALTER TABLE
-VACUUM
-[V2 fix] Normalizing Oracle empty-string semantics...
-UPDATE 51429
-[V2 fix] Resolving numeric mapping risk...
-ALTER TABLE
-UPDATE 120000
-[V2 fix] Adding practical performance indexes...
-CREATE INDEX
-CREATE INDEX
-[V2 fix] Refreshing mview and baseline stats...
-REFRESH MATERIALIZED VIEW
-ANALYZE
-ANALYZE
-ANALYZE
-ANALYZE
-ANALYZE
-ANALYZE
-ANALYZE
-ANALYZE
-ANALYZE
-[V2 fix] Fix complete.
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+-- Pager usage is off.
+-- [V2 fix] Adding primary key to customer_staging_no_pk...
+-- DO
+-- [V2 fix] Owning sequence by table column...
+-- ALTER TABLE
+-- ALTER SEQUENCE
+-- [V2 fix] Creating FK supporting index...
+-- CREATE INDEX
+-- [V2 fix] Removing duplicate index...
+-- DROP INDEX
+-- [V2 fix] Normalizing uppercase object names...
+-- DO
+-- ALTER SEQUENCE
+-- [V2 fix] Refreshing stale statistics path...
+-- ALTER TABLE
+-- ANALYZE
+-- [V2 fix] Clearing dead tuple pressure...
+-- ALTER TABLE
+-- VACUUM
+-- [V2 fix] Normalizing Oracle empty-string semantics...
+-- UPDATE 51429
+-- [V2 fix] Resolving numeric mapping risk...
+-- ALTER TABLE
+-- UPDATE 120000
+-- [V2 fix] Adding practical performance indexes...
+-- CREATE INDEX
+-- CREATE INDEX
+-- [V2 fix] Refreshing mview and baseline stats...
+-- REFRESH MATERIALIZED VIEW
+-- ANALYZE
+-- ANALYZE
+-- ANALYZE
+-- ANALYZE
+-- ANALYZE
+-- ANALYZE
+-- ANALYZE
+-- ANALYZE
+-- ANALYZE
+-- [V2 fix] Fix complete.
+-- SAMPLE_OUTPUT_END

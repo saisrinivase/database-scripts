@@ -61,13 +61,15 @@ GROUP BY p.schema_name, p.partitioned_table, p.partition_key, s.total_leaf_bytes
 ORDER BY p.schema_name, p.partitioned_table;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-   schema_name    | partitioned_table  |   partition_key    | leaf_partition_count | leaf_partitions_without_valid_index | total_leaf_size | partition_health_flag 
-------------------+--------------------+--------------------+----------------------+-------------------------------------+-----------------+-----------------------
- migration_v2_lab | partitioned_events | RANGE (event_date) |                    2 |                                   0 | 10 MB           | OK
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--    schema_name    | partitioned_table  |   partition_key    | leaf_partition_count | leaf_partitions_without_valid_index | total_leaf_size | partition_health_flag 
+-- ------------------+--------------------+--------------------+----------------------+-------------------------------------+-----------------+-----------------------
+--  migration_v2_lab | partitioned_events | RANGE (event_date) |                    2 |                                   0 | 10 MB           | OK
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

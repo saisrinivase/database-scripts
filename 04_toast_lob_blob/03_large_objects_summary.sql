@@ -10,13 +10,15 @@ SELECT
 FROM pg_largeobject;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- large_object_count | total_bytes | total_pretty 
---------------------+-------------+--------------
-                  0 |           0 | 0 bytes
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  large_object_count | total_bytes | total_pretty 
+-- --------------------+-------------+--------------
+--                   0 |           0 | 0 bytes
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

@@ -1599,17 +1599,19 @@ ORDER BY check_id, metric DESC NULLS LAST, object_name;
 \echo HTML report written to :report_file
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
 
-Pager usage is off.
-Border style is 1.
-Output format is html.
-Title is "Report Metadata".
-Title is "Overall Health Summary".
-Title is "360-Degree Check Results".
-Title is "Issue Details (Top Objects and Sessions)".
-Output format is aligned.
-HTML report written to postgres_360_migration_health_report.html
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+-- Pager usage is off.
+-- Border style is 1.
+-- Output format is html.
+-- Title is "Report Metadata".
+-- Title is "Overall Health Summary".
+-- Title is "360-Degree Check Results".
+-- Title is "Issue Details (Top Objects and Sessions)".
+-- Output format is aligned.
+-- HTML report written to postgres_360_migration_health_report.html
+-- SAMPLE_OUTPUT_END

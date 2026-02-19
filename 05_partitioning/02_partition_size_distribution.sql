@@ -22,12 +22,18 @@ JOIN pg_namespace cns
 ORDER BY partition_bytes DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- parent_schema | parent_table | partition_schema | partition_name | partition_bytes | partition_pretty 
----------------+--------------+------------------+----------------+-----------------+------------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--   parent_schema   |      parent_table       | partition_schema |        partition_name        | partition_bytes | partition_pretty 
+-- ------------------+-------------------------+------------------+------------------------------+-----------------+------------------
+--  migration_v2_lab | partitioned_events      | migration_v2_lab | partitioned_events_2025      |         5693440 | 5560 kB
+--  migration_v2_lab | partitioned_events      | migration_v2_lab | partitioned_events_2026      |         5226496 | 5104 kB
+--  migration_v2_lab | partitioned_events_pkey | migration_v2_lab | partitioned_events_2025_pkey |         1654784 | 1616 kB
+--  migration_v2_lab | partitioned_events_pkey | migration_v2_lab | partitioned_events_2026_pkey |         1523712 | 1488 kB
+-- (4 rows)
+-- 
+-- SAMPLE_OUTPUT_END

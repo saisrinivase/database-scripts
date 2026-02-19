@@ -19,9 +19,11 @@ SELECT
 FROM pg_stat_wal;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
 
-INSERT 0 1
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+-- INSERT 0 1
+-- SAMPLE_OUTPUT_END

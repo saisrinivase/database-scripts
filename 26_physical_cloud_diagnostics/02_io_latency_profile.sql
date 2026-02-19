@@ -16,18 +16,20 @@ WHERE datname NOT IN ('template0', 'template1')
 ORDER BY ms_per_block_read DESC NULLS LAST, blk_read_time DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-           database_name           | blks_read | blks_hit  | blk_read_time | blk_write_time | ms_per_block_read | write_time_per_txn 
------------------------------------+-----------+-----------+---------------+----------------+-------------------+--------------------
- postgres                          |      1605 |   5554276 |             0 |              0 |                 0 |                  0
- perf_test                         |      1103 |    318136 |             0 |              0 |                 0 |                  0
- appdb                             |      1541 |    327669 |             0 |              0 |                 0 |                  0
- hypopg_lab                        |      4016 |    318470 |             0 |              0 |                 0 |                  0
- pgbench_test                      |  14208247 | 141643215 |             0 |              0 |                 0 |                  0
- script_validation_20260218_172749 |       372 |   6094633 |             0 |              0 |                 0 |                  0
-(6 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--            database_name           | blks_read | blks_hit  | blk_read_time | blk_write_time | ms_per_block_read | write_time_per_txn 
+-- -----------------------------------+-----------+-----------+---------------+----------------+-------------------+--------------------
+--  postgres                          |      2113 |   5589160 |             0 |              0 |                 0 |                  0
+--  perf_test                         |      1244 |    327627 |             0 |              0 |                 0 |                  0
+--  appdb                             |      1679 |    336614 |             0 |              0 |                 0 |                  0
+--  hypopg_lab                        |      4115 |    327204 |             0 |              0 |                 0 |                  0
+--  pgbench_test                      |  14236640 | 173923446 |             0 |              0 |                 0 |                  0
+--  script_validation_20260218_172749 |       518 |   7833029 |             0 |              0 |                 0 |                  0
+-- (6 rows)
+-- 
+-- SAMPLE_OUTPUT_END

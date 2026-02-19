@@ -15,13 +15,15 @@ SELECT
     current_setting('hba_file') AS hba_file;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-           database_name           | login_role |                                                        server_version                                                        | server_version_num |     postmaster_start_time     |    instance_uptime     |         data_directory          |                   config_file                   |                  hba_file                   
------------------------------------+------------+------------------------------------------------------------------------------------------------------------------------------+--------------------+-------------------------------+------------------------+---------------------------------+-------------------------------------------------+---------------------------------------------
- script_validation_20260218_172749 | saiendla   | PostgreSQL 18.0 (Homebrew) on aarch64-apple-darwin25.0.0, compiled by Apple clang version 17.0.0 (clang-1700.3.19.1), 64-bit | 180000             | 2026-02-10 09:32:09.191307-05 | 8 days 08:11:02.534891 | /opt/homebrew/var/postgresql@18 | /opt/homebrew/var/postgresql@18/postgresql.conf | /opt/homebrew/var/postgresql@18/pg_hba.conf
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  database_name | login_role |                                                        server_version                                                        | server_version_num |     postmaster_start_time     |    instance_uptime     |         data_directory          |                   config_file                   |                  hba_file                   
+-- ---------------+------------+------------------------------------------------------------------------------------------------------------------------------+--------------------+-------------------------------+------------------------+---------------------------------+-------------------------------------------------+---------------------------------------------
+--  pgbench_test  | saiendla   | PostgreSQL 18.0 (Homebrew) on aarch64-apple-darwin25.0.0, compiled by Apple clang version 17.0.0 (clang-1700.3.19.1), 64-bit | 180000             | 2026-02-10 09:32:09.191307-05 | 8 days 10:11:21.746752 | /opt/homebrew/var/postgresql@18 | /opt/homebrew/var/postgresql@18/postgresql.conf | /opt/homebrew/var/postgresql@18/pg_hba.conf
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

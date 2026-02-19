@@ -20,12 +20,18 @@ WHERE xact_start IS NOT NULL
 ORDER BY xact_age DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- pid | user_name | application_name | client_addr | xact_start | xact_age | state | wait_event_type | wait_event | query_snippet 
------+-----------+------------------+-------------+------------+----------+-------+-----------------+------------+---------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  pid | user_name | application_name | client_addr | xact_start | xact_age | state | wait_event_type | wait_event | query_snippet 
+-- -----+-----------+------------------+-------------+------------+----------+-------+-----------------+------------+---------------
+-- (0 rows)
+-- 
+-- 
+-- Interpretation:
+-- - No issue/candidate rows were found at capture time.
+-- - This typically indicates healthy state for this check; rerun during peak load for validation.
+-- SAMPLE_OUTPUT_END

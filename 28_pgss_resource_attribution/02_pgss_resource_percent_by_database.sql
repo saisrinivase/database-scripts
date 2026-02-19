@@ -64,19 +64,21 @@ CROSS JOIN totals t
 ORDER BY pct_exec DESC NULLS LAST;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-           database_name           |  total_exec_time   |   cpu_proxy_time   | io_time | temp_bytes_written | temp_pretty | pct_exec | pct_cpu_proxy | pct_io | pct_memory_spill 
------------------------------------+--------------------+--------------------+---------+--------------------+-------------+----------+---------------+--------+------------------
- pgbench_test                      |  21135893.24357873 |  21135893.24357873 |       0 |                  0 | 0 bytes     |    99.92 |         99.92 |        |             0.00
- script_validation_20260218_172749 |  9665.874373999897 |  9665.874373999897 |       0 |            6750208 | 6592 kB     |     0.05 |          0.05 |        |            57.14
- postgres                          |  6721.722360999895 |  6721.722360999895 |       0 |            5062656 | 4944 kB     |     0.03 |          0.03 |        |            42.86
- template1                         |           0.013168 |           0.013168 |       0 |                  0 | 0 bytes     |     0.00 |          0.00 |        |             0.00
- appdb                             | 26.254455999999994 | 26.254455999999994 |       0 |                  0 | 0 bytes     |     0.00 |          0.00 |        |             0.00
- perf_test                         |           0.546833 |           0.546833 |       0 |                  0 | 0 bytes     |     0.00 |          0.00 |        |             0.00
- hypopg_lab                        |          84.404333 |          84.404333 |       0 |                  0 | 0 bytes     |     0.00 |          0.00 |        |             0.00
-(7 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--            database_name           |  total_exec_time   |   cpu_proxy_time   | io_time | temp_bytes_written | temp_pretty | pct_exec | pct_cpu_proxy | pct_io | pct_memory_spill 
+-- -----------------------------------+--------------------+--------------------+---------+--------------------+-------------+----------+---------------+--------+------------------
+--  pgbench_test                      | 21187845.280380692 | 21187845.280380692 |       0 |          192405504 | 183 MB      |    99.92 |         99.92 |        |            94.22
+--  script_validation_20260218_172749 |  9668.777081999895 |  9668.777081999895 |       0 |            6750208 | 6592 kB     |     0.05 |          0.05 |        |             3.31
+--  postgres                          |  6974.367387999896 |  6974.367387999896 |       0 |            5062656 | 4944 kB     |     0.03 |          0.03 |        |             2.48
+--  template1                         |           0.013168 |           0.013168 |       0 |                  0 | 0 bytes     |     0.00 |          0.00 |        |             0.00
+--  appdb                             | 26.254455999999994 | 26.254455999999994 |       0 |                  0 | 0 bytes     |     0.00 |          0.00 |        |             0.00
+--  perf_test                         |           0.546833 |           0.546833 |       0 |                  0 | 0 bytes     |     0.00 |          0.00 |        |             0.00
+--  hypopg_lab                        |          84.404333 |          84.404333 |       0 |                  0 | 0 bytes     |     0.00 |          0.00 |        |             0.00
+-- (7 rows)
+-- 
+-- SAMPLE_OUTPUT_END

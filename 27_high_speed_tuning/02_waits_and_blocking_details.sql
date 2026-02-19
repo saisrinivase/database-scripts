@@ -35,12 +35,18 @@ JOIN pg_stat_activity p
 ORDER BY b.blocked_query_age DESC NULLS LAST;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- blocked_pid | blocked_user | blocked_app | blocked_database | blocked_query_age | blocked_query | blocker_pid | blocker_user | blocker_app | blocker_state | blocker_query_age | blocker_query | blocker_wait_type | blocker_wait_event 
--------------+--------------+-------------+------------------+-------------------+---------------+-------------+--------------+-------------+---------------+-------------------+---------------+-------------------+--------------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  blocked_pid | blocked_user | blocked_app | blocked_database | blocked_query_age | blocked_query | blocker_pid | blocker_user | blocker_app | blocker_state | blocker_query_age | blocker_query | blocker_wait_type | blocker_wait_event 
+-- -------------+--------------+-------------+------------------+-------------------+---------------+-------------+--------------+-------------+---------------+-------------------+---------------+-------------------+--------------------
+-- (0 rows)
+-- 
+-- 
+-- Interpretation:
+-- - No issue/candidate rows were found at capture time.
+-- - This typically indicates healthy state for this check; rerun during peak load for validation.
+-- SAMPLE_OUTPUT_END

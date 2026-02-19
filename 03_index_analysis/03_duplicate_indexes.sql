@@ -52,13 +52,18 @@ HAVING count(*) > 1
 ORDER BY total_duplicate_bytes DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name | table_name |                             duplicate_indexes                              | total_duplicate_bytes | total_duplicate_pretty 
--------------+------------+----------------------------------------------------------------------------+-----------------------+------------------------
- public      | demo_users | {demo_users_username_idx,demo_users_username_idx1,idx_demo_users_username} |               1105920 | 1080 kB
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name | table_name | duplicate_indexes | total_duplicate_bytes | total_duplicate_pretty 
+-- -------------+------------+-------------------+-----------------------+------------------------
+-- (0 rows)
+-- 
+-- 
+-- Interpretation:
+-- - No issue/candidate rows were found at capture time.
+-- - This typically indicates healthy state for this check; rerun during peak load for validation.
+-- SAMPLE_OUTPUT_END

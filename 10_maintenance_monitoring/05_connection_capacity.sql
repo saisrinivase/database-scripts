@@ -25,13 +25,15 @@ FROM cfg
 CROSS JOIN act;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- max_connections | total_connections | active_connections | idle_connections | idle_in_txn_connections | pct_used 
------------------+-------------------+--------------------+------------------+-------------------------+----------
-             100 |                12 |                  1 |                3 |                       0 |    12.00
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  max_connections | total_connections | active_connections | idle_connections | idle_in_txn_connections | pct_used 
+-- -----------------+-------------------+--------------------+------------------+-------------------------+----------
+--              100 |                 9 |                  1 |                0 |                       0 |     9.00
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

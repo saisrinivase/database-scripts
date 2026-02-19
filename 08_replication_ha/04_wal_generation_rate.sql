@@ -22,13 +22,15 @@ SELECT
 FROM pg_stat_wal;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- wal_records | wal_fpi |  wal_bytes  |          stats_reset          | elapsed_seconds | wal_bytes_per_second | wal_rate_pretty_per_second 
--------------+---------+-------------+-------------------------------+-----------------+----------------------+----------------------------
-    48278912 |  675399 | 31813791436 | 2026-01-31 20:40:48.109778-05 |         1544544 |             20597.53 | 20 kB
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  wal_records | wal_fpi |  wal_bytes  |          stats_reset          | elapsed_seconds | wal_bytes_per_second | wal_rate_pretty_per_second 
+-- -------------+---------+-------------+-------------------------------+-----------------+----------------------+----------------------------
+--     62850486 |  690812 | 33184403795 | 2026-01-31 20:40:48.109778-05 |         1551763 |             21384.96 | 21 kB
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

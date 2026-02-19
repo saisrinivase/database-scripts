@@ -16,12 +16,18 @@ GROUP BY application_name, usename, datname
 ORDER BY idle_in_txn_sessions DESC, max_xact_age DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- application_name | user_name | database_name | idle_in_txn_sessions | oldest_xact_start | max_xact_age 
-------------------+-----------+---------------+----------------------+-------------------+--------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  application_name | user_name | database_name | idle_in_txn_sessions | oldest_xact_start | max_xact_age 
+-- ------------------+-----------+---------------+----------------------+-------------------+--------------
+-- (0 rows)
+-- 
+-- 
+-- Interpretation:
+-- - No issue/candidate rows were found at capture time.
+-- - This typically indicates healthy state for this check; rerun during peak load for validation.
+-- SAMPLE_OUTPUT_END

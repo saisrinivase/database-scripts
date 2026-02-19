@@ -34,13 +34,20 @@ FROM candidates
 ORDER BY total_bytes DESC, schema_name, table_name;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name |   table_name    | est_rows | total_size |                             starter_pk_sql                              
--------------+-----------------+----------+------------+-------------------------------------------------------------------------
- public      | pgbench_history |  5331130 | 270 MB     | ALTER TABLE public.pgbench_history ADD COLUMN id bigserial PRIMARY KEY;
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name |       table_name        | est_rows | total_size |                                    starter_pk_sql                                    
+-- -------------+-------------------------+----------+------------+--------------------------------------------------------------------------------------
+--  public      | pgbench_history         |  5331130 | 270 MB     | ALTER TABLE public.pgbench_history ADD COLUMN id bigserial PRIMARY KEY;
+--  dba_metrics | connection_snapshots    |       -1 | 16 kB      | ALTER TABLE dba_metrics.connection_snapshots ADD COLUMN id bigserial PRIMARY KEY;
+--  dba_metrics | database_size_snapshots |       -1 | 16 kB      | ALTER TABLE dba_metrics.database_size_snapshots ADD COLUMN id bigserial PRIMARY KEY;
+--  dba_metrics | index_size_snapshots    |       -1 | 16 kB      | ALTER TABLE dba_metrics.index_size_snapshots ADD COLUMN id bigserial PRIMARY KEY;
+--  dba_metrics | table_size_snapshots    |       -1 | 16 kB      | ALTER TABLE dba_metrics.table_size_snapshots ADD COLUMN id bigserial PRIMARY KEY;
+--  dba_metrics | wal_snapshots           |       -1 | 16 kB      | ALTER TABLE dba_metrics.wal_snapshots ADD COLUMN id bigserial PRIMARY KEY;
+-- (6 rows)
+-- 
+-- SAMPLE_OUTPUT_END

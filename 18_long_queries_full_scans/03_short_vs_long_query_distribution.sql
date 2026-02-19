@@ -31,16 +31,18 @@ ORDER BY
     END;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-      bucket       | statement_count | total_calls | total_exec_time_ms 
--------------------+-----------------+-------------+--------------------
- Short (<10ms)     |             346 |    38060766 | 21136572.523184724
- Medium (10-100ms) |              27 |          95 | 2270.3437449999997
- Long (100ms-1s)   |              15 |          45 |  9995.503952999998
- Very long (>1s)   |               1 |           1 |        1674.504167
-(4 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--       bucket       | statement_count | total_calls | total_exec_time_ms 
+-- -------------------+-----------------+-------------+--------------------
+--  Short (<10ms)     |             688 |    39301614 | 21138847.442612693
+--  Medium (10-100ms) |              68 |         226 |  6928.975448999999
+--  Long (100ms-1s)   |              35 |         130 |       36590.310079
+--  Very long (>1s)   |               3 |           9 | 10957.114957999998
+-- (4 rows)
+-- 
+-- SAMPLE_OUTPUT_END

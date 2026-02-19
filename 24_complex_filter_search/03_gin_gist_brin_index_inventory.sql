@@ -24,12 +24,18 @@ WHERE n.nspname !~ '^pg_'
 ORDER BY access_method, pg_relation_size(i.oid) DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name | table_name | index_name | access_method | index_size 
--------------+------------+------------+---------------+------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name | table_name | index_name | access_method | index_size 
+-- -------------+------------+------------+---------------+------------
+-- (0 rows)
+-- 
+-- 
+-- Interpretation:
+-- - No rows matched in this environment at capture time.
+-- - This can be expected when the related object/feature is not present or not in use.
+-- SAMPLE_OUTPUT_END

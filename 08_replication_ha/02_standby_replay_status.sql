@@ -14,13 +14,15 @@ SELECT
     END AS replay_delay;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- is_standby | last_received_lsn | last_replayed_lsn | last_replay_timestamp | replay_delay 
-------------+-------------------+-------------------+-----------------------+--------------
- f          |                   |                   |                       | 
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  is_standby | last_received_lsn | last_replayed_lsn | last_replay_timestamp | replay_delay 
+-- ------------+-------------------+-------------------+-----------------------+--------------
+--  f          |                   |                   |                       | 
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

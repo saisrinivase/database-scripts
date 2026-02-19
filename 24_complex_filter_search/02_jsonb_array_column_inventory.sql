@@ -25,17 +25,18 @@ WHERE c.relkind = 'r'
 ORDER BY schema_name, table_name, column_name;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name |  table_name   | column_name | data_type 
--------------+---------------+-------------+-----------
- perf        | app_events    | payload     | jsonb
- perf        | audit_log     | details     | jsonb
- perf        | job_runs      | metrics     | jsonb
- perf        | jobs          | meta        | jsonb
- perf        | notifications | payload     | jsonb
-(5 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name | table_name | column_name | data_type 
+-- -------------+------------+-------------+-----------
+-- (0 rows)
+-- 
+-- 
+-- Interpretation:
+-- - No rows matched in this environment at capture time.
+-- - This can be expected when the related object/feature is not present or not in use.
+-- SAMPLE_OUTPUT_END

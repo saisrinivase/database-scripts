@@ -24,22 +24,24 @@ WHERE name IN (
 ORDER BY name;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-              name               |  setting  | unit | source  
----------------------------------+-----------+------+---------
- autovacuum                      | on        |      | default
- autovacuum_analyze_scale_factor | 0.1       |      | default
- autovacuum_analyze_threshold    | 50        |      | default
- autovacuum_freeze_max_age       | 200000000 |      | default
- autovacuum_max_workers          | 3         |      | default
- autovacuum_naptime              | 60        | s    | default
- autovacuum_vacuum_scale_factor  | 0.2       |      | default
- autovacuum_vacuum_threshold     | 50        |      | default
- vacuum_freeze_min_age           | 50000000  |      | default
- vacuum_freeze_table_age         | 150000000 |      | default
-(10 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--               name               |  setting  | unit | source  
+-- ---------------------------------+-----------+------+---------
+--  autovacuum                      | on        |      | default
+--  autovacuum_analyze_scale_factor | 0.1       |      | default
+--  autovacuum_analyze_threshold    | 50        |      | default
+--  autovacuum_freeze_max_age       | 200000000 |      | default
+--  autovacuum_max_workers          | 3         |      | default
+--  autovacuum_naptime              | 60        | s    | default
+--  autovacuum_vacuum_scale_factor  | 0.2       |      | default
+--  autovacuum_vacuum_threshold     | 50        |      | default
+--  vacuum_freeze_min_age           | 50000000  |      | default
+--  vacuum_freeze_table_age         | 150000000 |      | default
+-- (10 rows)
+-- 
+-- SAMPLE_OUTPUT_END

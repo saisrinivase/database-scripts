@@ -17,12 +17,17 @@ WHERE c.relkind IN ('r', 'm', 'p')
 ORDER BY n.nspname, c.relname;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name | table_name | reloptions 
--------------+------------+------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name |    table_name    |    reloptions    
+-- -------------+------------------+------------------
+--  public      | pgbench_accounts | {fillfactor=100}
+--  public      | pgbench_branches | {fillfactor=100}
+--  public      | pgbench_tellers  | {fillfactor=100}
+-- (3 rows)
+-- 
+-- SAMPLE_OUTPUT_END

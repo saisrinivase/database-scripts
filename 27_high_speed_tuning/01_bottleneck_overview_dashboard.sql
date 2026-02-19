@@ -189,13 +189,15 @@ CROSS JOIN bg;
 \endif
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- total_connections | active_connections | idle_in_txn_connections | waiting_sessions | waiting_locks | granted_locks | deadlocks | blks_read | blks_hit  | cache_hit_pct | temp_files | temp_bytes | temp_bytes_pretty | blk_read_time | blk_write_time | checkpoints_timed | checkpoints_req | requested_checkpoint_pct | buffers_checkpoint | slru_written | buffers_clean | maxwritten_clean | buffers_backend | buffers_backend_fsync | buffers_alloc | checkpoint_write_time | checkpoint_sync_time |   checkpointer_stats_reset    |     bgwriter_stats_reset      |         top_bottleneck_hint         
--------------------+--------------------+-------------------------+------------------+---------------+---------------+-----------+-----------+-----------+---------------+------------+------------+-------------------+---------------+----------------+-------------------+-----------------+--------------------------+--------------------+--------------+---------------+------------------+-----------------+-----------------------+---------------+-----------------------+----------------------+-------------------------------+-------------------------------+-------------------------------------
-                12 |                  1 |                       0 |               11 |             0 |            12 |         0 |  14216884 | 154257491 |         91.56 |         12 | 4018523904 | 3832 MB           |             0 |              0 |               827 |              59 |                     6.66 |              29293 |          211 |        244345 |             2422 |                 |                       |      10846389 |               2788826 |                48655 | 2026-01-31 20:40:48.109778-05 | 2026-01-31 20:40:48.109778-05 | No dominant global bottleneck found
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  total_connections | active_connections | idle_in_txn_connections | waiting_sessions | waiting_locks | granted_locks | deadlocks | blks_read | blks_hit  | cache_hit_pct | temp_files | temp_bytes | temp_bytes_pretty | blk_read_time | blk_write_time | checkpoints_timed | checkpoints_req | requested_checkpoint_pct | buffers_checkpoint | slru_written | buffers_clean | maxwritten_clean | buffers_backend | buffers_backend_fsync | buffers_alloc | checkpoint_write_time | checkpoint_sync_time |   checkpointer_stats_reset    |     bgwriter_stats_reset      |         top_bottleneck_hint         
+-- -------------------+--------------------+-------------------------+------------------+---------------+---------------+-----------+-----------+-----------+---------------+------------+------------+-------------------+---------------+----------------+-------------------+-----------------+--------------------------+--------------------+--------------+---------------+------------------+-----------------+-----------------------+---------------+-----------------------+----------------------+-------------------------------+-------------------------------+-------------------------------------
+--                  9 |                  1 |                       0 |                8 |             0 |            12 |         0 |  14246309 | 188338172 |         92.97 |         58 | 4172992384 | 3980 MB           |             0 |              0 |               851 |              59 |                     6.48 |              68025 |          216 |        277435 |             2551 |                 |                       |      10942179 |               4142695 |                48708 | 2026-01-31 20:40:48.109778-05 | 2026-01-31 20:40:48.109778-05 | No dominant global bottleneck found
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

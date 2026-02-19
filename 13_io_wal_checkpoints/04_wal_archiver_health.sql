@@ -14,13 +14,15 @@ SELECT
 FROM pg_stat_archiver;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- archived_count | last_archived_wal | last_archived_time | failed_count | last_failed_wal | last_failed_time |          stats_reset          
-----------------+-------------------+--------------------+--------------+-----------------+------------------+-------------------------------
-              0 |                   |                    |            0 |                 |                  | 2026-01-31 20:40:48.109778-05
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  archived_count | last_archived_wal | last_archived_time | failed_count | last_failed_wal | last_failed_time |          stats_reset          
+-- ----------------+-------------------+--------------------+--------------+-----------------+------------------+-------------------------------
+--               0 |                   |                    |            0 |                 |                  | 2026-01-31 20:40:48.109778-05
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

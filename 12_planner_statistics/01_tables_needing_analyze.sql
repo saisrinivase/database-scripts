@@ -16,16 +16,22 @@ WHERE n_mod_since_analyze > 0
 ORDER BY n_mod_since_analyze DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name |       table_name        | n_live_tup | n_mod_since_analyze | mods_vs_live_pct | last_analyze |       last_autoanalyze        
--------------+-------------------------+------------+---------------------+------------------+--------------+-------------------------------
- dba_metrics | database_size_snapshots |         42 |                  42 |           100.00 |              | 
- dba_metrics | table_size_snapshots    |        176 |                  34 |            19.32 |              | 2026-02-18 17:37:43.159982-05
- dba_metrics | connection_snapshots    |         30 |                  30 |           100.00 |              | 
- dba_metrics | wal_snapshots           |          6 |                   6 |           100.00 |              | 
-(4 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--    schema_name    |       table_name        | n_live_tup | n_mod_since_analyze | mods_vs_live_pct |         last_analyze          | last_autoanalyze 
+-- ------------------+-------------------------+------------+---------------------+------------------+-------------------------------+------------------
+--  public           | pgbench_accounts        |  200000029 |             5332823 |             2.67 | 2026-01-31 21:38:08.216354-05 | 
+--  dba_metrics      | table_size_snapshots    |         25 |                  25 |           100.00 |                               | 
+--  dba_metrics      | index_size_snapshots    |         21 |                  21 |           100.00 |                               | 
+--  migration_v2_lab | issue_manifest          |         11 |                  11 |           100.00 |                               | 
+--  dba_metrics      | database_size_snapshots |          7 |                   7 |           100.00 |                               | 
+--  dba_metrics      | connection_snapshots    |          3 |                   3 |           100.00 |                               | 
+--  migration_v2_lab | mv_daily_order_volume   |          1 |                   2 |           200.00 |                               | 
+--  dba_metrics      | wal_snapshots           |          1 |                   1 |           100.00 |                               | 
+-- (8 rows)
+-- 
+-- SAMPLE_OUTPUT_END

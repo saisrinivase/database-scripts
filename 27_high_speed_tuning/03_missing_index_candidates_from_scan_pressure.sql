@@ -40,12 +40,16 @@ WHERE total_bytes >= 128::bigint * 1024 * 1024
 ORDER BY seq_scan_pct DESC NULLS LAST, heap_blks_read DESC, total_bytes DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name | table_name | total_bytes | total_pretty | estimated_live_rows | seq_scan | idx_scan | seq_scan_pct | heap_blks_read | heap_blks_hit | recommendation | index_template 
--------------+------------+-------------+--------------+---------------------+----------+----------+--------------+----------------+---------------+----------------+----------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name |    table_name    | total_bytes | total_pretty | estimated_live_rows | seq_scan | idx_scan | seq_scan_pct | heap_blks_read | heap_blks_hit | recommendation |                                      index_template                                      
+-- -------------+------------------+-------------+--------------+---------------------+----------+----------+--------------+----------------+---------------+----------------+------------------------------------------------------------------------------------------
+--  public      | pgbench_accounts | 31716564992 | 30 GB        |           200000029 |        2 | 10665646 |         0.00 |        8716689 |      30324707 | Observe        | -- Template: CREATE INDEX CONCURRENTLY ON public.pgbench_accounts (<predicate_columns>);
+--  public      | pgbench_history  |   282656768 | 270 MB       |             5331130 |        0 |          |              |         189340 |       5565865 | Observe        | -- Template: CREATE INDEX CONCURRENTLY ON public.pgbench_history (<predicate_columns>);
+-- (2 rows)
+-- 
+-- SAMPLE_OUTPUT_END

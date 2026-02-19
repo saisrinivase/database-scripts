@@ -25,14 +25,17 @@ WHERE r.rolcanlogin
 ORDER BY pct_of_role_limit DESC NULLS LAST, current_connections DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- role_name | rolconnlimit | current_connections | pct_of_role_limit 
------------+--------------+---------------------+-------------------
- saiendla  |           -1 |                   5 |                  
- postgres  |           -1 |                   0 |                  
-(2 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--       role_name      | rolconnlimit | current_connections | pct_of_role_limit 
+-- ---------------------+--------------+---------------------+-------------------
+--  saiendla            |           -1 |                   2 |                  
+--  postgres            |           -1 |                   0 |                  
+--  migration_v2_reader |           -1 |                   0 |                  
+-- (3 rows)
+-- 
+-- SAMPLE_OUTPUT_END

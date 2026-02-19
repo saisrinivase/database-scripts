@@ -22,46 +22,46 @@ LEFT JOIN idx_count i
 ORDER BY index_count DESC, total_writes DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-   schema_name    |       table_name        | index_count | total_writes | total_size 
-------------------+-------------------------+-------------+--------------+------------
- public           | demo_users              |           4 |            0 | 4400 kB
- perf             | orders                  |           3 |            0 | 75 MB
- perf             | app_events              |           3 |            0 | 95 MB
- migration_v1_lab | child_transactions      |           2 |       120000 | 11 MB
- migration_v1_lab | product_catalog         |           2 |        50000 | 6032 kB
- perf             | payments                |           2 |            0 | 83 MB
- perf             | users                   |           2 |            0 | 4720 kB
- perf             | audit_log               |           2 |            0 | 24 kB
- perf             | order_items             |           2 |            0 | 117 MB
- perf             | documents               |           2 |            0 | 24 kB
- migration_v1_lab | stale_stats_table       |           1 |        60000 | 7768 kB
- migration_v1_lab | dml_bloat_table         |           1 |        38000 | 4248 kB
- migration_v1_lab | parent_accounts         |           1 |        10000 | 792 kB
- migration_v1_lab | orders_no_pk            |           1 |        10000 | 872 kB
- migration_v1_lab | sales_orders            |           1 |         1000 | 128 kB
- perf             | categories              |           1 |            0 | 96 kB
- perf             | support_tickets         |           1 |            0 | 16 kB
- perf             | products                |           1 |            0 | 2232 kB
- perf             | jobs                    |           1 |            0 | 16 kB
- perf             | sessions                |           1 |            0 | 1344 kB
- perf             | addresses               |           1 |            0 | 1576 kB
- perf             | job_runs                |           1 |            0 | 16 kB
- perf             | tenants                 |           1 |            0 | 32 kB
- perf             | feature_flags           |           1 |            0 | 120 kB
- perf             | product_categories      |           1 |            0 | 2640 kB
- perf             | shipments               |           1 |            0 | 18 MB
- perf             | ticket_comments         |           1 |            0 | 16 kB
- perf             | inventory               |           1 |            0 | 3416 kB
- perf             | notifications           |           1 |            0 | 16 kB
- dba_metrics      | index_size_snapshots    |           0 |          265 | 64 kB
- dba_metrics      | table_size_snapshots    |           0 |          210 | 56 kB
- dba_metrics      | database_size_snapshots |           0 |           49 | 16 kB
- dba_metrics      | connection_snapshots    |           0 |           35 | 16 kB
- dba_metrics      | wal_snapshots           |           0 |            7 | 16 kB
-(34 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--    schema_name    |       table_name        | index_count | total_writes | total_size 
+-- ------------------+-------------------------+-------------+--------------+------------
+--  migration_v2_lab | order_fact              |           3 |       300000 | 49 MB
+--  migration_v2_lab | child_events            |           2 |       250000 | 25 MB
+--  migration_v2_lab | sales_catalog           |           2 |       120000 | 14 MB
+--  migration_v1_lab | child_transactions      |           2 |       120000 | 11 MB
+--  migration_v1_lab | product_catalog         |           2 |        50000 | 6032 kB
+--  public           | pgbench_accounts        |           1 |    205332823 | 30 GB
+--  public           | pgbench_tellers         |           1 |      5352823 | 3712 kB
+--  public           | pgbench_branches        |           1 |      5334823 | 7048 kB
+--  migration_v2_lab | amount_mapping_risk     |           1 |       240000 | 19 MB
+--  migration_v2_lab | stale_stats_table       |           1 |       180000 | 24 MB
+--  migration_v2_lab | customer_contact_compat |           1 |       141429 | 13 MB
+--  migration_v2_lab | bloat_pressure_table    |           1 |       138000 | 14 MB
+--  migration_v1_lab | stale_stats_table       |           1 |        60000 | 7768 kB
+--  migration_v2_lab | customer_staging_no_pk  |           1 |        60000 | 5016 kB
+--  migration_v2_lab | partitioned_events_2025 |           1 |        52194 | 5560 kB
+--  migration_v2_lab | parent_accounts         |           1 |        50000 | 4096 kB
+--  migration_v2_lab | partitioned_events_2026 |           1 |        47806 | 5104 kB
+--  migration_v1_lab | dml_bloat_table         |           1 |        38000 | 4248 kB
+--  migration_v1_lab | orders_no_pk            |           1 |        10000 | 872 kB
+--  migration_v1_lab | parent_accounts         |           1 |        10000 | 792 kB
+--  migration_v2_lab | quoted_orders           |           1 |         5000 | 496 kB
+--  migration_v1_lab | sales_orders            |           1 |         1000 | 128 kB
+--  migration_v2_lab | issue_manifest          |           1 |           11 | 32 kB
+--  migration_v2_lab | partitioned_events      |           1 |            0 | 0 bytes
+--  migration_v2_lab | trigger_audit_demo      |           1 |            0 | 16 kB
+--  public           | pgbench_history         |           0 |      5332823 | 270 MB
+--  dba_metrics      | table_size_snapshots    |           0 |           57 | 16 kB
+--  dba_metrics      | index_size_snapshots    |           0 |           51 | 16 kB
+--  dba_metrics      | database_size_snapshots |           0 |           14 | 16 kB
+--  dba_metrics      | connection_snapshots    |           0 |            6 | 16 kB
+--  migration_v2_lab | mv_daily_order_volume   |           0 |            2 | 24 kB
+--  dba_metrics      | wal_snapshots           |           0 |            2 | 16 kB
+-- (32 rows)
+-- 
+-- SAMPLE_OUTPUT_END

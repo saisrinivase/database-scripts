@@ -15,12 +15,18 @@ ORDER BY total_time DESC
 LIMIT 200;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name | function_name | calls | total_time | self_time | mean_time 
--------------+---------------+-------+------------+-----------+-----------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name | function_name | calls | total_time | self_time | mean_time 
+-- -------------+---------------+-------+------------+-----------+-----------
+-- (0 rows)
+-- 
+-- 
+-- Interpretation:
+-- - No matching rows were returned at capture time.
+-- - Rerun during peak workload or after seeding representative test cases for non-zero examples.
+-- SAMPLE_OUTPUT_END

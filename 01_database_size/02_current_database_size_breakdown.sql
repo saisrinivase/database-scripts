@@ -26,13 +26,15 @@ SELECT
 FROM base b;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- database_total_bytes | database_total_pretty | table_heap_bytes | table_heap_pretty | indexes_bytes | indexes_pretty | toast_bytes | toast_pretty 
-----------------------+-----------------------+------------------+-------------------+---------------+----------------+-------------+--------------
-            468506303 | 447 MB                |         24412160 | 23 MB             |     434102272 | 414 MB         |      221184 | 216 kB
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  database_total_bytes | database_total_pretty | table_heap_bytes | table_heap_pretty | indexes_bytes | indexes_pretty | toast_bytes | toast_pretty 
+-- ----------------------+-----------------------+------------------+-------------------+---------------+----------------+-------------+--------------
+--           32236762815 | 30 GB                 |      27656060928 | 26 GB             |    4562763776 | 4351 MB        |      204800 | 200 kB
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

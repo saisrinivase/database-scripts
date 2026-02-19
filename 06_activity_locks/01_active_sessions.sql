@@ -21,23 +21,22 @@ WHERE a.pid <> pg_backend_pid()
 ORDER BY query_age DESC NULLS LAST;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-  pid  | user_name | application_name | client_addr |         backend_start         | xact_start |          query_start          |    query_age    | state | wait_event_type |      wait_event      |                                                                                                                                                                                                  query_snippet                                                                                                                                                                                                   
--------+-----------+------------------+-------------+-------------------------------+------------+-------------------------------+-----------------+-------+-----------------+----------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- 98359 | saiendla  | dbvis            | 127.0.0.1   | 2026-02-18 17:30:39.557297-05 |            | 2026-02-18 17:30:39.626331-05 | 00:12:32.601889 | idle  | Client          | ClientRead           | SELECT c.oid, a.attnum, a.attname, c.relname, n.nspname, a.attnotnull OR (t.typtype = 'd' AND t.typnotnull), a.attidentity != '' OR pg_catalog.pg_get_expr(d.adbin, d.adrelid) LIKE '%nextval(%' FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON (c.relnamespace = n.oid) JOIN pg_catalog.pg_attribute a ON (c.oid = a.attrelid) JOIN pg_catalog.pg_type t ON (a.atttypid = t.oid) LEFT JOIN pg_cat
- 98321 | saiendla  | dbvis            | 127.0.0.1   | 2026-02-18 17:30:31.175582-05 |            | 2026-02-18 17:30:47.003016-05 | 00:12:25.225204 | idle  | Client          | ClientRead           | SELECT 1
- 98412 | saiendla  | dbvis            | 127.0.0.1   | 2026-02-18 17:30:52.332242-05 |            | 2026-02-18 17:30:53.560003-05 | 00:12:18.668217 | idle  | Client          | ClientRead           | show search_path
-   885 |           |                  |             | 2026-02-10 09:32:09.197791-05 |            |                               |                 |       | Activity        | IoWorkerMain         | 
-   886 |           |                  |             | 2026-02-10 09:32:09.200077-05 |            |                               |                 |       | Activity        | IoWorkerMain         | 
-   887 |           |                  |             | 2026-02-10 09:32:09.201055-05 |            |                               |                 |       | Activity        | IoWorkerMain         | 
-   888 |           |                  |             | 2026-02-10 09:32:09.202493-05 |            |                               |                 |       | Timeout         | CheckpointWriteDelay | 
-   889 |           |                  |             | 2026-02-10 09:32:09.20292-05  |            |                               |                 |       | Activity        | BgwriterHibernate    | 
-   891 |           |                  |             | 2026-02-10 09:32:09.21264-05  |            |                               |                 |       | Activity        | WalWriterMain        | 
-   892 |           |                  |             | 2026-02-10 09:32:09.214793-05 |            |                               |                 |       | Activity        | AutovacuumMain       | 
-   893 | saiendla  |                  |             | 2026-02-10 09:32:09.216526-05 |            |                               |                 |       | Activity        | LogicalLauncherMain  | 
-(11 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  pid | user_name | application_name | client_addr |         backend_start         | xact_start | query_start | query_age | state | wait_event_type |     wait_event      | query_snippet 
+-- -----+-----------+------------------+-------------+-------------------------------+------------+-------------+-----------+-------+-----------------+---------------------+---------------
+--  892 |           |                  |             | 2026-02-10 09:32:09.214793-05 |            |             |           |       | Activity        | AutovacuumMain      | 
+--  893 | saiendla  |                  |             | 2026-02-10 09:32:09.216526-05 |            |             |           |       | Activity        | LogicalLauncherMain | 
+--  885 |           |                  |             | 2026-02-10 09:32:09.197791-05 |            |             |           |       | Activity        | IoWorkerMain        | 
+--  886 |           |                  |             | 2026-02-10 09:32:09.200077-05 |            |             |           |       | Activity        | IoWorkerMain        | 
+--  887 |           |                  |             | 2026-02-10 09:32:09.201055-05 |            |             |           |       | Activity        | IoWorkerMain        | 
+--  888 |           |                  |             | 2026-02-10 09:32:09.202493-05 |            |             |           |       | Activity        | CheckpointerMain    | 
+--  889 |           |                  |             | 2026-02-10 09:32:09.20292-05  |            |             |           |       | Activity        | BgwriterMain        | 
+--  891 |           |                  |             | 2026-02-10 09:32:09.21264-05  |            |             |           |       | Activity        | WalWriterMain       | 
+-- (8 rows)
+-- 
+-- SAMPLE_OUTPUT_END

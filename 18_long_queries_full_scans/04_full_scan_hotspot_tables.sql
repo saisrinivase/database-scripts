@@ -20,12 +20,15 @@ WHERE pg_total_relation_size(s.relid) >= 512::bigint * 1024 * 1024
 ORDER BY seq_scan_pct DESC NULLS LAST, total_bytes DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name | table_name | seq_scan | idx_scan | seq_scan_pct | total_bytes | total_pretty | estimated_live_rows 
--------------+------------+----------+----------+--------------+-------------+--------------+---------------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name |    table_name    | seq_scan | idx_scan | seq_scan_pct | total_bytes | total_pretty | estimated_live_rows 
+-- -------------+------------------+----------+----------+--------------+-------------+--------------+---------------------
+--  public      | pgbench_accounts |        2 | 10665646 |         0.00 | 31716564992 | 30 GB        |           200000029
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

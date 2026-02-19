@@ -28,13 +28,15 @@ WHERE NOT t.tgisinternal
 ORDER BY n.nspname, c.relname, t.tgname;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-   table_schema   |     table_name     |    trigger_name    | trigger_status | function_schema  |   function_name   |                                                                trigger_definition_snippet                                                                 
-------------------+--------------------+--------------------+----------------+------------------+-------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------
- migration_v2_lab | trigger_audit_demo | trg_set_updated_at | ENABLED        | migration_v2_lab | fn_set_updated_at | CREATE TRIGGER trg_set_updated_at BEFORE UPDATE ON migration_v2_lab.trigger_audit_demo FOR EACH ROW EXECUTE FUNCTION migration_v2_lab.fn_set_updated_at()
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--    table_schema   |     table_name     |    trigger_name    | trigger_status | function_schema  |   function_name   |                                                                trigger_definition_snippet                                                                 
+-- ------------------+--------------------+--------------------+----------------+------------------+-------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+--  migration_v2_lab | trigger_audit_demo | trg_set_updated_at | ENABLED        | migration_v2_lab | fn_set_updated_at | CREATE TRIGGER trg_set_updated_at BEFORE UPDATE ON migration_v2_lab.trigger_audit_demo FOR EACH ROW EXECUTE FUNCTION migration_v2_lab.fn_set_updated_at()
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

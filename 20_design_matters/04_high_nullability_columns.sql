@@ -17,12 +17,17 @@ WHERE schemaname !~ '^pg_'
 ORDER BY null_frac DESC, schemaname, tablename, attname;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name | table_name | column_name | null_frac | n_distinct | correlation 
--------------+------------+-------------+-----------+------------+-------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name |    table_name    | column_name | null_frac | n_distinct | correlation 
+-- -------------+------------------+-------------+-----------+------------+-------------
+--  public      | pgbench_branches | filler      |         1 |          0 |            
+--  public      | pgbench_history  | filler      |         1 |          0 |            
+--  public      | pgbench_tellers  | filler      |         1 |          0 |            
+-- (3 rows)
+-- 
+-- SAMPLE_OUTPUT_END

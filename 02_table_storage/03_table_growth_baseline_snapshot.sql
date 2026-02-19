@@ -15,46 +15,46 @@ FROM pg_stat_user_tables s
 ORDER BY total_bytes DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-         captured_at          |   schema_name    |       table_name        | estimated_live_rows | estimated_dead_rows | total_bytes | total_pretty 
-------------------------------+------------------+-------------------------+---------------------+---------------------+-------------+--------------
- 2026-02-18 17:43:11.93201-05 | perf             | order_items             |                   0 |                   0 |   122626048 | 117 MB
- 2026-02-18 17:43:11.93201-05 | perf             | app_events              |                   0 |                   0 |    99270656 | 95 MB
- 2026-02-18 17:43:11.93201-05 | perf             | payments                |                   0 |                   0 |    87080960 | 83 MB
- 2026-02-18 17:43:11.93201-05 | perf             | orders                  |                   0 |                   0 |    78512128 | 75 MB
- 2026-02-18 17:43:11.93201-05 | perf             | shipments               |                   0 |                   0 |    19038208 | 18 MB
- 2026-02-18 17:43:11.93201-05 | migration_v1_lab | child_transactions      |              120000 |                   0 |    11051008 | 11 MB
- 2026-02-18 17:43:11.93201-05 | migration_v1_lab | stale_stats_table       |               60000 |                   0 |     7954432 | 7768 kB
- 2026-02-18 17:43:11.93201-05 | migration_v1_lab | product_catalog         |               50000 |                   0 |     6176768 | 6032 kB
- 2026-02-18 17:43:11.93201-05 | perf             | users                   |                   0 |                   0 |     4833280 | 4720 kB
- 2026-02-18 17:43:11.93201-05 | public           | demo_users              |                   0 |                   0 |     4505600 | 4400 kB
- 2026-02-18 17:43:11.93201-05 | migration_v1_lab | dml_bloat_table         |               12000 |                   0 |     4349952 | 4248 kB
- 2026-02-18 17:43:11.93201-05 | perf             | inventory               |                   0 |                   0 |     3497984 | 3416 kB
- 2026-02-18 17:43:11.93201-05 | perf             | product_categories      |                   0 |                   0 |     2703360 | 2640 kB
- 2026-02-18 17:43:11.93201-05 | perf             | products                |                   0 |                   0 |     2285568 | 2232 kB
- 2026-02-18 17:43:11.93201-05 | perf             | addresses               |                   0 |                   0 |     1613824 | 1576 kB
- 2026-02-18 17:43:11.93201-05 | perf             | sessions                |                   0 |                   0 |     1376256 | 1344 kB
- 2026-02-18 17:43:11.93201-05 | migration_v1_lab | orders_no_pk            |               10000 |                   0 |      892928 | 872 kB
- 2026-02-18 17:43:11.93201-05 | migration_v1_lab | parent_accounts         |               10000 |                   0 |      811008 | 792 kB
- 2026-02-18 17:43:11.93201-05 | migration_v1_lab | sales_orders            |                1000 |                   0 |      131072 | 128 kB
- 2026-02-18 17:43:11.93201-05 | perf             | feature_flags           |                   0 |                   0 |      122880 | 120 kB
- 2026-02-18 17:43:11.93201-05 | perf             | categories              |                   0 |                   0 |       98304 | 96 kB
- 2026-02-18 17:43:11.93201-05 | dba_metrics      | index_size_snapshots    |                 222 |                   0 |       57344 | 56 kB
- 2026-02-18 17:43:11.93201-05 | dba_metrics      | table_size_snapshots    |                 176 |                   0 |       49152 | 48 kB
- 2026-02-18 17:43:11.93201-05 | perf             | tenants                 |                   0 |                   0 |       32768 | 32 kB
- 2026-02-18 17:43:11.93201-05 | perf             | documents               |                   0 |                   0 |       24576 | 24 kB
- 2026-02-18 17:43:11.93201-05 | perf             | audit_log               |                   0 |                   0 |       24576 | 24 kB
- 2026-02-18 17:43:11.93201-05 | perf             | notifications           |                   0 |                   0 |       16384 | 16 kB
- 2026-02-18 17:43:11.93201-05 | dba_metrics      | connection_snapshots    |                  30 |                   0 |       16384 | 16 kB
- 2026-02-18 17:43:11.93201-05 | dba_metrics      | wal_snapshots           |                   6 |                   0 |       16384 | 16 kB
- 2026-02-18 17:43:11.93201-05 | perf             | support_tickets         |                   0 |                   0 |       16384 | 16 kB
- 2026-02-18 17:43:11.93201-05 | perf             | job_runs                |                   0 |                   0 |       16384 | 16 kB
- 2026-02-18 17:43:11.93201-05 | perf             | ticket_comments         |                   0 |                   0 |       16384 | 16 kB
- 2026-02-18 17:43:11.93201-05 | perf             | jobs                    |                   0 |                   0 |       16384 | 16 kB
- 2026-02-18 17:43:11.93201-05 | dba_metrics      | database_size_snapshots |                  42 |                   0 |       16384 | 16 kB
-(34 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--           captured_at          |   schema_name    |       table_name        | estimated_live_rows | estimated_dead_rows | total_bytes | total_pretty 
+-- -------------------------------+------------------+-------------------------+---------------------+---------------------+-------------+--------------
+--  2026-02-18 19:43:31.089313-05 | public           | pgbench_accounts        |           200000029 |             4232485 | 31716564992 | 30 GB
+--  2026-02-18 19:43:31.089313-05 | public           | pgbench_history         |             5331130 |                   0 |   282656768 | 270 MB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | order_fact              |              300000 |                   0 |    51806208 | 49 MB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | child_events            |              250000 |                   0 |    25714688 | 25 MB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | stale_stats_table       |              180000 |                   0 |    25174016 | 24 MB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | amount_mapping_risk     |              120000 |                   0 |    20119552 | 19 MB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | sales_catalog           |              120000 |                   0 |    14745600 | 14 MB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | bloat_pressure_table    |               42000 |                   0 |    14163968 | 14 MB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | customer_contact_compat |               90000 |                   0 |    13107200 | 13 MB
+--  2026-02-18 19:43:31.089313-05 | migration_v1_lab | child_transactions      |              120000 |                   0 |    11051008 | 11 MB
+--  2026-02-18 19:43:31.089313-05 | migration_v1_lab | stale_stats_table       |               60000 |                   0 |     7954432 | 7768 kB
+--  2026-02-18 19:43:31.089313-05 | public           | pgbench_branches        |                2000 |                  81 |     7217152 | 7048 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v1_lab | product_catalog         |               50000 |                   0 |     6176768 | 6032 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | partitioned_events_2025 |               52194 |                   0 |     5693440 | 5560 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | partitioned_events_2026 |               47806 |                   0 |     5226496 | 5104 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | customer_staging_no_pk  |               60000 |                   0 |     5136384 | 5016 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v1_lab | dml_bloat_table         |               12000 |                   0 |     4349952 | 4248 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | parent_accounts         |               50000 |                   0 |     4194304 | 4096 kB
+--  2026-02-18 19:43:31.089313-05 | public           | pgbench_tellers         |               20000 |                   0 |     3801088 | 3712 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v1_lab | orders_no_pk            |               10000 |                   0 |      892928 | 872 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v1_lab | parent_accounts         |               10000 |                   0 |      811008 | 792 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | quoted_orders           |                5000 |                   0 |      507904 | 496 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v1_lab | sales_orders            |                1000 |                   0 |      131072 | 128 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | issue_manifest          |                  11 |                   0 |       32768 | 32 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | mv_daily_order_volume   |                   1 |                   0 |       24576 | 24 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | trigger_audit_demo      |                   0 |                   0 |       16384 | 16 kB
+--  2026-02-18 19:43:31.089313-05 | dba_metrics      | index_size_snapshots    |                  21 |                   0 |       16384 | 16 kB
+--  2026-02-18 19:43:31.089313-05 | dba_metrics      | wal_snapshots           |                   1 |                   0 |       16384 | 16 kB
+--  2026-02-18 19:43:31.089313-05 | dba_metrics      | database_size_snapshots |                   7 |                   0 |       16384 | 16 kB
+--  2026-02-18 19:43:31.089313-05 | dba_metrics      | connection_snapshots    |                   3 |                   0 |       16384 | 16 kB
+--  2026-02-18 19:43:31.089313-05 | dba_metrics      | table_size_snapshots    |                  25 |                   0 |       16384 | 16 kB
+--  2026-02-18 19:43:31.089313-05 | migration_v2_lab | partitioned_events      |                   0 |                   0 |           0 | 0 bytes
+-- (32 rows)
+-- 
+-- SAMPLE_OUTPUT_END

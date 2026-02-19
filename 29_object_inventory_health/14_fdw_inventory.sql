@@ -85,13 +85,15 @@ WHERE NOT EXISTS (
 ORDER BY object_type, object_name, server_name, relation_name;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- object_type | object_name | owner_name | server_name | relation_name | mapping_count |                     notes                      
--------------+-------------+------------+-------------+---------------+---------------+------------------------------------------------
- FDW_STATUS  | (none)      |            |             |               |               | No FDW wrapper/server/foreign table configured
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  object_type | object_name | owner_name | server_name | relation_name | mapping_count |                     notes                      
+-- -------------+-------------+------------+-------------+---------------+---------------+------------------------------------------------
+--  FDW_STATUS  | (none)      |            |             |               |               | No FDW wrapper/server/foreign table configured
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

@@ -18,12 +18,19 @@ WHERE n_tup_upd > 0
 ORDER BY hot_update_pct ASC NULLS LAST, n_tup_upd DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name | table_name | n_tup_upd | n_tup_hot_upd | hot_update_pct | total_size 
--------------+------------+-----------+---------------+----------------+------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--    schema_name    |       table_name        | n_tup_upd | n_tup_hot_upd | hot_update_pct | total_size 
+-- ------------------+-------------------------+-----------+---------------+----------------+------------
+--  migration_v2_lab | amount_mapping_risk     |    120000 |             0 |           0.00 | 19 MB
+--  migration_v2_lab | customer_contact_compat |     51429 |           466 |           0.91 | 13 MB
+--  public           | pgbench_accounts        |   5332823 |       2672081 |          50.11 | 30 GB
+--  public           | pgbench_tellers         |   5332823 |       5288199 |          99.16 | 3712 kB
+--  public           | pgbench_branches        |   5332823 |       5316334 |          99.69 | 7048 kB
+-- (5 rows)
+-- 
+-- SAMPLE_OUTPUT_END

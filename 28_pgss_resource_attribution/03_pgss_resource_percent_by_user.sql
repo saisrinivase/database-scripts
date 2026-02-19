@@ -64,14 +64,16 @@ CROSS JOIN totals t
 ORDER BY pct_exec DESC NULLS LAST;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- user_name |  total_exec_time  |  cpu_proxy_time   | io_time | temp_bytes_written | temp_pretty | pct_exec | pct_cpu_proxy | pct_io | pct_memory_spill 
------------+-------------------+-------------------+---------+--------------------+-------------+----------+---------------+--------+------------------
- saiendla  | 21131931.63176273 | 21131931.63176273 |       0 |           11812864 | 11 MB       |    99.90 |         99.90 |        |           100.00
- postgres  | 20461.00471599986 | 20461.00471599986 |       0 |                  0 | 0 bytes     |     0.10 |          0.10 |        |             0.00
-(2 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  user_name |  total_exec_time   |   cpu_proxy_time   | io_time | temp_bytes_written | temp_pretty | pct_exec | pct_cpu_proxy | pct_io | pct_memory_spill 
+-- -----------+--------------------+--------------------+---------+--------------------+-------------+----------+---------------+--------+------------------
+--  saiendla  | 21184139.636132687 | 21184139.636132687 |       0 |          204218368 | 195 MB      |    99.90 |         99.90 |        |           100.00
+--  postgres  |  20461.00471599986 |  20461.00471599986 |       0 |                  0 | 0 bytes     |     0.10 |          0.10 |        |             0.00
+-- (2 rows)
+-- 
+-- SAMPLE_OUTPUT_END

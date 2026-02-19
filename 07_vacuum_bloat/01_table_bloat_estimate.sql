@@ -28,12 +28,16 @@ WHERE n_dead_tup > 0
 ORDER BY est_bloat_bytes DESC NULLS LAST;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name | table_name | total_bytes | total_pretty | n_live_tup | n_dead_tup | dead_tuple_pct | est_bloat_bytes | est_bloat_pretty 
--------------+------------+-------------+--------------+------------+------------+----------------+-----------------+------------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name |    table_name    | total_bytes | total_pretty | n_live_tup | n_dead_tup | dead_tuple_pct | est_bloat_bytes | est_bloat_pretty 
+-- -------------+------------------+-------------+--------------+------------+------------+----------------+-----------------+------------------
+--  public      | pgbench_accounts | 31716564992 | 30 GB        |  200000029 |    4232485 |           2.07 |       656035175 | 626 MB
+--  public      | pgbench_branches |     7217152 | 7048 kB      |       2000 |         81 |           3.89 |          280908 | 274 kB
+-- (2 rows)
+-- 
+-- SAMPLE_OUTPUT_END

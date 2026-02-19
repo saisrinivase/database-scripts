@@ -29,46 +29,45 @@ WHERE table_total_bytes > 0
 ORDER BY toast_pct DESC, toast_bytes DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-   schema_name    |       table_name        | table_total_bytes | table_total_pretty | toast_bytes | toast_pretty | toast_pct 
-------------------+-------------------------+-------------------+--------------------+-------------+--------------+-----------
- perf             | support_tickets         |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
- dba_metrics      | wal_snapshots           |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
- dba_metrics      | database_size_snapshots |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
- dba_metrics      | connection_snapshots    |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
- perf             | job_runs                |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
- perf             | jobs                    |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
- perf             | notifications           |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
- perf             | ticket_comments         |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
- perf             | documents               |             24576 | 24 kB              |        8192 | 8192 bytes   |     33.33
- perf             | audit_log               |             24576 | 24 kB              |        8192 | 8192 bytes   |     33.33
- perf             | tenants                 |             32768 | 32 kB              |        8192 | 8192 bytes   |     25.00
- dba_metrics      | table_size_snapshots    |             49152 | 48 kB              |        8192 | 8192 bytes   |     16.67
- dba_metrics      | index_size_snapshots    |             57344 | 56 kB              |        8192 | 8192 bytes   |     14.29
- perf             | categories              |             98304 | 96 kB              |        8192 | 8192 bytes   |      8.33
- perf             | feature_flags           |            122880 | 120 kB             |        8192 | 8192 bytes   |      6.67
- migration_v1_lab | sales_orders            |            131072 | 128 kB             |        8192 | 8192 bytes   |      6.25
- migration_v1_lab | parent_accounts         |            811008 | 792 kB             |        8192 | 8192 bytes   |      1.01
- migration_v1_lab | orders_no_pk            |            892928 | 872 kB             |        8192 | 8192 bytes   |      0.92
- perf             | addresses               |           1613824 | 1576 kB            |        8192 | 8192 bytes   |      0.51
- perf             | products                |           2285568 | 2232 kB            |        8192 | 8192 bytes   |      0.36
- migration_v1_lab | dml_bloat_table         |           4349952 | 4248 kB            |        8192 | 8192 bytes   |      0.19
- public           | demo_users              |           4505600 | 4400 kB            |        8192 | 8192 bytes   |      0.18
- perf             | users                   |           4833280 | 4720 kB            |        8192 | 8192 bytes   |      0.17
- migration_v1_lab | product_catalog         |           6176768 | 6032 kB            |        8192 | 8192 bytes   |      0.13
- migration_v1_lab | stale_stats_table       |           7954432 | 7768 kB            |        8192 | 8192 bytes   |      0.10
- perf             | shipments               |          19038208 | 18 MB              |        8192 | 8192 bytes   |      0.04
- perf             | app_events              |          99270656 | 95 MB              |        8192 | 8192 bytes   |      0.01
- perf             | order_items             |         122626048 | 117 MB             |           0 | 0 bytes      |      0.00
- perf             | orders                  |          78512128 | 75 MB              |           0 | 0 bytes      |      0.00
- migration_v1_lab | child_transactions      |          11051008 | 11 MB              |           0 | 0 bytes      |      0.00
- perf             | payments                |          87080960 | 83 MB              |           0 | 0 bytes      |      0.00
- perf             | inventory               |           3497984 | 3416 kB            |           0 | 0 bytes      |      0.00
- perf             | product_categories      |           2703360 | 2640 kB            |           0 | 0 bytes      |      0.00
- perf             | sessions                |           1376256 | 1344 kB            |           0 | 0 bytes      |      0.00
-(34 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--    schema_name    |       table_name        | table_total_bytes | table_total_pretty | toast_bytes | toast_pretty | toast_pct 
+-- ------------------+-------------------------+-------------------+--------------------+-------------+--------------+-----------
+--  dba_metrics      | database_size_snapshots |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+--  migration_v2_lab | trigger_audit_demo      |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+--  dba_metrics      | wal_snapshots           |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+--  dba_metrics      | connection_snapshots    |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+--  dba_metrics      | index_size_snapshots    |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+--  dba_metrics      | table_size_snapshots    |             16384 | 16 kB              |        8192 | 8192 bytes   |     50.00
+--  migration_v2_lab | mv_daily_order_volume   |             24576 | 24 kB              |        8192 | 8192 bytes   |     33.33
+--  migration_v2_lab | issue_manifest          |             32768 | 32 kB              |        8192 | 8192 bytes   |     25.00
+--  migration_v1_lab | sales_orders            |            131072 | 128 kB             |        8192 | 8192 bytes   |      6.25
+--  migration_v2_lab | quoted_orders           |            507904 | 496 kB             |        8192 | 8192 bytes   |      1.61
+--  migration_v1_lab | parent_accounts         |            811008 | 792 kB             |        8192 | 8192 bytes   |      1.01
+--  migration_v1_lab | orders_no_pk            |            892928 | 872 kB             |        8192 | 8192 bytes   |      0.92
+--  migration_v2_lab | parent_accounts         |           4194304 | 4096 kB            |        8192 | 8192 bytes   |      0.20
+--  migration_v1_lab | dml_bloat_table         |           4349952 | 4248 kB            |        8192 | 8192 bytes   |      0.19
+--  migration_v2_lab | customer_staging_no_pk  |           5136384 | 5016 kB            |        8192 | 8192 bytes   |      0.16
+--  migration_v2_lab | partitioned_events_2026 |           5226496 | 5104 kB            |        8192 | 8192 bytes   |      0.16
+--  migration_v2_lab | partitioned_events_2025 |           5693440 | 5560 kB            |        8192 | 8192 bytes   |      0.14
+--  migration_v1_lab | product_catalog         |           6176768 | 6032 kB            |        8192 | 8192 bytes   |      0.13
+--  migration_v1_lab | stale_stats_table       |           7954432 | 7768 kB            |        8192 | 8192 bytes   |      0.10
+--  migration_v2_lab | customer_contact_compat |          13107200 | 13 MB              |        8192 | 8192 bytes   |      0.06
+--  migration_v2_lab | sales_catalog           |          14745600 | 14 MB              |        8192 | 8192 bytes   |      0.06
+--  migration_v2_lab | bloat_pressure_table    |          14163968 | 14 MB              |        8192 | 8192 bytes   |      0.06
+--  migration_v2_lab | child_events            |          25714688 | 25 MB              |        8192 | 8192 bytes   |      0.03
+--  migration_v2_lab | stale_stats_table       |          25174016 | 24 MB              |        8192 | 8192 bytes   |      0.03
+--  migration_v2_lab | order_fact              |          51806208 | 49 MB              |        8192 | 8192 bytes   |      0.02
+--  public           | pgbench_branches        |           7217152 | 7048 kB            |           0 | 0 bytes      |      0.00
+--  migration_v2_lab | amount_mapping_risk     |          20119552 | 19 MB              |           0 | 0 bytes      |      0.00
+--  public           | pgbench_tellers         |           3801088 | 3712 kB            |           0 | 0 bytes      |      0.00
+--  migration_v1_lab | child_transactions      |          11051008 | 11 MB              |           0 | 0 bytes      |      0.00
+--  public           | pgbench_accounts        |       31716564992 | 30 GB              |           0 | 0 bytes      |      0.00
+--  public           | pgbench_history         |         282656768 | 270 MB             |           0 | 0 bytes      |      0.00
+-- (31 rows)
+-- 
+-- SAMPLE_OUTPUT_END

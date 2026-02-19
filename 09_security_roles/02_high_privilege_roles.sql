@@ -19,14 +19,16 @@ WHERE rolsuper
 ORDER BY role_name;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- role_name | is_superuser | can_replicate | bypasses_row_level_security | can_create_roles | can_create_databases | can_login 
------------+--------------+---------------+-----------------------------+------------------+----------------------+-----------
- postgres  | t            | t             | f                           | t                | t                    | t
- saiendla  | t            | t             | t                           | t                | t                    | t
-(2 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  role_name | is_superuser | can_replicate | bypasses_row_level_security | can_create_roles | can_create_databases | can_login 
+-- -----------+--------------+---------------+-----------------------------+------------------+----------------------+-----------
+--  postgres  | t            | t             | f                           | t                | t                    | t
+--  saiendla  | t            | t             | t                           | t                | t                    | t
+-- (2 rows)
+-- 
+-- SAMPLE_OUTPUT_END

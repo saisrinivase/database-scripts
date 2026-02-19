@@ -25,13 +25,15 @@ FROM table_io
 CROSS JOIN index_io;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- table_cache_hit_pct | index_cache_hit_pct 
----------------------+---------------------
-              100.00 |              100.00
-(1 row)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  table_cache_hit_pct | index_cache_hit_pct 
+-- ---------------------+---------------------
+--                89.26 |               93.38
+-- (1 row)
+-- 
+-- SAMPLE_OUTPUT_END

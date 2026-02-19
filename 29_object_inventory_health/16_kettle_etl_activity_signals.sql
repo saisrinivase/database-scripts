@@ -60,12 +60,18 @@ FROM etl_roles
 ORDER BY signal_type, signal_id;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- signal_type | signal_id | principal | database_name | application_name | state | wait_event_type | wait_event | duration | details 
--------------+-----------+-----------+---------------+------------------+-------+-----------------+------------+----------+---------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  signal_type | signal_id | principal | database_name | application_name | state | wait_event_type | wait_event | duration | details 
+-- -------------+-----------+-----------+---------------+------------------+-------+-----------------+------------+----------+---------
+-- (0 rows)
+-- 
+-- 
+-- Interpretation:
+-- - No KETTLE/ETL-like sessions or roles matched at capture time.
+-- - This is expected outside ETL windows or when application_name/role naming differs.
+-- SAMPLE_OUTPUT_END

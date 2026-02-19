@@ -46,26 +46,16 @@ WHERE NOT EXISTS (
 ORDER BY fk.schema_name, fk.table_name, fk.conname;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
-   schema_name    |     table_name     |          foreign_key_name           | fk_columns_attnums 
-------------------+--------------------+-------------------------------------+--------------------
- migration_v1_lab | child_transactions | child_transactions_account_id_fkey  | {2}
- perf             | addresses          | addresses_user_id_fkey              | {3}
- perf             | categories         | categories_tenant_id_fkey           | {2}
- perf             | job_runs           | job_runs_job_id_fkey                | {3}
- perf             | notifications      | notifications_user_id_fkey          | {3}
- perf             | order_items        | order_items_product_id_fkey         | {4}
- perf             | orders             | orders_tenant_id_fkey               | {2}
- perf             | product_categories | product_categories_category_id_fkey | {3}
- perf             | products           | products_tenant_id_fkey             | {2}
- perf             | sessions           | sessions_user_id_fkey               | {3}
- perf             | shipments          | shipments_order_id_fkey             | {3}
- perf             | support_tickets    | support_tickets_user_id_fkey        | {3}
- perf             | ticket_comments    | ticket_comments_ticket_id_fkey      | {3}
- perf             | users              | users_tenant_id_fkey                | {2}
-(14 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--    schema_name    |     table_name     |          foreign_key_name          | fk_columns_attnums 
+-- ------------------+--------------------+------------------------------------+--------------------
+--  migration_v1_lab | child_transactions | child_transactions_account_id_fkey | {2}
+--  migration_v2_lab | child_events       | child_events_account_id_fkey       | {2}
+-- (2 rows)
+-- 
+-- SAMPLE_OUTPUT_END

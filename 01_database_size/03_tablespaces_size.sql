@@ -11,14 +11,16 @@ FROM pg_tablespace
 ORDER BY size_bytes DESC;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- tablespace_name | size_bytes  | size_pretty 
------------------+-------------+-------------
- pg_default      | 33023539496 | 31 GB
- pg_global       |      586116 | 572 kB
-(2 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  tablespace_name | size_bytes  | size_pretty 
+-- -----------------+-------------+-------------
+--  pg_default      | 33241900424 | 31 GB
+--  pg_global       |      586116 | 572 kB
+-- (2 rows)
+-- 
+-- SAMPLE_OUTPUT_END

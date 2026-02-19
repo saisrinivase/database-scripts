@@ -22,12 +22,18 @@ WHERE n.nspname !~ '^pg_'
 ORDER BY schema_name, function_name;
 
 
-/* SAMPLE_OUTPUT_BEGIN
-Sample output (captured from local validation run; values may vary by environment).
-
- schema_name | function_name | function_args | language_name | security_definer | has_dynamic_sql 
--------------+---------------+---------------+---------------+------------------+-----------------
-(0 rows)
 
 
-SAMPLE_OUTPUT_END */
+-- SAMPLE_OUTPUT_BEGIN
+-- Sample output captured from database: pgbench_test
+-- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
+--
+--  schema_name | function_name | function_args | language_name | security_definer | has_dynamic_sql 
+-- -------------+---------------+---------------+---------------+------------------+-----------------
+-- (0 rows)
+-- 
+-- 
+-- Interpretation:
+-- - No rows matched in this environment at capture time.
+-- - This can be expected when the related object/feature is not present or not in use.
+-- SAMPLE_OUTPUT_END

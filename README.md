@@ -63,7 +63,7 @@ See `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/VERSIO
 ## Sample Output Convention
 
 - Every SQL script includes an embedded sample output section at the bottom.
-- Section markers: `/* SAMPLE_OUTPUT_BEGIN` ... `SAMPLE_OUTPUT_END */`.
+- Section markers: `-- SAMPLE_OUTPUT_BEGIN` ... `-- SAMPLE_OUTPUT_END`.
 - Sample output is for quick understanding; values vary by environment and runtime state.
 - Historical full-run outputs are retained in `_validation_runs/` for audit purposes.
 
