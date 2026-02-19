@@ -57,20 +57,20 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 
 ## Performance Topic Coverage
 
-See `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/PERFORMANCE_TUNING_COVERAGE.md` for direct mapping from performance topics to scripts.
-See `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/27_high_speed_tuning/README.md` for a fast triage run order.
+See `PERFORMANCE_TUNING_COVERAGE.md` for direct mapping from performance topics to scripts.
+See `27_high_speed_tuning/README.md` for a fast triage run order.
 
 ## Object Topic Coverage
 
-See `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/OBJECT_COVERAGE_MATRIX.md` for direct mapping from object types/issues to scripts.
+See `OBJECT_COVERAGE_MATRIX.md` for direct mapping from object types/issues to scripts.
 
 ## Internals Mapping
 
-See `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/INTERNALS_COVERAGE_MATRIX.md` for topic-to-internals source mapping.
+See `INTERNALS_COVERAGE_MATRIX.md` for topic-to-internals source mapping.
 
 ## Version Compatibility
 
-See `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/VERSION_COMPATIBILITY.md`.
+See `VERSION_COMPATIBILITY.md`.
 
 ## Sample Output Convention
 

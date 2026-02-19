@@ -6,8 +6,8 @@ Purpose: Document compatibility expectations for PostgreSQL 15-18.
 
 - Target versions: `PostgreSQL 15, 16, 17, 18`.
 - Validated in this workspace: `PostgreSQL 18.0` (full run, all scripts passed).
-- Validation artifact: `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/_validation_runs/20260218_174311/report.md`.
-- Object inventory pack validation artifact: `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/29_object_inventory_health/samples_20260218_pgbench_test/summary.tsv`.
+- Validation artifact: `_validation_runs/20260218_174311/report.md`.
+- Object inventory pack validation artifact: `29_object_inventory_health/samples_20260218_pgbench_test/summary.tsv`.
 
 ## Guarded Cross-Version Scripts
 
