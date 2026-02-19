@@ -5,7 +5,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 ## Scope
 
 - Coverage: 31 operational areas.
-- Current SQL scripts: 159.
+- Current SQL scripts: 163.
 - Style: every script includes `Purpose`, `Area`, and `Usage` headers.
 - Goal: enable any DBA/engineer to open an area folder and run purpose-specific scripts quickly.
 
@@ -17,6 +17,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `03_index_analysis`: index size/use, unused and duplicate index candidates.
 - `04_toast_lob_blob`: TOAST, LOB/BLOB footprint and heavy-object detection.
 - `05_partitioning`: partition inventory, distribution, and recommendation heuristics.
+  - Includes SME decision scorecard, target-table deep advisor, and 5GB+ time-series lab generator.
 - `06_activity_locks`: active sessions, blockers, waits, long transactions.
 - `07_vacuum_bloat`: bloat heuristics, freeze age, autovacuum visibility.
 - `08_replication_ha`: replication lag, slots, standby replay, WAL rates.

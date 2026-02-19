@@ -6,6 +6,7 @@ Purpose: provide deterministic issue simulation + enterprise-style reporting for
 
 - `V1 Baseline`: quick 360 report + seeded core migration issues.
 - `V2 Enterprise`: deeper object coverage, practical issue lab, and clearer issue playbook guidance.
+- `V3 Takeover Gate`: enterprise go/no-go gate with blocker checks and CI-friendly exit behavior.
 
 ## Files
 
@@ -28,6 +29,12 @@ Purpose: provide deterministic issue simulation + enterprise-style reporting for
   - Styled HTML report with object coverage matrix and issue playbook.
 - `ISSUE_CATALOG_V2.md`
   - Enterprise-style issue catalog (impact, coverage, detect/fix mapping).
+
+### V3 Takeover Gate
+
+- `09_enterprise_takeover_gate_v3.sql`
+  - Blocker-based migration takeover decision (`GO`, `CONDITIONAL_GO`, `NO_GO`).
+  - Exits with non-zero code when `NO_GO` and `enforce_exit=true`.
 
 ## Target Database
 
@@ -80,6 +87,32 @@ psql "host=<host> port=<port> dbname=pgbench_test user=<user>" \
 psql "host=<host> port=<port> dbname=pgbench_test user=<user>" \
   -f "postgres_admin_scripts/27_migration_validation/07_v2_sanity_checks.sql"
 ```
+
+## V3 Takeover Gate Workflow (Decision Step)
+
+### 1) Run gate in reporting mode (no forced exit)
+
+```bash
+psql "host=<host> port=<port> dbname=pgbench_test user=<user>" \
+  -v critical_schema_regex='^public$' \
+  -v enforce_exit=false \
+  -v gate_output_file='postgres_admin_scripts/27_migration_validation/samples/v3_takeover_gate_pgbench_test.txt' \
+  -f "postgres_admin_scripts/27_migration_validation/09_enterprise_takeover_gate_v3.sql"
+```
+
+### 2) Run gate in CI/CD enforcement mode
+
+```bash
+psql "host=<host> port=<port> dbname=pgbench_test user=<user>" \
+  -v critical_schema_regex='^public$' \
+  -v enforce_exit=true \
+  -f "postgres_admin_scripts/27_migration_validation/09_enterprise_takeover_gate_v3.sql"
+```
+
+Interpretation:
+- `GO`: no blocker fails and no warnings.
+- `CONDITIONAL_GO`: no blocker fails, but warnings exist.
+- `NO_GO`: one or more blocker fails (non-zero exit when `enforce_exit=true`).
 
 ## V2 Object Coverage Scope
 

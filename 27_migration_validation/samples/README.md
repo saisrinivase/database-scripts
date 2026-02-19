@@ -33,3 +33,15 @@ V2 scripts:
 - Sanity results:
   - Before fix: `total=11`, `pass=0`, `fail=11`, `all_passed=NO`
   - After fix: `total=11`, `pass=11`, `fail=0`, `all_passed=YES`
+
+## V3 Takeover Gate Snapshot (pgbench_test)
+
+- Gate output file:
+  - `v3_takeover_gate_pgbench_test.txt`
+- Decision:
+  - `NO_GO`
+- Summary:
+  - `blocker_failures=2`
+  - `warning_checks=2`
+- Enforcement behavior:
+  - Non-zero exit in pipeline mode when `enforce_exit=true`.
