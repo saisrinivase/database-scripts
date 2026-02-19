@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>PostgreSQL Enterprise Migration & Performance Report V2</title>
+<style>
+body { font-family: "Segoe UI", Arial, sans-serif; margin: 24px; color: #17212b; background: #f6f8fb; }
+h1 { color: #0b3b8f; margin-bottom: 4px; }
+h2 { color: #154a9a; margin-top: 26px; }
+.meta { color: #4b5b71; margin-bottom: 14px; }
+.kpi { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 10px; margin: 16px 0 20px; }
+.card { background: #ffffff; border: 1px solid #d7e0ef; border-radius: 8px; padding: 10px 12px; }
+.label { font-size: 12px; color: #5c6f89; text-transform: uppercase; letter-spacing: .04em; }
+.value { font-size: 24px; font-weight: 700; color: #0b3b8f; }
+table { border-collapse: collapse; width: 100%; background: #ffffff; margin-bottom: 22px; }
+th { background: #113f8c; color: #ffffff; padding: 8px; border: 1px solid #d7e0ef; text-align: left; }
+td { padding: 7px; border: 1px solid #d7e0ef; vertical-align: top; }
+tr:nth-child(even) td { background: #f8fbff; }
+caption { caption-side: top; text-align: left; font-weight: 700; color: #183f80; margin: 0 0 8px 0; }
+.foot { margin-top: 24px; color: #5c6f89; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>PostgreSQL Enterprise Migration & Performance Report (V2)</h1>
+<div class="meta">Object-level + issue-level coverage with clear remediation guidance.</div>
+<table border="1">
+  <caption>Report Metadata</caption>
+  <tr>
+    <th align="center">database_name</th>
+    <th align="center">executed_by</th>
+    <th align="center">postgres_version</th>
+    <th align="center">server_version_num</th>
+    <th align="center">instance_start_time</th>
+    <th align="center">report_generated_at</th>
+  </tr>
+  <tr valign="top">
+    <td align="left">pgbench_test</td>
+    <td align="left">saiendla</td>
+    <td align="left">PostgreSQL 18.0 (Homebrew) on aarch64-apple-darwin25.0.0, compiled by Apple clang version 17.0.0 (clang-1700.3.19.1), 64-bit</td>
+    <td align="left">180000</td>
+    <td align="left">2026-02-10 09:32:09.191307-05</td>
+    <td align="left">2026-02-18 18:19:58.093928-05</td>
+  </tr>
+</table>
+<p>(1 row)<br />
+</p>
+<p>CREATE FUNCTION</p>
+<p>CREATE FUNCTION</p>
+<p>CREATE TABLE</p>
+<p>INSERT 0 14</p>
+<p>CREATE TABLE</p>
+<p>INSERT 0 19</p>
+<h2>Executive Snapshot</h2>
+<div class="kpi">
+<div class="card"><div class="label">Health Score</div><div class="value">5</div></div>
+<div class="card"><div class="label">Risk Points</div><div class="value">95</div></div>
+<div class="card"><div class="label">Checks</div><div class="value">14</div></div>
+<div class="card"><div class="label">Pass</div><div class="value">2</div></div>
+<div class="card"><div class="label">Open Risks</div><div class="value">12</div></div>
+</div>
+<table border="1">
+  <caption>Object Coverage Matrix (Deep Inventory)</caption>
+  <tr>
+    <th align="center">object_family</th>
+    <th align="center">object_type</th>
+    <th align="center">object_count</th>
+    <th align="center">status</th>
+    <th align="center">note</th>
+  </tr>
+  <tr valign="top">
+    <td align="left">Core Objects</td>
+    <td align="left">INDEX</td>
+    <td align="right">18</td>
+    <td align="left">PRESENT</td>
+    <td align="left">All index objects</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Core Objects</td>
+    <td align="left">MVIEW</td>
+    <td align="right">1</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Materialized view objects</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Core Objects</td>
+    <td align="left">SEQUENCE</td>
+    <td align="right">11</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Sequence generators</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Core Objects</td>
+    <td align="left">TABLE</td>
+    <td align="right">18</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Base tables in non-system schemas</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Core Objects</td>
+    <td align="left">VIEW</td>
+    <td align="right">3</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Logical abstraction layer objects</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Data Movement</td>
+    <td align="left">INSERT_OR_COPY_WORKLOAD_SIGNAL</td>
+    <td align="right">0</td>
+    <td align="left">OBSERVED</td>
+    <td align="left">Signal from pg_stat_statements when available</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">External Integration</td>
+    <td align="left">KETTLE</td>
+    <td align="right">&nbsp; </td>
+    <td align="left">EXTERNAL</td>
+    <td align="left">Pentaho/Kettle metadata is outside PostgreSQL catalogs; validate via ETL repository/tooling</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Federation</td>
+    <td align="left">FDW_SERVER</td>
+    <td align="right">0</td>
+    <td align="left">NOT_PRESENT</td>
+    <td align="left">Foreign data wrapper servers</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Migration Mapping</td>
+    <td align="left">PACKAGE</td>
+    <td align="right">0</td>
+    <td align="left">N/A</td>
+    <td align="left">Oracle packages are not a native PostgreSQL object (map to schemas + functions/procedures)</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Migration Mapping</td>
+    <td align="left">SYNONYM</td>
+    <td align="right">0</td>
+    <td align="left">N/A</td>
+    <td align="left">Oracle synonym has no direct PostgreSQL object equivalent (use views/search_path)</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Partitioning</td>
+    <td align="left">PARTITION</td>
+    <td align="right">4</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Child partitions (relispartition=true)</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Partitioning</td>
+    <td align="left">PARTITIONED_TABLE</td>
+    <td align="right">1</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Parent partitioned tables (relkind=p)</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Programmability</td>
+    <td align="left">FUNCTION</td>
+    <td align="right">5</td>
+    <td align="left">PRESENT</td>
+    <td align="left">User functions (prokind=f)</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Programmability</td>
+    <td align="left">PROCEDURE</td>
+    <td align="right">1</td>
+    <td align="left">PRESENT</td>
+    <td align="left">User procedures (prokind=p)</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Programmability</td>
+    <td align="left">TRIGGER</td>
+    <td align="right">1</td>
+    <td align="left">PRESENT</td>
+    <td align="left">User-defined triggers</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Schema Modeling</td>
+    <td align="left">TYPE</td>
+    <td align="right">24</td>
+    <td align="left">PRESENT</td>
+    <td align="left">User enum/composite/domain types</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Security</td>
+    <td align="left">GRANT</td>
+    <td align="right">158</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Table-level privilege grants</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Storage</td>
+    <td align="left">TABLESPACE</td>
+    <td align="right">2</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Includes default and custom tablespaces</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Telemetry</td>
+    <td align="left">QUERY</td>
+    <td align="right">1</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Query telemetry through pg_stat_statements extension</td>
+  </tr>
+</table>
+<p>(19 rows)<br />
+</p>
+<table border="1">
+  <caption>Issue Control Matrix</caption>
+  <tr>
+    <th align="center">check_id</th>
+    <th align="center">issue_title</th>
+    <th align="center">area</th>
+    <th align="center">severity</th>
+    <th align="center">status</th>
+    <th align="center">issue_count</th>
+    <th align="center">threshold_rule</th>
+    <th align="center">seed_coverage</th>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-001</td>
+    <td align="left">Tables without primary key (migration_v2_lab)</td>
+    <td align="left">Schema Design</td>
+    <td align="left">CRITICAL</td>
+    <td align="left">FAIL</td>
+    <td align="right">1</td>
+    <td align="left">All base tables should have PKs</td>
+    <td align="left">Yes</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-CFG-001</td>
+    <td align="left">autovacuum enabled</td>
+    <td align="left">Configuration</td>
+    <td align="left">CRITICAL</td>
+    <td align="left">PASS</td>
+    <td align="right">0</td>
+    <td align="left">autovacuum must be enabled</td>
+    <td align="left">No (environment-level)</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-002</td>
+    <td align="left">Foreign keys without supporting index (migration_v2_lab)</td>
+    <td align="left">Referential Integrity</td>
+    <td align="left">HIGH</td>
+    <td align="left">FAIL</td>
+    <td align="right">1</td>
+    <td align="left">FK referencing columns should be indexed</td>
+    <td align="left">Yes</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-DATA-001</td>
+    <td align="left">Oracle empty-string semantic mismatch</td>
+    <td align="left">Data Quality</td>
+    <td align="left">HIGH</td>
+    <td align="left">WARN</td>
+    <td align="right">51429</td>
+    <td align="left">Columns expected to treat empty strings as NULL should be normalized</td>
+    <td align="left">Yes</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-DATA-002</td>
+    <td align="left">Numeric overflow mapping risk (int4 target)</td>
+    <td align="left">Data Type Mapping</td>
+    <td align="left">HIGH</td>
+    <td align="left">WARN</td>
+    <td align="right">24000</td>
+    <td align="left">Values outside int4 range need bigint/numeric target mapping</td>
+    <td align="left">Yes</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-005</td>
+    <td align="left">Unowned sequences (migration_v2_lab)</td>
+    <td align="left">Sequence Lifecycle</td>
+    <td align="left">HIGH</td>
+    <td align="left">WARN</td>
+    <td align="right">11</td>
+    <td align="left">Sequences should be owned by target columns</td>
+    <td align="left">Yes</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-STAT-001</td>
+    <td align="left">Stale table statistics pressure</td>
+    <td align="left">Planner Statistics</td>
+    <td align="left">HIGH</td>
+    <td align="left">WARN</td>
+    <td align="right">2</td>
+    <td align="left">n_mod_since_analyze should not greatly exceed analyze recency policy</td>
+    <td align="left">Yes</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-MAINT-001</td>
+    <td align="left">Dead tuple / bloat pressure</td>
+    <td align="left">Maintenance</td>
+    <td align="left">HIGH</td>
+    <td align="left">WARN</td>
+    <td align="right">1</td>
+    <td align="left">Dead tuple ratio should stay below risk thresholds</td>
+    <td align="left">Yes</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-004</td>
+    <td align="left">Uppercase quoted object names (migration_v2_lab)</td>
+    <td align="left">Naming Standards</td>
+    <td align="left">MEDIUM</td>
+    <td align="left">WARN</td>
+    <td align="right">2</td>
+    <td align="left">Uppercase object names should be avoided unless required</td>
+    <td align="left">Yes</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-CFG-002</td>
+    <td align="left">track_io_timing enabled</td>
+    <td align="left">Configuration</td>
+    <td align="left">MEDIUM</td>
+    <td align="left">WARN</td>
+    <td align="right">1</td>
+    <td align="left">track_io_timing should be enabled for accurate I/O attribution</td>
+    <td align="left">No (environment-level)</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-003</td>
+    <td align="left">Duplicate indexes (migration_v2_lab)</td>
+    <td align="left">Index Hygiene</td>
+    <td align="left">MEDIUM</td>
+    <td align="left">WARN</td>
+    <td align="right">1</td>
+    <td align="left">Avoid duplicate indexes with same definition</td>
+    <td align="left">Yes</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-PERF-001</td>
+    <td align="left">Missing index on join/filter column</td>
+    <td align="left">Query Performance</td>
+    <td align="left">MEDIUM</td>
+    <td align="left">WARN</td>
+    <td align="right">1</td>
+    <td align="left">High-cardinality filter/join columns should be indexed</td>
+    <td align="left">Yes</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-PERF-002</td>
+    <td align="left">Case-insensitive search index path</td>
+    <td align="left">Search Performance</td>
+    <td align="left">MEDIUM</td>
+    <td align="left">WARN</td>
+    <td align="right">1</td>
+    <td align="left">Search-heavy text paths need an index strategy</td>
+    <td align="left">Yes</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-EXT-001</td>
+    <td align="left">pg_stat_statements extension availability</td>
+    <td align="left">Environment</td>
+    <td align="left">MEDIUM</td>
+    <td align="left">PASS</td>
+    <td align="right">0</td>
+    <td align="left">pg_stat_statements should be installed for reliable query telemetry</td>
+    <td align="left">No (environment-level)</td>
+  </tr>
+</table>
+<p>(14 rows)<br />
+</p>
+<table border="1">
+  <caption>Issue Playbook (Clear and Precise Guidance)</caption>
+  <tr>
+    <th align="center">check_id</th>
+    <th align="center">issue_title</th>
+    <th align="center">why_it_matters</th>
+    <th align="center">evidence</th>
+    <th align="center">recommended_action</th>
+    <th align="center">runbook_ref</th>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-001</td>
+    <td align="left">Tables without primary key (migration_v2_lab)</td>
+    <td align="left">Missing PKs affect integrity, replication safety, and tuning strategy.</td>
+    <td align="left">migration_v2_lab.customer_staging_no_pk</td>
+    <td align="left">Add PK on stable business/surrogate key columns.</td>
+    <td align="left">05_seed_v2_test_issues.sql / 06_fix_v2_test_issues.sql</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-002</td>
+    <td align="left">Foreign keys without supporting index (migration_v2_lab)</td>
+    <td align="left">Missing FK indexes can severely slow parent UPDATE/DELETE operations.</td>
+    <td align="left">migration_v2_lab.child_events(child_events_account_id_fkey)</td>
+    <td align="left">Create indexes on FK referencing columns.</td>
+    <td align="left">05_seed_v2_test_issues.sql / 06_fix_v2_test_issues.sql</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-DATA-001</td>
+    <td align="left">Oracle empty-string semantic mismatch</td>
+    <td align="left">Oracle and PostgreSQL differ on empty-string semantics.</td>
+    <td align="left">rows_with_empty=51429</td>
+    <td align="left">Use NULLIF(col, '') during migration cleanup or ETL.</td>
+    <td align="left">05_seed_v2_test_issues.sql / 06_fix_v2_test_issues.sql</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-DATA-002</td>
+    <td align="left">Numeric overflow mapping risk (int4 target)</td>
+    <td align="left">Oracle NUMBER mappings can overflow if narrowed too aggressively.</td>
+    <td align="left">overflow_candidates=24000</td>
+    <td align="left">Use bigint/numeric target columns and explicit cast strategy.</td>
+    <td align="left">05_seed_v2_test_issues.sql / 06_fix_v2_test_issues.sql</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-MAINT-001</td>
+    <td align="left">Dead tuple / bloat pressure</td>
+    <td align="left">High dead tuples imply storage bloat and worse scan latency.</td>
+    <td align="left">migration_v2_lab.bloat_pressure_table dead=48000</td>
+    <td align="left">Tune autovacuum and run VACUUM (ANALYZE) for hotspots.</td>
+    <td align="left">07_vacuum_bloat/* + 06_fix_v2_test_issues.sql</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-005</td>
+    <td align="left">Unowned sequences (migration_v2_lab)</td>
+    <td align="left">Unowned sequences are easy to orphan during schema evolution.</td>
+    <td align="left">migration_v2_lab.&quot;QuotedOrders_quoted_order_id_seq&quot;, migration_v2_lab.amount_mapping_risk_id_seq, migration_v2_lab.bloat_pressure_table_id_seq, migration_v2_lab.child_events_event_id_seq, migration_v2_lab.customer_contact_compat_customer_id_seq</td>
+    <td align="left">Run ALTER SEQUENCE ... OWNED BY ... for lifecycle safety.</td>
+    <td align="left">05_seed_v2_test_issues.sql / 06_fix_v2_test_issues.sql</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-STAT-001</td>
+    <td align="left">Stale table statistics pressure</td>
+    <td align="left">Stale stats drive poor plans and unstable latency.</td>
+    <td align="left">migration_v2_lab.stale_stats_table mods=180000, migration_v2_lab.bloat_pressure_table mods=138000</td>
+    <td align="left">Run ANALYZE and ensure autoanalyze thresholds are tuned.</td>
+    <td align="left">12_planner_statistics/01_tables_needing_analyze.sql + 06_fix_v2_test_issues.sql</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-CFG-002</td>
+    <td align="left">track_io_timing enabled</td>
+    <td align="left">I/O root-cause analysis is weaker without block timing visibility.</td>
+    <td align="left">track_io_timing=off</td>
+    <td align="left">Set track_io_timing=on and reload configuration.</td>
+    <td align="left">13_io_wal_checkpoints/* + 26_physical_cloud_diagnostics/*</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-003</td>
+    <td align="left">Duplicate indexes (migration_v2_lab)</td>
+    <td align="left">Duplicate indexes increase write cost and maintenance overhead.</td>
+    <td align="left">migration_v2_lab.sales_catalog -&gt; idx_v2_sales_ref_a|idx_v2_sales_ref_b</td>
+    <td align="left">Drop redundant index after workload validation.</td>
+    <td align="left">03_index_analysis/03_duplicate_indexes.sql + 06_fix_v2_test_issues.sql</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-004</td>
+    <td align="left">Uppercase quoted object names (migration_v2_lab)</td>
+    <td align="left">Quoted casing increases SQL fragility in migrated code paths.</td>
+    <td align="left">migration_v2_lab.&quot;QuotedOrders&quot;, migration_v2_lab.&quot;QuotedOrders_quoted_order_id_seq&quot;</td>
+    <td align="left">Rename objects to lowercase standard names.</td>
+    <td align="left">05_seed_v2_test_issues.sql / 06_fix_v2_test_issues.sql</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-PERF-001</td>
+    <td align="left">Missing index on join/filter column</td>
+    <td align="left">Missing index causes avoidable full scans and high latency.</td>
+    <td align="left">index missing for filter_key</td>
+    <td align="left">Create index on migration_v2_lab.order_fact(filter_key).</td>
+    <td align="left">18_long_queries_full_scans/* + 27_high_speed_tuning/03_missing_index_candidates_from_scan_pressure.sql</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-PERF-002</td>
+    <td align="left">Case-insensitive search index path</td>
+    <td align="left">ILIKE/LOWER search without index can cause expensive scans.</td>
+    <td align="left">functional index missing</td>
+    <td align="left">Create functional index on lower(search_text) (or trigram where needed).</td>
+    <td align="left">24_complex_filter_search/* + 06_fix_v2_test_issues.sql</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-CFG-001</td>
+    <td align="left">autovacuum enabled</td>
+    <td align="left">Without autovacuum, dead tuples and xid age can grow into production outages.</td>
+    <td align="left">autovacuum=on</td>
+    <td align="left">Enable autovacuum and tune thresholds by table size/write volume.</td>
+    <td align="left">07_vacuum_bloat/* + 21_configuration_parameters/03_autovacuum_settings.sql</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-EXT-001</td>
+    <td align="left">pg_stat_statements extension availability</td>
+    <td align="left">Query-level bottleneck analysis depends on statement stats history.</td>
+    <td align="left">installed</td>
+    <td align="left">Install extension and preload library where required.</td>
+    <td align="left">11_performance_tuning/* + 28_pgss_resource_attribution/*</td>
+  </tr>
+</table>
+<p>(14 rows)<br />
+</p>
+<table border="1">
+  <caption>Open Risks (WARN/FAIL Only)</caption>
+  <tr>
+    <th align="center">check_id</th>
+    <th align="center">issue_title</th>
+    <th align="center">severity</th>
+    <th align="center">status</th>
+    <th align="center">issue_count</th>
+    <th align="center">evidence</th>
+    <th align="center">recommended_action</th>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-001</td>
+    <td align="left">Tables without primary key (migration_v2_lab)</td>
+    <td align="left">CRITICAL</td>
+    <td align="left">FAIL</td>
+    <td align="right">1</td>
+    <td align="left">migration_v2_lab.customer_staging_no_pk</td>
+    <td align="left">Add PK on stable business/surrogate key columns.</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-002</td>
+    <td align="left">Foreign keys without supporting index (migration_v2_lab)</td>
+    <td align="left">HIGH</td>
+    <td align="left">FAIL</td>
+    <td align="right">1</td>
+    <td align="left">migration_v2_lab.child_events(child_events_account_id_fkey)</td>
+    <td align="left">Create indexes on FK referencing columns.</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-DATA-001</td>
+    <td align="left">Oracle empty-string semantic mismatch</td>
+    <td align="left">HIGH</td>
+    <td align="left">WARN</td>
+    <td align="right">51429</td>
+    <td align="left">rows_with_empty=51429</td>
+    <td align="left">Use NULLIF(col, '') during migration cleanup or ETL.</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-DATA-002</td>
+    <td align="left">Numeric overflow mapping risk (int4 target)</td>
+    <td align="left">HIGH</td>
+    <td align="left">WARN</td>
+    <td align="right">24000</td>
+    <td align="left">overflow_candidates=24000</td>
+    <td align="left">Use bigint/numeric target columns and explicit cast strategy.</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-005</td>
+    <td align="left">Unowned sequences (migration_v2_lab)</td>
+    <td align="left">HIGH</td>
+    <td align="left">WARN</td>
+    <td align="right">11</td>
+    <td align="left">migration_v2_lab.&quot;QuotedOrders_quoted_order_id_seq&quot;, migration_v2_lab.amount_mapping_risk_id_seq, migration_v2_lab.bloat_pressure_table_id_seq, migration_v2_lab.child_events_event_id_seq, migration_v2_lab.customer_contact_compat_customer_id_seq</td>
+    <td align="left">Run ALTER SEQUENCE ... OWNED BY ... for lifecycle safety.</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-STAT-001</td>
+    <td align="left">Stale table statistics pressure</td>
+    <td align="left">HIGH</td>
+    <td align="left">WARN</td>
+    <td align="right">2</td>
+    <td align="left">migration_v2_lab.stale_stats_table mods=180000, migration_v2_lab.bloat_pressure_table mods=138000</td>
+    <td align="left">Run ANALYZE and ensure autoanalyze thresholds are tuned.</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-MAINT-001</td>
+    <td align="left">Dead tuple / bloat pressure</td>
+    <td align="left">HIGH</td>
+    <td align="left">WARN</td>
+    <td align="right">1</td>
+    <td align="left">migration_v2_lab.bloat_pressure_table dead=48000</td>
+    <td align="left">Tune autovacuum and run VACUUM (ANALYZE) for hotspots.</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-004</td>
+    <td align="left">Uppercase quoted object names (migration_v2_lab)</td>
+    <td align="left">MEDIUM</td>
+    <td align="left">WARN</td>
+    <td align="right">2</td>
+    <td align="left">migration_v2_lab.&quot;QuotedOrders&quot;, migration_v2_lab.&quot;QuotedOrders_quoted_order_id_seq&quot;</td>
+    <td align="left">Rename objects to lowercase standard names.</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-CFG-002</td>
+    <td align="left">track_io_timing enabled</td>
+    <td align="left">MEDIUM</td>
+    <td align="left">WARN</td>
+    <td align="right">1</td>
+    <td align="left">track_io_timing=off</td>
+    <td align="left">Set track_io_timing=on and reload configuration.</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-OBJ-003</td>
+    <td align="left">Duplicate indexes (migration_v2_lab)</td>
+    <td align="left">MEDIUM</td>
+    <td align="left">WARN</td>
+    <td align="right">1</td>
+    <td align="left">migration_v2_lab.sales_catalog -&gt; idx_v2_sales_ref_a|idx_v2_sales_ref_b</td>
+    <td align="left">Drop redundant index after workload validation.</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-PERF-001</td>
+    <td align="left">Missing index on join/filter column</td>
+    <td align="left">MEDIUM</td>
+    <td align="left">WARN</td>
+    <td align="right">1</td>
+    <td align="left">index missing for filter_key</td>
+    <td align="left">Create index on migration_v2_lab.order_fact(filter_key).</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">MV2-PERF-002</td>
+    <td align="left">Case-insensitive search index path</td>
+    <td align="left">MEDIUM</td>
+    <td align="left">WARN</td>
+    <td align="right">1</td>
+    <td align="left">functional index missing</td>
+    <td align="left">Create functional index on lower(search_text) (or trigram where needed).</td>
+  </tr>
+</table>
+<p>(12 rows)<br />
+</p>
+<div class="foot">Report generated by 08_oracle_to_postgres_enterprise_report_v2.sql. For deterministic lab testing, run 05_seed_v2_test_issues.sql then re-run this report.</div>
+</body>
+</html>

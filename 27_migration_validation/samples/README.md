@@ -1,23 +1,35 @@
-# V1 Sample Artifacts
+# Migration Validation Sample Artifacts
 
-Generated on: `2026-02-18` (local PostgreSQL 18 test instance).
+Purpose: store before/after evidence for migration validation workflows.
 
-## Files
+## V1 Samples (Available)
 
 - `v1_report_before_fix.html`
 - `v1_report_after_fix.html`
 - `v1_sanity_before_fix.txt`
 - `v1_sanity_after_fix.txt`
 
-## Summary
+## V2 Samples (Generate in pgbench_test)
 
-- Main 360 report (`Overall Health Summary`)
-  - Before fix: `total=23`, `pass=13`, `warn=10`, `fail=0`
-  - After fix: `total=23`, `pass=19`, `warn=4`, `fail=0`
-- V1 seeded sanity checks (`04_v1_sanity_checks.sql`)
-  - Before fix: `total=7`, `pass=0`, `fail=7`, `all_passed=NO`
-  - After fix: `total=7`, `pass=7`, `fail=0`, `all_passed=YES`
+Recommended output names:
 
-## Why warnings remain after fix
+- `v2_report_before_fix.html`
+- `v2_report_after_fix.html`
+- `v2_sanity_before_fix.txt`
+- `v2_sanity_after_fix.txt`
 
-The remaining WARN checks are environment-level defaults in this local test instance (for example `track_io_timing`, `WAL/checkpoint baseline`, `replication topology`, and cache ratio), not unresolved seeded migration issues.
+V2 scripts:
+
+- Seed: `05_seed_v2_test_issues.sql`
+- Report: `08_oracle_to_postgres_enterprise_report_v2.sql`
+- Sanity: `07_v2_sanity_checks.sql`
+- Fix: `06_fix_v2_test_issues.sql`
+
+## V2 Practical Run Snapshot (pgbench_test)
+
+- Enterprise report files:
+  - `v2_report_before_fix.html`
+  - `v2_report_after_fix.html`
+- Sanity results:
+  - Before fix: `total=11`, `pass=0`, `fail=11`, `all_passed=NO`
+  - After fix: `total=11`, `pass=11`, `fail=0`, `all_passed=YES`

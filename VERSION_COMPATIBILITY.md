@@ -7,6 +7,7 @@ Purpose: Document compatibility expectations for PostgreSQL 15-18.
 - Target versions: `PostgreSQL 15, 16, 17, 18`.
 - Validated in this workspace: `PostgreSQL 18.0` (full run, all scripts passed).
 - Validation artifact: `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/_validation_runs/20260218_174311/report.md`.
+- Object inventory pack validation artifact: `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/29_object_inventory_health/samples_20260218_pgbench_test/summary.tsv`.
 
 ## Guarded Cross-Version Scripts
 
@@ -27,11 +28,17 @@ These scripts auto-switch logic with `psql` meta commands (`\gset`, `\if`) for v
   - Runs full query on 16+.
   - Returns informational message on 15.
 
+- `29_object_inventory_health/18_object_query_hotspots_pgss.sql`
+  - Uses `psql` guard logic.
+  - Runs hotspot query when `pg_stat_statements` is installed.
+  - Returns guidance row when extension is missing.
+
 ## Feature/Extension Requirements
 
 - `pg_stat_statements` required for query-level performance and resource attribution scripts.
 - `pg_stat_wal` scripts require PostgreSQL 14+ (covered by 15-18 target).
 - `pg_stat_io` requires PostgreSQL 16+.
+- `pg_stat_progress_copy` is used in `29_object_inventory_health/13_insert_copy_activity.sql` (available in 15-18 target range).
 
 ## Important Execution Note
 

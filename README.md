@@ -4,8 +4,8 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 
 ## Scope
 
-- Coverage: 30 operational areas.
-- Current SQL scripts: 137.
+- Coverage: 31 operational areas.
+- Current SQL scripts: 159.
 - Style: every script includes `Purpose`, `Area`, and `Usage` headers.
 - Goal: enable any DBA/engineer to open an area folder and run purpose-specific scripts quickly.
 
@@ -41,11 +41,16 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `27_high_speed_tuning`: fast bottleneck triage, parameter advisor, and missing-index detection.
 - `27_migration_validation`: Oracle-to-PostgreSQL migration health checks and issue simulation/fix flows.
 - `28_pgss_resource_attribution`: pg_stat_statements-based CPU/IO/memory-spill percentage attribution.
+- `29_object_inventory_health`: object-centric deep diagnostics (TABLE/VIEW/MVIEW/TABLESPACE/SEQUENCE/INDEX/TRIGGER/GRANT/FUNCTION/PROCEDURE/PARTITION/TYPE/FDW/INSERT-COPY) plus PACKAGE/SYNONYM mapping and KETTLE signals.
 
 ## Performance Topic Coverage
 
 See `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/PERFORMANCE_TUNING_COVERAGE.md` for direct mapping from performance topics to scripts.
 See `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/27_high_speed_tuning/README.md` for a fast triage run order.
+
+## Object Topic Coverage
+
+See `/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/OBJECT_COVERAGE_MATRIX.md` for direct mapping from object types/issues to scripts.
 
 ## Internals Mapping
 

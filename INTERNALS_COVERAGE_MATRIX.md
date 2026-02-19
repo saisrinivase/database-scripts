@@ -32,6 +32,10 @@ Purpose: Map administration topics to PostgreSQL internals sources and ready-to-
 | XID/multixact aging | `pg_database.datfrozenxid`, `datminmxid`, `pg_class.relfrozenxid` | `16_internals_deep_dive/01_database_xid_multixact_age.sql`, `16_internals_deep_dive/06_visibility_and_freeze_profile.sql` |
 | Storage file mapping | `pg_relation_filenode()`, `pg_relation_filepath()` | `16_internals_deep_dive/02_relation_filenode_mapping.sql` |
 | Dependency graph internals | `pg_depend` | `16_internals_deep_dive/04_dependency_fanout_objects.sql` |
+| Object type inventory | `pg_class`, `pg_proc`, `pg_type`, `pg_tablespace`, `pg_trigger`, `information_schema.*` | `29_object_inventory_health/01_object_type_inventory.sql` |
+| PK/FK and join-index health | `pg_constraint`, `pg_index`, `pg_stat_user_tables`, `pg_attribute` | `29_object_inventory_health/02_table_pk_fk_health.sql`, `29_object_inventory_health/04_missing_fk_supporting_indexes.sql`, `29_object_inventory_health/05_missing_join_column_indexes.sql` |
+| Identifier naming and migration mapping | `pg_class`, `pg_attribute`, `pg_proc`, `pg_namespace` | `29_object_inventory_health/06_identifier_casing_risks.sql`, `29_object_inventory_health/15_oracle_package_synonym_mapping.sql` |
+| Ingest/federation/object query diagnostics | `pg_stat_progress_copy`, `pg_foreign_*`, `pg_stat_statements` | `29_object_inventory_health/13_insert_copy_activity.sql`, `29_object_inventory_health/14_fdw_inventory.sql`, `29_object_inventory_health/18_object_query_hotspots_pgss.sql` |
 
 ## Gaps to Expand Next
 

@@ -1,122 +1,112 @@
-# Oracle -> PostgreSQL Migration Validation (V1)
+# Oracle -> PostgreSQL Migration Validation
 
-Purpose: generate a single HTML report that detects migration and operational risks and gives quick fix guidance.
+Purpose: provide deterministic issue simulation + enterprise-style reporting for migration and post-migration performance risk validation.
+
+## Tracks
+
+- `V1 Baseline`: quick 360 report + seeded core migration issues.
+- `V2 Enterprise`: deeper object coverage, practical issue lab, and clearer issue playbook guidance.
 
 ## Files
 
+### V1 Baseline
+
 - `01_oracle_to_postgres_360_health_report.sql`
-  - Main report generator (`PASS/WARN/FAIL`, issue details, suggested fixes).
 - `02_seed_v1_test_issues.sql`
-  - Seeds deterministic problems in `migration_v1_lab` schema for testing.
 - `03_fix_v1_test_issues.sql`
-  - Resolves seeded problems.
 - `04_v1_sanity_checks.sql`
-  - PASS/FAIL assertions for seeded checks only.
 
-## Prerequisites
+### V2 Enterprise / Practical
 
-- PostgreSQL 12+ (validated on PostgreSQL 18).
-- `psql` client access.
-- Role with enough visibility to query:
-  - `pg_settings`
-  - `pg_stat_activity`
-  - `pg_stat_database`
-  - `pg_stat_replication`
-  - `pg_replication_slots`
-- Recommended role memberships for full output:
-  - `pg_monitor` (or superuser in controlled environments)
-- Disk space for HTML outputs and test data (seed script creates sizable test tables).
+- `05_seed_v2_test_issues.sql`
+  - Seeds practical issues in `migration_v2_lab` (PK/FK/index/casing/sequence/stats/bloat/datatype/search).
+- `06_fix_v2_test_issues.sql`
+  - Fixes V2 seeded issues.
+- `07_v2_sanity_checks.sql`
+  - PASS/FAIL assertions for V2 controls.
+- `08_oracle_to_postgres_enterprise_report_v2.sql`
+  - Styled HTML report with object coverage matrix and issue playbook.
+- `ISSUE_CATALOG_V2.md`
+  - Enterprise-style issue catalog (impact, coverage, detect/fix mapping).
 
-## Main Usage
+## Target Database
 
-```bash
-cd "/Users/saiendla/Documents/PostgreSQl SCripts "
+Use your practical dataset database (`pgbench_test`) for realistic validation.
 
-psql "host=<host> port=<port> dbname=<db> user=<user>" \
-  -v report_file='postgres_360_migration_health_report.html' \
-  -f "postgres_admin_scripts/27_migration_validation/01_oracle_to_postgres_360_health_report.sql"
-```
+## V2 End-to-End Workflow (Recommended)
 
-## V1 End-to-End Test Workflow
-
-### 1) Seed known issues
+### 1) Seed practical issues
 
 ```bash
-psql "host=<host> port=<port> dbname=<db> user=<user>" \
-  -f "postgres_admin_scripts/27_migration_validation/02_seed_v1_test_issues.sql"
+psql "host=<host> port=<port> dbname=pgbench_test user=<user>" \
+  -f "postgres_admin_scripts/27_migration_validation/05_seed_v2_test_issues.sql"
 ```
 
-### 2) Generate report with issues present
+### 2) Generate enterprise report (before fix)
 
 ```bash
 mkdir -p "postgres_admin_scripts/27_migration_validation/samples"
 
-psql "host=<host> port=<port> dbname=<db> user=<user>" \
-  -v report_file='postgres_admin_scripts/27_migration_validation/samples/v1_report_before_fix.html' \
-  -f "postgres_admin_scripts/27_migration_validation/01_oracle_to_postgres_360_health_report.sql"
+psql "host=<host> port=<port> dbname=pgbench_test user=<user>" \
+  -v report_file='postgres_admin_scripts/27_migration_validation/samples/v2_report_before_fix.html' \
+  -f "postgres_admin_scripts/27_migration_validation/08_oracle_to_postgres_enterprise_report_v2.sql"
 ```
 
-### 3) Run sanity checks (should show FAIL items before fix)
+### 3) Run sanity checks (expect FAIL items before fix)
 
 ```bash
-psql "host=<host> port=<port> dbname=<db> user=<user>" \
-  -f "postgres_admin_scripts/27_migration_validation/04_v1_sanity_checks.sql"
+psql "host=<host> port=<port> dbname=pgbench_test user=<user>" \
+  -f "postgres_admin_scripts/27_migration_validation/07_v2_sanity_checks.sql"
 ```
 
 ### 4) Apply fixes
 
 ```bash
-psql "host=<host> port=<port> dbname=<db> user=<user>" \
-  -f "postgres_admin_scripts/27_migration_validation/03_fix_v1_test_issues.sql"
+psql "host=<host> port=<port> dbname=pgbench_test user=<user>" \
+  -f "postgres_admin_scripts/27_migration_validation/06_fix_v2_test_issues.sql"
 ```
 
-### 5) Generate report after fixes
+### 5) Re-run report after fix
 
 ```bash
-psql "host=<host> port=<port> dbname=<db> user=<user>" \
-  -v report_file='postgres_admin_scripts/27_migration_validation/samples/v1_report_after_fix.html' \
-  -f "postgres_admin_scripts/27_migration_validation/01_oracle_to_postgres_360_health_report.sql"
+psql "host=<host> port=<port> dbname=pgbench_test user=<user>" \
+  -v report_file='postgres_admin_scripts/27_migration_validation/samples/v2_report_after_fix.html' \
+  -f "postgres_admin_scripts/27_migration_validation/08_oracle_to_postgres_enterprise_report_v2.sql"
 ```
 
-### 6) Run sanity checks again (target: all PASS)
+### 6) Re-run sanity checks (target: all PASS)
 
 ```bash
-psql "host=<host> port=<port> dbname=<db> user=<user>" \
-  -f "postgres_admin_scripts/27_migration_validation/04_v1_sanity_checks.sql"
+psql "host=<host> port=<port> dbname=pgbench_test user=<user>" \
+  -f "postgres_admin_scripts/27_migration_validation/07_v2_sanity_checks.sql"
 ```
 
-## Expected Report Sections
+## V2 Object Coverage Scope
 
-- `Report Metadata`
-- `Overall Health Summary`
-- `360-Degree Check Results`
-- `Issue Details (Top Objects and Sessions)`
+The enterprise report includes inventory and guidance for:
 
-## Included Sample Outputs
+- `TABLE`
+- `VIEW`
+- `MVIEW`
+- `TABLESPACE`
+- `SEQUENCE`
+- `INDEXES`
+- `TRIGGER`
+- `GRANT`
+- `FUNCTION`
+- `PROCEDURE`
+- `PARTITION`
+- `TYPE`
+- `FDW`
+- `QUERY` telemetry (`pg_stat_statements`)
+- `INSERT/COPY` signal (when statement telemetry is available)
+- Oracle mappings noted explicitly:
+  - `PACKAGE` -> mapped guidance (`schema + function/procedure`)
+  - `SYNONYM` -> mapped guidance (`view + search_path`)
+  - `KETTLE` -> external integration note (not introspected via PostgreSQL catalogs)
 
-- `samples/v1_report_before_fix.html`
-- `samples/v1_report_after_fix.html`
-- `samples/v1_sanity_before_fix.txt`
-- `samples/v1_sanity_after_fix.txt`
-- `samples/README.md` (quick summary of before/after results)
+## Notes
 
-## Common Oracle -> PostgreSQL Pitfalls (Datatype/Casting)
-
-- Oracle `DATE` includes time; PostgreSQL `date` does not.
-- Oracle empty string (`''`) behaves like `NULL`; PostgreSQL keeps empty string as value.
-- Oracle implicit casting is looser; PostgreSQL requires explicit, type-safe casts.
-- `NUMBER` mapped to small integer types can overflow; use proper `numeric(p,s)` where needed.
-- `NVL`/`DECODE` rewrites can fail when branch types differ; normalize with explicit casts.
-- `TIMESTAMP WITH LOCAL TIME ZONE` mapping needs `timestamptz` and timezone policy checks.
-- Mixed-type joins (`text` vs `bigint`, etc.) can break plan quality and correctness.
-- Uppercase quoted identifiers increase SQL fragility.
-
-## V1 Release Checklist
-
-- [ ] Report script runs with `ON_ERROR_STOP=1` on target environment.
-- [ ] Sanity checks pass after running `03_fix_v1_test_issues.sql`.
-- [ ] Attach both sample reports:
-  - `samples/v1_report_before_fix.html`
-  - `samples/v1_report_after_fix.html`
-- [ ] Keep command history/log output for reproducibility in PR description.
-- [ ] Review WARN/FAIL checks that are environment-level (for example replication topology) before sign-off.
+- V2 seed/fix scripts are isolated to `migration_v2_lab`.
+- Environment-level checks (for example `autovacuum`, `track_io_timing`, extension baseline) are reported but not auto-seeded.
+- Keep generated HTML and sanity outputs as PR/release evidence.

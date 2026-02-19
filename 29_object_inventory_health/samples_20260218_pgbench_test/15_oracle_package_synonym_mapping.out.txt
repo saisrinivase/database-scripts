@@ -1,0 +1,6 @@
+ oracle_object |             postgres_mapping             | candidate_count |                             recommendation                              |                                          sample_objects                                          
+---------------+------------------------------------------+-----------------+-------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------
+ PACKAGE       | schema + function/procedure API grouping |               2 | Use schema-scoped naming and grants to emulate package contracts.       | migration_v2_lab, public
+ SYNONYM       | view or search_path aliasing pattern     |               3 | Use views for stable aliases; avoid brittle global search_path changes. | migration_v2_lab.vw_high_value_orders, public.pg_stat_statements, public.pg_stat_statements_info
+(2 rows)
+
