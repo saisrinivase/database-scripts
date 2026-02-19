@@ -41,3 +41,4 @@ ORDER BY name;
 -- (7 rows)
 -- 
 -- SAMPLE_OUTPUT_END
+

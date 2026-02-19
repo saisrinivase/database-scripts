@@ -1615,3 +1615,4 @@ ORDER BY check_id, metric DESC NULLS LAST, object_name;
 -- Output format is aligned.
 -- HTML report written to postgres_360_migration_health_report.html
 -- SAMPLE_OUTPUT_END
+

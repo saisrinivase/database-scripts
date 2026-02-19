@@ -30,3 +30,4 @@ LIMIT 200;
 -- - No matching rows were returned at capture time.
 -- - Rerun during peak workload or after seeding representative test cases for non-zero examples.
 -- SAMPLE_OUTPUT_END
+

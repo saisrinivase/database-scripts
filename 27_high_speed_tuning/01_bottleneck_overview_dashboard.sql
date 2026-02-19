@@ -201,3 +201,4 @@ CROSS JOIN bg;
 -- (1 row)
 -- 
 -- SAMPLE_OUTPUT_END
+

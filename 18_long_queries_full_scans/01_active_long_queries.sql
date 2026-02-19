@@ -36,3 +36,4 @@ ORDER BY query_age DESC;
 -- - No issue/candidate rows were found at capture time.
 -- - This typically indicates healthy state for this check; rerun during peak load for validation.
 -- SAMPLE_OUTPUT_END
+

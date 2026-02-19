@@ -66,3 +66,4 @@ CREATE TABLE IF NOT EXISTS dba_metrics.wal_snapshots (
 -- psql:15_capacity_forecasting/01_create_capacity_repository.sql:47: NOTICE:  relation "wal_snapshots" already exists, skipping
 -- CREATE TABLE
 -- SAMPLE_OUTPUT_END
+

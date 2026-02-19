@@ -27,3 +27,4 @@ SELECT
 -- (1 row)
 -- 
 -- SAMPLE_OUTPUT_END
+

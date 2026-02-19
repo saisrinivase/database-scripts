@@ -50,3 +50,4 @@ ORDER BY r.rolname, member_of_role;
 -- (21 rows)
 -- 
 -- SAMPLE_OUTPUT_END
+

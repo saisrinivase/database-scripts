@@ -32,3 +32,4 @@ ORDER BY xid_age DESC, multixact_age DESC;
 -- (8 rows)
 -- 
 -- SAMPLE_OUTPUT_END
+

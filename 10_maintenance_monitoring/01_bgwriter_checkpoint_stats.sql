@@ -53,3 +53,4 @@ FROM pg_stat_bgwriter;
 -- (1 row)
 -- 
 -- SAMPLE_OUTPUT_END
+

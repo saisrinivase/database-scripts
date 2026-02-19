@@ -28,3 +28,4 @@ ORDER BY connection_count DESC, datname, usename, application_name;
 -- (3 rows)
 -- 
 -- SAMPLE_OUTPUT_END
+

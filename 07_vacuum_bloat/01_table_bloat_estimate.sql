@@ -41,3 +41,4 @@ ORDER BY est_bloat_bytes DESC NULLS LAST;
 -- (2 rows)
 -- 
 -- SAMPLE_OUTPUT_END
+

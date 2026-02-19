@@ -30,3 +30,4 @@ ORDER BY partition_count DESC, parent_schema, partitioned_table;
 -- (1 row)
 -- 
 -- SAMPLE_OUTPUT_END
+

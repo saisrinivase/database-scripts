@@ -209,3 +209,4 @@ ORDER BY object_group, object_type;
 -- (17 rows)
 -- 
 -- SAMPLE_OUTPUT_END
+

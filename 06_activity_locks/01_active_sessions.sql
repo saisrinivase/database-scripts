@@ -40,3 +40,4 @@ ORDER BY query_age DESC NULLS LAST;
 -- (8 rows)
 -- 
 -- SAMPLE_OUTPUT_END
+

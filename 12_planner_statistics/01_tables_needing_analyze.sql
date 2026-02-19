@@ -35,3 +35,4 @@ ORDER BY n_mod_since_analyze DESC;
 -- (8 rows)
 -- 
 -- SAMPLE_OUTPUT_END
+

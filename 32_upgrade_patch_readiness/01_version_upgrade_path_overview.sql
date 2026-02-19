@@ -46,3 +46,4 @@ ORDER BY t.target_major;
 -- (4 rows)
 -- 
 -- SAMPLE_OUTPUT_END
+

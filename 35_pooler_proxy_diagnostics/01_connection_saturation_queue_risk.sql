@@ -59,3 +59,4 @@ CROSS JOIN act a;
 -- (1 row)
 -- 
 -- SAMPLE_OUTPUT_END
+

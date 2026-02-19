@@ -57,3 +57,4 @@ ORDER BY index_bytes DESC;
 -- (30 rows)
 -- 
 -- SAMPLE_OUTPUT_END
+

@@ -37,3 +37,4 @@ ORDER BY byte_lag DESC NULLS LAST;
 -- - No replication rows were found in this capture.
 -- - This is expected on standalone instances or when replication features are not configured.
 -- SAMPLE_OUTPUT_END
+

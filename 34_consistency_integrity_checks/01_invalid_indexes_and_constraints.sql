@@ -70,3 +70,4 @@ ORDER BY
 -- (0 rows)
 -- 
 -- SAMPLE_OUTPUT_END
+
