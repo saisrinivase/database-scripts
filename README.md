@@ -4,8 +4,8 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 
 ## Scope
 
-- Coverage: 31 operational areas.
-- Current SQL scripts: 163.
+- Coverage: 38 operational areas.
+- Current SQL scripts: 198.
 - Style: every script includes `Purpose`, `Area`, and `Usage` headers.
 - Goal: enable any DBA/engineer to open an area folder and run purpose-specific scripts quickly.
 
@@ -43,6 +43,17 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `27_migration_validation`: Oracle-to-PostgreSQL migration health checks and issue simulation/fix flows.
 - `28_pgss_resource_attribution`: pg_stat_statements-based CPU/IO/memory-spill percentage attribution.
 - `29_object_inventory_health`: object-centric deep diagnostics (TABLE/VIEW/MVIEW/TABLESPACE/SEQUENCE/INDEX/TRIGGER/GRANT/FUNCTION/PROCEDURE/PARTITION/TYPE/FDW/INSERT-COPY) plus PACKAGE/SYNONYM mapping and KETTLE signals.
+- `30_backup_restore_pitr_dr`: backup/PITR configuration checks, WAL archive readiness, restore-to-timestamp quick test, and DR evidence.
+- `31_logging_error_signatures`: logging parameter sanity, error-signature indicators, and slow-query/log correlation.
+- `32_upgrade_patch_readiness`: pre-upgrade risk gates, extension drift/dependency checks, collation mismatch, and post-upgrade watchlists.
+- `33_bgwriter_memory_pressure`: checkpointer/bgwriter, WAL writer/archiver, autovacuum, parallel workers, and spill pressure triage.
+- `34_consistency_integrity_checks`: invalid object checks, checksum posture, TOAST/catalog anomaly signals, and amcheck readiness.
+- `35_pooler_proxy_diagnostics`: saturation/churn indicators, prepared statement risk, transaction pooling incompatibility patterns, and proxy inventory.
+- `36_cloud_provider_signals`: optional managed-service fingerprint, parameter drift/pending-restart, replica lag/failover, and cloud incident checklist.
+
+## Numbering Note
+
+- Both `27_high_speed_tuning` and `27_migration_validation` are retained as-is for backward compatibility with existing references.
 
 ## Performance Topic Coverage
 
