@@ -1,0 +1,5 @@
+ object_type | object_name | owner_name | server_name | relation_name | mapping_count |                     notes                      
+-------------+-------------+------------+-------------+---------------+---------------+------------------------------------------------
+ FDW_STATUS  | (none)      |            |             |               |               | No FDW wrapper/server/foreign table configured
+(1 row)
+

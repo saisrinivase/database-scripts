@@ -1,0 +1,15 @@
+          parameter           |            current_value             | severity |                                      finding                                      |                                       recommendation                                        
+------------------------------+--------------------------------------+----------+-----------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------
+ shared_buffers               | 160 MB                               | high     | Low shared_buffers can increase physical reads.                                   | For dedicated DB hosts, start around 15-30% of RAM and validate with cache hit and latency.
+ max_wal_size                 | 1024 MB                              | medium   | Low max_wal_size can force frequent checkpoints and write pressure.               | Increase max_wal_size and review checkpoint metrics.
+ random_page_cost             | 4                                    | medium   | High random_page_cost may discourage useful index scans on SSD/cloud storage.     | Benchmark lower values (for example 1.1-2.0) in staging before production.
+ track_io_timing              | off                                  | medium   | Without I/O timing, root-cause analysis of storage bottlenecks is limited.        | Enable track_io_timing for better performance diagnostics.
+ work_mem                     | 4096 kB                              | medium   | Low work_mem increases sort/hash spill risk (temp files).                         | Increase carefully per workload; remember it is per operation, per backend.
+ autovacuum                   | on                                   | ok       | Autovacuum is required to control bloat and transaction age.                      | Keep autovacuum enabled and tune thresholds/scales by table size and write rate.
+ checkpoint_completion_target | 0.9                                  | ok       | Low target can create bursty checkpoint I/O.                                      | Use around 0.7-0.9 for smoother write profile.
+ effective_cache_size         | 5120 MB                              | ok       | Too-low effective_cache_size can bias planner away from index plans.              | Set roughly to OS cache + shared_buffers visible to PostgreSQL.
+ jit                          | on                                   | ok       | JIT may help CPU-heavy long queries but can hurt very short OLTP queries.         | Evaluate JIT effect by workload class (OLTP vs OLAP).
+ max_connections              | 100                                  | ok       | Too many direct connections can reduce throughput and increase context switching. | Use a connection pool; target lower active backend count for OLTP.
+ parallel_workers             | max_parallel_workers=8, per_gather=2 | ok       | No parallel workers can slow analytical scans and aggregations.                   | Enable and tune parallel workers for OLAP/reporting workloads.
+(11 rows)
+

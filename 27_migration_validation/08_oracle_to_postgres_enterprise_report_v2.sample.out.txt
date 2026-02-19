@@ -1,0 +1,123 @@
+[Sample output note] This script generates an HTML report file.
+[Source artifact] 27_migration_validation/samples/v2_report_after_fix.html
+[Preview] First 120 lines:
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>PostgreSQL Enterprise Migration & Performance Report V2</title>
+<style>
+body { font-family: "Segoe UI", Arial, sans-serif; margin: 24px; color: #17212b; background: #f6f8fb; }
+h1 { color: #0b3b8f; margin-bottom: 4px; }
+h2 { color: #154a9a; margin-top: 26px; }
+.meta { color: #4b5b71; margin-bottom: 14px; }
+.kpi { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 10px; margin: 16px 0 20px; }
+.card { background: #ffffff; border: 1px solid #d7e0ef; border-radius: 8px; padding: 10px 12px; }
+.label { font-size: 12px; color: #5c6f89; text-transform: uppercase; letter-spacing: .04em; }
+.value { font-size: 24px; font-weight: 700; color: #0b3b8f; }
+table { border-collapse: collapse; width: 100%; background: #ffffff; margin-bottom: 22px; }
+th { background: #113f8c; color: #ffffff; padding: 8px; border: 1px solid #d7e0ef; text-align: left; }
+td { padding: 7px; border: 1px solid #d7e0ef; vertical-align: top; }
+tr:nth-child(even) td { background: #f8fbff; }
+caption { caption-side: top; text-align: left; font-weight: 700; color: #183f80; margin: 0 0 8px 0; }
+.foot { margin-top: 24px; color: #5c6f89; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>PostgreSQL Enterprise Migration & Performance Report (V2)</h1>
+<div class="meta">Object-level + issue-level coverage with clear remediation guidance.</div>
+<table border="1">
+  <caption>Report Metadata</caption>
+  <tr>
+    <th align="center">database_name</th>
+    <th align="center">executed_by</th>
+    <th align="center">postgres_version</th>
+    <th align="center">server_version_num</th>
+    <th align="center">instance_start_time</th>
+    <th align="center">report_generated_at</th>
+  </tr>
+  <tr valign="top">
+    <td align="left">pgbench_test</td>
+    <td align="left">saiendla</td>
+    <td align="left">PostgreSQL 18.0 (Homebrew) on aarch64-apple-darwin25.0.0, compiled by Apple clang version 17.0.0 (clang-1700.3.19.1), 64-bit</td>
+    <td align="left">180000</td>
+    <td align="left">2026-02-10 09:32:09.191307-05</td>
+    <td align="left">2026-02-18 18:20:01.19854-05</td>
+  </tr>
+</table>
+<p>(1 row)<br />
+</p>
+<p>CREATE FUNCTION</p>
+<p>CREATE FUNCTION</p>
+<p>CREATE TABLE</p>
+<p>INSERT 0 14</p>
+<p>CREATE TABLE</p>
+<p>INSERT 0 19</p>
+<h2>Executive Snapshot</h2>
+<div class="kpi">
+<div class="card"><div class="label">Health Score</div><div class="value">67</div></div>
+<div class="card"><div class="label">Risk Points</div><div class="value">33</div></div>
+<div class="card"><div class="label">Checks</div><div class="value">14</div></div>
+<div class="card"><div class="label">Pass</div><div class="value">10</div></div>
+<div class="card"><div class="label">Open Risks</div><div class="value">4</div></div>
+</div>
+<table border="1">
+  <caption>Object Coverage Matrix (Deep Inventory)</caption>
+  <tr>
+    <th align="center">object_family</th>
+    <th align="center">object_type</th>
+    <th align="center">object_count</th>
+    <th align="center">status</th>
+    <th align="center">note</th>
+  </tr>
+  <tr valign="top">
+    <td align="left">Core Objects</td>
+    <td align="left">INDEX</td>
+    <td align="right">21</td>
+    <td align="left">PRESENT</td>
+    <td align="left">All index objects</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Core Objects</td>
+    <td align="left">MVIEW</td>
+    <td align="right">1</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Materialized view objects</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Core Objects</td>
+    <td align="left">SEQUENCE</td>
+    <td align="right">11</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Sequence generators</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Core Objects</td>
+    <td align="left">TABLE</td>
+    <td align="right">18</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Base tables in non-system schemas</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Core Objects</td>
+    <td align="left">VIEW</td>
+    <td align="right">3</td>
+    <td align="left">PRESENT</td>
+    <td align="left">Logical abstraction layer objects</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Data Movement</td>
+    <td align="left">INSERT_OR_COPY_WORKLOAD_SIGNAL</td>
+    <td align="right">0</td>
+    <td align="left">OBSERVED</td>
+    <td align="left">Signal from pg_stat_statements when available</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">External Integration</td>
+    <td align="left">KETTLE</td>
+    <td align="right">&nbsp; </td>
+    <td align="left">EXTERNAL</td>
+    <td align="left">Pentaho/Kettle metadata is outside PostgreSQL catalogs; validate via ETL repository/tooling</td>
+  </tr>
+  <tr valign="top">
+    <td align="left">Federation</td>

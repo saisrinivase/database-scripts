@@ -1,0 +1,5 @@
+   schema_name    | table_name | column_name | est_rows | seq_scan | idx_scan | seq_tup_read | n_distinct  |                                       suggested_index_sql                                        
+------------------+------------+-------------+----------+----------+----------+--------------+-------------+--------------------------------------------------------------------------------------------------
+ migration_v2_lab | order_fact | account_id  |   300000 |       11 |        0 |      1200000 | -0.14875667 | CREATE INDEX CONCURRENTLY idx_order_fact_account_id ON migration_v2_lab.order_fact (account_id);
+(1 row)
+

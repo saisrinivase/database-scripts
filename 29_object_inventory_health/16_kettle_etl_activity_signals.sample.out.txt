@@ -1,0 +1,4 @@
+ signal_type | signal_id | principal | database_name | application_name | state | wait_event_type | wait_event | duration | details 
+-------------+-----------+-----------+---------------+------------------+-------+-----------------+------------+----------+---------
+(0 rows)
+

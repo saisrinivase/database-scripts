@@ -1,0 +1,6 @@
+ role_name | rolconnlimit | current_connections | pct_of_role_limit 
+-----------+--------------+---------------------+-------------------
+ saiendla  |           -1 |                   5 |                  
+ postgres  |           -1 |                   0 |                  
+(2 rows)
+

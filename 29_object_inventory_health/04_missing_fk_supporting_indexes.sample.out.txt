@@ -1,0 +1,4 @@
+ schema_name | table_name | foreign_key_name | fk_columns | suggested_index_sql 
+-------------+------------+------------------+------------+---------------------
+(0 rows)
+

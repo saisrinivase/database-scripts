@@ -109,4 +109,5 @@ The enterprise report includes inventory and guidance for:
 
 - V2 seed/fix scripts are isolated to `migration_v2_lab`.
 - Environment-level checks (for example `autovacuum`, `track_io_timing`, extension baseline) are reported but not auto-seeded.
+- Each script in this area now has a colocated sample output file: `<script>.sample.out.txt`.
 - Keep generated HTML and sanity outputs as PR/release evidence.

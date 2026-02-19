@@ -1,0 +1,9 @@
+ schema_name |  table_name   | column_name | data_type 
+-------------+---------------+-------------+-----------
+ perf        | app_events    | payload     | jsonb
+ perf        | audit_log     | details     | jsonb
+ perf        | job_runs      | metrics     | jsonb
+ perf        | jobs          | meta        | jsonb
+ perf        | notifications | payload     | jsonb
+(5 rows)
+

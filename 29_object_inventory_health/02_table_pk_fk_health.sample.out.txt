@@ -1,0 +1,23 @@
+   schema_name    |       table_name        | est_rows  | total_size | has_primary_key | outbound_fk_count | inbound_fk_count | valid_index_count |   health_flag   
+------------------+-------------------------+-----------+------------+-----------------+-------------------+------------------+-------------------+-----------------
+ public           | pgbench_history         |   5331130 | 270 MB     | NO              |                 0 |                0 |                 0 | ADD_PRIMARY_KEY
+ public           | pgbench_accounts        | 200000032 | 30 GB      | YES             |                 0 |                0 |                 1 | OK
+ migration_v2_lab | order_fact              |    300000 | 49 MB      | YES             |                 0 |                0 |                 3 | OK
+ migration_v2_lab | child_events            |    250000 | 25 MB      | YES             |                 1 |                0 |                 2 | OK
+ migration_v2_lab | stale_stats_table       |    180000 | 24 MB      | YES             |                 0 |                0 |                 1 | OK
+ migration_v2_lab | amount_mapping_risk     |    120000 | 19 MB      | YES             |                 0 |                0 |                 1 | OK
+ migration_v2_lab | sales_catalog           |    120000 | 14 MB      | YES             |                 0 |                0 |                 2 | OK
+ migration_v2_lab | bloat_pressure_table    |     42000 | 14 MB      | YES             |                 0 |                0 |                 1 | OK
+ migration_v2_lab | customer_contact_compat |     90000 | 13 MB      | YES             |                 0 |                0 |                 1 | OK
+ public           | pgbench_branches        |      2000 | 7048 kB    | YES             |                 0 |                0 |                 1 | OK
+ migration_v2_lab | partitioned_events_2025 |     52194 | 5560 kB    | YES             |                 0 |                0 |                 1 | OK
+ migration_v2_lab | partitioned_events_2026 |     47806 | 5104 kB    | YES             |                 0 |                0 |                 1 | OK
+ migration_v2_lab | customer_staging_no_pk  |     60000 | 5016 kB    | YES             |                 0 |                0 |                 1 | OK
+ migration_v2_lab | parent_accounts         |     50000 | 4096 kB    | YES             |                 0 |                1 |                 1 | OK
+ public           | pgbench_tellers         |     20000 | 3712 kB    | YES             |                 0 |                0 |                 1 | OK
+ migration_v2_lab | quoted_orders           |      5000 | 496 kB     | YES             |                 0 |                0 |                 1 | OK
+ migration_v2_lab | issue_manifest          |        -1 | 32 kB      | YES             |                 0 |                0 |                 1 | OK
+ migration_v2_lab | trigger_audit_demo      |         0 | 16 kB      | YES             |                 0 |                0 |                 1 | OK
+ migration_v2_lab | partitioned_events      |    100000 | 0 bytes    | YES             |                 0 |                0 |                 1 | OK
+(19 rows)
+

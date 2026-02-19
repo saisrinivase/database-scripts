@@ -1,0 +1,38 @@
+   schema_name    |       table_name        | main_bytes | fsm_bytes | vm_bytes | toast_total_bytes | table_total_bytes | table_total_pretty 
+------------------+-------------------------+------------+-----------+----------+-------------------+-------------------+--------------------
+ perf             | order_items             |          0 |     16384 |        0 |                 0 |         122626048 | 117 MB
+ perf             | app_events              |          0 |     16384 |        0 |              8192 |          99270656 | 95 MB
+ perf             | payments                |          0 |     16384 |        0 |                 0 |          87080960 | 83 MB
+ perf             | orders                  |          0 |     16384 |        0 |                 0 |          78512128 | 75 MB
+ perf             | shipments               |          0 |     16384 |        0 |              8192 |          19038208 | 18 MB
+ migration_v1_lab | child_transactions      |    7233536 |     24576 |     8192 |                 0 |          11051008 | 11 MB
+ migration_v1_lab | stale_stats_table       |    6553600 |     24576 |     8192 |              8192 |           7954432 | 7768 kB
+ migration_v1_lab | product_catalog         |    3416064 |     24576 |     8192 |              8192 |           6176768 | 6032 kB
+ perf             | users                   |          0 |     16384 |        0 |              8192 |           4833280 | 4720 kB
+ public           | demo_users              |    2220032 |     24576 |     8192 |              8192 |           4505600 | 4400 kB
+ migration_v1_lab | dml_bloat_table         |    3727360 |     24576 |     8192 |              8192 |           4349952 | 4248 kB
+ perf             | inventory               |          0 |     16384 |        0 |                 0 |           3497984 | 3416 kB
+ perf             | product_categories      |          0 |     16384 |        0 |                 0 |           2703360 | 2640 kB
+ perf             | products                |          0 |     16384 |        0 |              8192 |           2285568 | 2232 kB
+ perf             | addresses               |          0 |     16384 |        0 |              8192 |           1613824 | 1576 kB
+ perf             | sessions                |          0 |     16384 |        0 |                 0 |           1376256 | 1344 kB
+ migration_v1_lab | orders_no_pk            |     606208 |     24576 |     8192 |              8192 |            892928 | 872 kB
+ migration_v1_lab | parent_accounts         |     524288 |     24576 |     8192 |              8192 |            811008 | 792 kB
+ migration_v1_lab | sales_orders            |      57344 |     24576 |        0 |              8192 |            131072 | 128 kB
+ perf             | feature_flags           |          0 |     16384 |        0 |              8192 |            122880 | 120 kB
+ perf             | categories              |          0 |     16384 |        0 |              8192 |             98304 | 96 kB
+ dba_metrics      | index_size_snapshots    |      32768 |     24576 |        0 |              8192 |             65536 | 64 kB
+ dba_metrics      | table_size_snapshots    |      24576 |     24576 |        0 |              8192 |             57344 | 56 kB
+ perf             | tenants                 |       8192 |         0 |        0 |              8192 |             32768 | 32 kB
+ perf             | documents               |          0 |         0 |        0 |              8192 |             24576 | 24 kB
+ perf             | audit_log               |          0 |         0 |        0 |              8192 |             24576 | 24 kB
+ dba_metrics      | wal_snapshots           |       8192 |         0 |        0 |              8192 |             16384 | 16 kB
+ perf             | job_runs                |          0 |         0 |        0 |              8192 |             16384 | 16 kB
+ perf             | jobs                    |          0 |         0 |        0 |              8192 |             16384 | 16 kB
+ dba_metrics      | connection_snapshots    |       8192 |         0 |        0 |              8192 |             16384 | 16 kB
+ perf             | ticket_comments         |          0 |         0 |        0 |              8192 |             16384 | 16 kB
+ perf             | support_tickets         |          0 |         0 |        0 |              8192 |             16384 | 16 kB
+ perf             | notifications           |          0 |         0 |        0 |              8192 |             16384 | 16 kB
+ dba_metrics      | database_size_snapshots |       8192 |         0 |        0 |              8192 |             16384 | 16 kB
+(34 rows)
+
