@@ -2,22 +2,28 @@
 
 Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 
+## Quick Start
+
+1. Pick an area folder based on your issue (size, locks, performance, migration, internals, etc.).
+2. Run a script with `psql -d <database> -f <area>/<script>.sql`.
+3. Compare your result with the embedded sample output at the bottom of the same script.
+4. Use coverage maps (`PERFORMANCE_TUNING_COVERAGE.md`, `OBJECT_COVERAGE_MATRIX.md`, `INTERNALS_COVERAGE_MATRIX.md`) for cross-area troubleshooting.
+
 ## Scope
 
-- Coverage: 38 operational areas.
-- Current SQL scripts: 198.
-- Style: every script includes `Purpose`, `Area`, and `Usage` headers.
-- Goal: enable any DBA/engineer to open an area folder and run purpose-specific scripts quickly.
+- Coverage: `38` operational areas.
+- Current SQL scripts: `198`.
+- Script style: every SQL file includes `Purpose`, `Area`, and `Usage` headers.
+- Goal: any DBA/engineer can open an area and run purpose-specific scripts quickly.
 
-## Areas
+## Area Index
 
 - `00_environment`: instance fingerprint, extension baseline, catalog object inventory.
 - `01_database_size`: database/tablespace size and top-level storage breakdown.
 - `02_table_storage`: table-level storage distribution and growth baselines.
 - `03_index_analysis`: index size/use, unused and duplicate index candidates.
 - `04_toast_lob_blob`: TOAST, LOB/BLOB footprint and heavy-object detection.
-- `05_partitioning`: partition inventory, distribution, and recommendation heuristics.
-  - Includes SME decision scorecard, target-table deep advisor, and 5GB+ time-series lab generator.
+- `05_partitioning`: partition inventory, distribution, recommendation heuristics, SME scorecard, target-table advisor, 5GB+ lab generator.
 - `06_activity_locks`: active sessions, blockers, waits, long transactions.
 - `07_vacuum_bloat`: bloat heuristics, freeze age, autovacuum visibility.
 - `08_replication_ha`: replication lag, slots, standby replay, WAL rates.
@@ -39,55 +45,44 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `24_complex_filter_search`: LIKE/ILIKE, JSON/array, GIN/GiST/BRIN and FTS diagnostics.
 - `25_oltp_olap_goals`: workload goal alignment and classification.
 - `26_physical_cloud_diagnostics`: physical/cloud root-cause indicators.
-- `27_high_speed_tuning`: fast bottleneck triage, parameter advisor, and missing-index detection.
+- `27_high_speed_tuning`: fast bottleneck triage, parameter advisor, missing-index detection.
 - `27_migration_validation`: Oracle-to-PostgreSQL migration health checks and issue simulation/fix flows.
 - `28_pgss_resource_attribution`: pg_stat_statements-based CPU/IO/memory-spill percentage attribution.
-- `29_object_inventory_health`: object-centric deep diagnostics (TABLE/VIEW/MVIEW/TABLESPACE/SEQUENCE/INDEX/TRIGGER/GRANT/FUNCTION/PROCEDURE/PARTITION/TYPE/FDW/INSERT-COPY) plus PACKAGE/SYNONYM mapping and KETTLE signals.
-- `30_backup_restore_pitr_dr`: backup/PITR configuration checks, WAL archive readiness, restore-to-timestamp quick test, and DR evidence.
-- `31_logging_error_signatures`: logging parameter sanity, error-signature indicators, and slow-query/log correlation.
-- `32_upgrade_patch_readiness`: pre-upgrade risk gates, extension drift/dependency checks, collation mismatch, and post-upgrade watchlists.
-- `33_bgwriter_memory_pressure`: checkpointer/bgwriter, WAL writer/archiver, autovacuum, parallel workers, and spill pressure triage.
-- `34_consistency_integrity_checks`: invalid object checks, checksum posture, TOAST/catalog anomaly signals, and amcheck readiness.
-- `35_pooler_proxy_diagnostics`: saturation/churn indicators, prepared statement risk, transaction pooling incompatibility patterns, and proxy inventory.
-- `36_cloud_provider_signals`: optional managed-service fingerprint, parameter drift/pending-restart, replica lag/failover, and cloud incident checklist.
+- `29_object_inventory_health`: deep diagnostics for TABLE/VIEW/MVIEW/TABLESPACE/SEQUENCE/INDEX/TRIGGER/GRANT/FUNCTION/PROCEDURE/PARTITION/TYPE/FDW/INSERT-COPY, plus PACKAGE/SYNONYM mapping and KETTLE signals.
+- `30_backup_restore_pitr_dr`: backup/PITR checks, archive readiness, restore-to-timestamp quick test, DR evidence.
+- `31_logging_error_signatures`: logging sanity, error-signature indicators, slow-query/log correlation.
+- `32_upgrade_patch_readiness`: pre-upgrade gates, extension drift/dependencies, collation mismatch, post-upgrade watchlists.
+- `33_bgwriter_memory_pressure`: checkpointer/bgwriter, WAL writer/archiver, autovacuum, parallel workers, spill pressure triage.
+- `34_consistency_integrity_checks`: invalid object checks, checksum posture, TOAST/catalog anomaly signals, amcheck readiness.
+- `35_pooler_proxy_diagnostics`: saturation/churn indicators, prepared statement risk, transaction pooling incompatibility, proxy inventory.
+- `36_cloud_provider_signals`: optional managed-service fingerprint, parameter drift, replica lag/failover, cloud incident checklist.
 
-## Numbering Note
+Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionally retained for backward compatibility.
 
-- Both `27_high_speed_tuning` and `27_migration_validation` are retained as-is for backward compatibility with existing references.
+## Coverage Maps
 
-## Performance Topic Coverage
-
-See `PERFORMANCE_TUNING_COVERAGE.md` for direct mapping from performance topics to scripts.
-See `27_high_speed_tuning/README.md` for a fast triage run order.
-
-## Object Topic Coverage
-
-See `OBJECT_COVERAGE_MATRIX.md` for direct mapping from object types/issues to scripts.
-
-## Internals Mapping
-
-See `INTERNALS_COVERAGE_MATRIX.md` for topic-to-internals source mapping.
-
-## Version Compatibility
-
-See `VERSION_COMPATIBILITY.md`.
+- Performance topic map: `PERFORMANCE_TUNING_COVERAGE.md`
+- Object topic map: `OBJECT_COVERAGE_MATRIX.md`
+- Internals topic map: `INTERNALS_COVERAGE_MATRIX.md`
+- Fast triage order: `27_high_speed_tuning/README.md`
+- Version compatibility details: `VERSION_COMPATIBILITY.md`
 
 ## Sample Output Convention
 
-- Every SQL script includes an embedded sample output section at the bottom.
-- Section markers: `-- SAMPLE_OUTPUT_BEGIN` ... `-- SAMPLE_OUTPUT_END`.
-- Sample output is for quick understanding; values vary by environment and runtime state.
-- Historical full-run outputs are retained in `_validation_runs/` for audit purposes.
+- Every SQL script includes embedded sample output at the bottom.
+- Markers: `-- SAMPLE_OUTPUT_BEGIN` and `-- SAMPLE_OUTPUT_END`.
+- Samples are for quick understanding; values vary by environment and runtime state.
+- Historical full validation outputs are retained in `_validation_runs/`.
 
 ## Operational Notes
 
-- Candidate scripts (for example index drop, partitioning, extended statistics) are advisory; review plans and workload before action.
-- Target support is PostgreSQL `15` through `18`.
+- Candidate scripts (index drop, partitioning, extended statistics, etc.) are advisory; review plans and workload before changes.
+- Target support: PostgreSQL `15` through `18`.
 - Current validated execution in this workspace: PostgreSQL `18.0`.
-- A subset of scripts contains `psql` version guards (`\\if`/`\\gset`) to switch logic between `15/16` and `17/18` system view changes.
-- Some scripts require extensions/features:
-  - `pg_stat_statements` for statement-level tuning scripts.
-  - `pg_stat_wal` (PostgreSQL 14+) for WAL counter scripts.
-  - `pg_stat_io` (PostgreSQL 16+) for detailed I/O scripts.
-  - Access to `pg_largeobject` for large object analysis.
-- Capacity area (`15_capacity_forecasting`) stores snapshots in schema `dba_metrics`; run create script first.
+- Some scripts use `psql` guards (`\\if`, `\\gset`) to support differences between `15/16` and `17/18` views/columns.
+Extension/feature dependencies:
+- `pg_stat_statements` for statement-level tuning scripts.
+- `pg_stat_wal` (PostgreSQL 14+) for WAL counter scripts.
+- `pg_stat_io` (PostgreSQL 16+) for detailed I/O scripts.
+- Access to `pg_largeobject` for large object analysis.
+- Capacity area (`15_capacity_forecasting`) stores snapshots in schema `dba_metrics`; run repository/create script first.
