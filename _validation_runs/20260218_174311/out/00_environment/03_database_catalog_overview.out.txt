@@ -1,9 +1,0 @@
-    object_type     | object_count 
---------------------+--------------
- indexes            |           43
- partitioned tables |            0
- schemas            |            4
- tables             |           34
- views              |            2
-(5 rows)
-

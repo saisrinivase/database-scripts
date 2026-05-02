@@ -1,29 +1,14 @@
 /*
-Purpose: Summarize session states and average age per state.
-Area: Connection and Workload
-Usage: Detect excessive idle or long-running active workloads.
+MySQL DBA Script: Connection State Distribution
+Purpose: Provide MySQL DBA diagnostics for connection state distribution.
+Area: Connection Workload
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    state,
-    count(*) AS session_count,
-    min(query_start) AS oldest_query_start,
-    max(query_start) AS newest_query_start,
-    avg(extract(epoch FROM (now() - query_start))) FILTER (WHERE query_start IS NOT NULL) AS avg_query_age_seconds
-FROM pg_stat_activity
-GROUP BY state
-ORDER BY session_count DESC;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Connection State Distribution') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  state  | session_count |      oldest_query_start      |      newest_query_start      | avg_query_age_seconds  
--- --------+---------------+------------------------------+------------------------------+------------------------
---         |             8 |                              |                              |                       
---  active |             1 | 2026-02-18 19:43:32.09865-05 | 2026-02-18 19:43:32.09865-05 | 0.00000000000000000000
--- (2 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT command, state, COUNT(*) AS thread_count, MAX(time) AS max_seconds
+FROM information_schema.processlist
+GROUP BY command, state
+ORDER BY thread_count DESC;

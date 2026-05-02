@@ -1,6 +1,0 @@
-   extension_name   | extension_version | extension_schema | extension_owner 
---------------------+-------------------+------------------+-----------------
- pg_stat_statements | 1.12              | public           | saiendla
- plpgsql            | 1.0               | pg_catalog       | saiendla
-(2 rows)
-

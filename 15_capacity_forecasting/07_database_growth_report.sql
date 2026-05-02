@@ -1,61 +1,16 @@
 /*
-Purpose: Report database growth between first and latest snapshots in repository.
+MySQL DBA Script: Database Growth Report
+Purpose: Provide MySQL DBA diagnostics for database growth report.
 Area: Capacity Forecasting
-Usage: Requires captured data in dba_metrics.database_size_snapshots.
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-WITH ranked AS (
-    SELECT
-        database_name,
-        captured_at,
-        size_bytes,
-        row_number() OVER (PARTITION BY database_name ORDER BY captured_at ASC) AS rn_first,
-        row_number() OVER (PARTITION BY database_name ORDER BY captured_at DESC) AS rn_last
-    FROM dba_metrics.database_size_snapshots
-),
-first_snap AS (
-    SELECT database_name, captured_at AS first_captured_at, size_bytes AS first_size_bytes
-    FROM ranked
-    WHERE rn_first = 1
-),
-last_snap AS (
-    SELECT database_name, captured_at AS last_captured_at, size_bytes AS last_size_bytes
-    FROM ranked
-    WHERE rn_last = 1
-)
-SELECT
-    l.database_name,
-    f.first_captured_at,
-    l.last_captured_at,
-    f.first_size_bytes,
-    l.last_size_bytes,
-    (l.last_size_bytes - f.first_size_bytes) AS growth_bytes,
-    pg_size_pretty((l.last_size_bytes - f.first_size_bytes)::bigint) AS growth_pretty,
-    CASE
-        WHEN extract(epoch FROM (l.last_captured_at - f.first_captured_at)) > 0
-            THEN ((l.last_size_bytes - f.first_size_bytes) / extract(epoch FROM (l.last_captured_at - f.first_captured_at)))::numeric(20,2)
-        ELSE NULL
-    END AS growth_bytes_per_second
-FROM last_snap l
-JOIN first_snap f
-    ON f.database_name = l.database_name
-ORDER BY growth_bytes DESC;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Database Growth Report') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---            database_name           |       first_captured_at       |       last_captured_at        | first_size_bytes | last_size_bytes | growth_bytes | growth_pretty | growth_bytes_per_second 
--- -----------------------------------+-------------------------------+-------------------------------+------------------+-----------------+--------------+---------------+-------------------------
---  pgbench_test                      | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |      32205059775 |     32236762815 |     31703040 | 30 MB         |               147650.80
---  hypopg_lab                        | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |         36173503 |        36173503 |            0 | 0 bytes       |                    0.00
---  perf_test                         | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |        436410047 |       436410047 |            0 | 0 bytes       |                    0.00
---  appdb                             | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |          8058559 |         8058559 |            0 | 0 bytes       |                    0.00
---  postgres                          | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |         40007359 |        40007359 |            0 | 0 bytes       |                    0.00
---  script_validation_20260218_172749 | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |        468563647 |       468563647 |            0 | 0 bytes       |                    0.00
---  template1                         | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |          8033983 |         8033983 |            0 | 0 bytes       |                    0.00
--- (7 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT schema_name, DATE(snap_time) AS snap_day,
+       ROUND(MAX(data_bytes+index_bytes)/1024/1024,2) AS total_mb,
+       ROUND(MAX(free_bytes)/1024/1024,2) AS free_mb
+FROM dba_capacity_schema_snap
+GROUP BY schema_name, DATE(snap_time)
+ORDER BY snap_day DESC, total_mb DESC;

@@ -1,108 +1,15 @@
 /*
-Purpose: Create monthly growth views for objects and databases.
-Area: Object Lifecycle and Capacity Monitoring
-Usage: Use for month-by-month capacity tracking and growth anomaly detection.
+MySQL DBA Script: Create Growth Views
+Purpose: Provide MySQL DBA diagnostics for create growth views.
+Area: Object Lifecycle Capacity
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-CREATE SCHEMA IF NOT EXISTS dba_metrics;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Create Growth Views') AS script_name;
 
-CREATE OR REPLACE VIEW dba_metrics.vw_object_growth_monthly AS
-WITH monthly_last AS (
-    SELECT
-        date_trunc('month', captured_at)::date AS month_start,
-        object_oid,
-        schema_name,
-        object_name,
-        object_type,
-        total_size_bytes,
-        captured_at,
-        row_number() OVER (
-            PARTITION BY object_oid, date_trunc('month', captured_at)::date
-            ORDER BY captured_at DESC
-        ) AS rn
-    FROM dba_metrics.object_size_snap
-),
-series AS (
-    SELECT
-        month_start,
-        object_oid,
-        schema_name,
-        object_name,
-        object_type,
-        total_size_bytes,
-        lag(total_size_bytes) OVER (
-            PARTITION BY object_oid
-            ORDER BY month_start
-        ) AS prev_total_size_bytes
-    FROM monthly_last
-    WHERE rn = 1
-)
-SELECT
-    month_start,
-    schema_name,
-    object_name,
-    object_type,
-    total_size_bytes,
-    prev_total_size_bytes,
-    (total_size_bytes - prev_total_size_bytes) AS growth_bytes,
-    round(
-        CASE
-            WHEN prev_total_size_bytes IS NULL OR prev_total_size_bytes = 0 THEN NULL
-            ELSE 100.0 * (total_size_bytes - prev_total_size_bytes)::numeric / prev_total_size_bytes
-        END,
-        2
-    ) AS growth_pct,
-    pg_size_pretty(total_size_bytes) AS total_size_pretty,
-    pg_size_pretty(coalesce(total_size_bytes - prev_total_size_bytes, 0)) AS growth_pretty
-FROM series;
-
-CREATE OR REPLACE VIEW dba_metrics.vw_database_growth_monthly AS
-WITH monthly_last AS (
-    SELECT
-        date_trunc('month', captured_at)::date AS month_start,
-        database_name,
-        size_bytes,
-        captured_at,
-        row_number() OVER (
-            PARTITION BY database_name, date_trunc('month', captured_at)::date
-            ORDER BY captured_at DESC
-        ) AS rn
-    FROM dba_metrics.database_size_snap
-),
-series AS (
-    SELECT
-        month_start,
-        database_name,
-        size_bytes,
-        lag(size_bytes) OVER (
-            PARTITION BY database_name
-            ORDER BY month_start
-        ) AS prev_size_bytes
-    FROM monthly_last
-    WHERE rn = 1
-)
-SELECT
-    month_start,
-    database_name,
-    size_bytes,
-    prev_size_bytes,
-    (size_bytes - prev_size_bytes) AS growth_bytes,
-    round(
-        CASE
-            WHEN prev_size_bytes IS NULL OR prev_size_bytes = 0 THEN NULL
-            ELSE 100.0 * (size_bytes - prev_size_bytes)::numeric / prev_size_bytes
-        END,
-        2
-    ) AS growth_pct,
-    pg_size_pretty(size_bytes) AS size_pretty,
-    pg_size_pretty(coalesce(size_bytes - prev_size_bytes, 0)) AS growth_pretty
-FROM series;
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_37_verify_20260220_safedrop_final
---
--- CREATE SCHEMA
--- CREATE VIEW
--- CREATE VIEW
--- SAMPLE_OUTPUT_END
+CREATE OR REPLACE VIEW dba_object_growth_v AS
+SELECT object_schema, object_name, object_type, DATE(snap_time) AS snap_day,
+       MAX(data_bytes + index_bytes) AS max_bytes
+FROM dba_lifecycle_object_snap
+GROUP BY object_schema, object_name, object_type, DATE(snap_time);

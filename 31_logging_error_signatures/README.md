@@ -1,15 +1,16 @@
-# Logging and Error Signature Diagnostics
+# 31_logging_error_signatures
 
-Purpose: SQL-first triage for logging configuration quality and recurring error symptom patterns.
+Error log, slow query digests, waits, locks, and deadlock indicators.
 
-## Run Order
+Scripts in this area: `4`.
 
-1. `01_logging_configuration_sanity.sql`
-2. `02_error_signature_indicators.sql`
-3. `03_slow_query_log_vs_pgss_correlation.sql`
-4. `04_lock_wait_deadlock_signatures.sql`
+## Usage
 
-## Notes
+Run with the mysql client, for example: `mysql -u root -p < 31_logging_error_signatures/<script>.sql`.
 
-- Database views cannot replace full log parsing; they provide fast triage signals to narrow investigation.
-- Combine this area with log files or centralized observability for full incident timelines.
+## Scripts
+
+- `01_logging_configuration_sanity.sql`
+- `02_error_signature_indicators.sql`
+- `03_slow_query_digest_correlation.sql`
+- `04_lock_wait_deadlock_signatures.sql`

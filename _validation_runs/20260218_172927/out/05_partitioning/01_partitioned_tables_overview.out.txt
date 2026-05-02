@@ -1,4 +1,0 @@
- parent_schema | partitioned_table | partition_key | partition_count 
----------------+-------------------+---------------+-----------------
-(0 rows)
-

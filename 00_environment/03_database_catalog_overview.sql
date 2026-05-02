@@ -1,67 +1,20 @@
 /*
-Purpose: Show high-level object counts in the current database catalog.
-Area: Environment / Internals
-Usage: Run in any database.
+MySQL DBA Script: Database Catalog Overview
+Purpose: Provide MySQL DBA diagnostics for database catalog overview.
+Area: Environment
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-WITH object_counts AS (
-    SELECT 'schemas'::text AS object_type, count(*)::bigint AS object_count
-    FROM pg_namespace
-    WHERE nspname !~ '^pg_' AND nspname <> 'information_schema'
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Database Catalog Overview') AS script_name;
 
-    UNION ALL
-
-    SELECT 'tables', count(*)
-    FROM pg_class c
-    JOIN pg_namespace n ON n.oid = c.relnamespace
-    WHERE c.relkind = 'r'
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-
-    UNION ALL
-
-    SELECT 'partitioned tables', count(*)
-    FROM pg_class c
-    JOIN pg_namespace n ON n.oid = c.relnamespace
-    WHERE c.relkind = 'p'
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-
-    UNION ALL
-
-    SELECT 'indexes', count(*)
-    FROM pg_class c
-    JOIN pg_namespace n ON n.oid = c.relnamespace
-    WHERE c.relkind = 'i'
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-
-    UNION ALL
-
-    SELECT 'views', count(*)
-    FROM pg_class c
-    JOIN pg_namespace n ON n.oid = c.relnamespace
-    WHERE c.relkind = 'v'
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-)
-SELECT object_type, object_count
-FROM object_counts
-ORDER BY object_type;
-
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---     object_type     | object_count 
--- --------------------+--------------
---  indexes            |           30
---  partitioned tables |            1
---  schemas            |            4
---  tables             |           30
---  views              |            3
--- (5 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT table_schema AS schema_name, table_type, COUNT(*) AS object_count
+FROM information_schema.tables
+WHERE table_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+GROUP BY table_schema, table_type
+UNION ALL
+SELECT routine_schema, routine_type, COUNT(*)
+FROM information_schema.routines
+WHERE routine_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+GROUP BY routine_schema, routine_type
+ORDER BY schema_name, table_type;

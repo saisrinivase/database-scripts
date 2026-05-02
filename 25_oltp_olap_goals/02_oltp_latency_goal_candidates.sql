@@ -1,36 +1,19 @@
 /*
-Purpose: Find high-frequency statements violating common OLTP latency expectations.
-Area: Optimization Goals (OLTP vs OLAP)
-Usage: Tune thresholds to your SLA targets.
+MySQL DBA Script: Oltp Latency Goal Candidates
+Purpose: Provide MySQL DBA diagnostics for oltp latency goal candidates.
+Area: Oltp Olap Goals
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    queryid,
-    calls,
-    mean_exec_time,
-    total_exec_time,
-    rows,
-    shared_blks_read,
-    temp_blks_written,
-    left(query, 260) AS query_snippet
-FROM pg_stat_statements
-WHERE calls >= 1000
-  AND mean_exec_time >= 20
-ORDER BY mean_exec_time DESC
-LIMIT 200;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Oltp Latency Goal Candidates') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  queryid | calls | mean_exec_time | total_exec_time | rows | shared_blks_read | temp_blks_written | query_snippet 
--- ---------+-------+----------------+-----------------+------+------------------+-------------------+---------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No matching rows were returned at capture time.
--- - Rerun during peak workload or after seeding representative test cases for non-zero examples.
--- SAMPLE_OUTPUT_END
+SELECT schema_name, digest, count_star,
+       ROUND(sum_timer_wait/1000000000000,2) AS total_seconds,
+       ROUND(avg_timer_wait/1000000000000,6) AS avg_latency,
+       sum_rows_examined, sum_rows_sent, sum_errors, sum_warnings,
+       LEFT(digest_text, 200) AS digest_text
+FROM performance_schema.events_statements_summary_by_digest
+WHERE digest IS NOT NULL
+ORDER BY avg_latency DESC
+LIMIT 100;

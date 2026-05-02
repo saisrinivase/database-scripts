@@ -1,39 +1,14 @@
 /*
-Purpose: List currently running long queries and wait signals.
-Area: Long Queries and Full Scans
-Usage: Run during incidents; adjust threshold interval as needed.
+MySQL DBA Script: Active Long Queries
+Purpose: Provide MySQL DBA diagnostics for active long queries.
+Area: Long Queries Full Scans
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    pid,
-    datname AS database_name,
-    usename AS user_name,
-    application_name,
-    client_addr,
-    now() - query_start AS query_age,
-    state,
-    wait_event_type,
-    wait_event,
-    left(query, 400) AS query_snippet
-FROM pg_stat_activity
-WHERE state = 'active'
-  AND query_start IS NOT NULL
-  AND now() - query_start >= interval '1 minute'
-ORDER BY query_age DESC;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Active Long Queries') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  pid | database_name | user_name | application_name | client_addr | query_age | state | wait_event_type | wait_event | query_snippet 
--- -----+---------------+-----------+------------------+-------------+-----------+-------+-----------------+------------+---------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No issue/candidate rows were found at capture time.
--- - This typically indicates healthy state for this check; rerun during peak load for validation.
--- SAMPLE_OUTPUT_END
-
+SELECT id, user, host, db, command, time AS seconds_running, state, info
+FROM information_schema.processlist
+WHERE command <> 'Sleep' AND time >= 300
+ORDER BY time DESC;

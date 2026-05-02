@@ -1,5 +1,0 @@
-   schema_name    |     type_name     | type_kind | typcategory | used_in_column_count |     enum_labels      
-------------------+-------------------+-----------+-------------+----------------------+----------------------
- migration_v2_lab | order_status_enum | ENUM      | E           |                    0 | NEW, PAID, CANCELLED
-(1 row)
-

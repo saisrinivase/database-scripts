@@ -1,33 +1,14 @@
 /*
-Purpose: Rank user functions by execution cost.
-Area: Functions and Dynamic SQL
-Usage: Enable track_functions for complete timing data.
+MySQL DBA Script: Function Execution Hotspots
+Purpose: Provide MySQL DBA diagnostics for function execution hotspots.
+Area: Functions Dynamic Sql
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    schemaname AS schema_name,
-    funcname AS function_name,
-    calls,
-    total_time,
-    self_time,
-    CASE WHEN calls = 0 THEN NULL ELSE total_time / calls END AS mean_time
-FROM pg_stat_user_functions
-ORDER BY total_time DESC
-LIMIT 200;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Function Execution Hotspots') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name | function_name | calls | total_time | self_time | mean_time 
--- -------------+---------------+-------+------------+-----------+-----------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No matching rows were returned at capture time.
--- - Rerun during peak workload or after seeding representative test cases for non-zero examples.
--- SAMPLE_OUTPUT_END
-
+SELECT routine_schema, routine_name, routine_type, data_type, security_type, deterministic, created, last_altered
+FROM information_schema.routines
+WHERE routine_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+ORDER BY routine_schema, routine_name;

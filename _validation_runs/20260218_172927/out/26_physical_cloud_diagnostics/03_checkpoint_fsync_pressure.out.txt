@@ -1,3 +1,0 @@
-psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/26_physical_cloud_diagnostics/03_checkpoint_fsync_pressure.sql:20: ERROR:  column "checkpoints_timed" does not exist
-LINE 7:     checkpoints_timed,
-            ^

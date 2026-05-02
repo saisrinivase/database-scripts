@@ -1,55 +1,14 @@
 /*
-Purpose: List configuration parameters that differ from built-in defaults.
-Area: Maintenance and Monitoring
-Usage: Good baseline for environment drift checks.
+MySQL DBA Script: Non Default Config
+Purpose: Provide MySQL DBA diagnostics for non default config.
+Area: Maintenance Monitoring
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    name,
-    setting,
-    unit,
-    source,
-    boot_val,
-    reset_val
-FROM pg_settings
-WHERE source <> 'default'
-ORDER BY name;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Non Default Config') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---                name                |                     setting                     | unit |       source       |     boot_val      |                    reset_val                    
--- -----------------------------------+-------------------------------------------------+------+--------------------+-------------------+-------------------------------------------------
---  application_name                  | psql                                            |      | client             |                   | psql
---  autovacuum_worker_slots           | 16                                              |      | configuration file | 16                | 16
---  config_file                       | /opt/homebrew/var/postgresql@18/postgresql.conf |      | override           |                   | /opt/homebrew/var/postgresql@18/postgresql.conf
---  data_directory                    | /opt/homebrew/var/postgresql@18                 |      | override           |                   | /opt/homebrew/var/postgresql@18
---  DateStyle                         | ISO, MDY                                        |      | configuration file | ISO, MDY          | ISO, MDY
---  default_text_search_config        | pg_catalog.english                              |      | configuration file | pg_catalog.simple | pg_catalog.english
---  dynamic_shared_memory_type        | posix                                           |      | configuration file | posix             | posix
---  full_page_writes                  | off                                             |      | configuration file | on                | off
---  hba_file                          | /opt/homebrew/var/postgresql@18/pg_hba.conf     |      | override           |                   | /opt/homebrew/var/postgresql@18/pg_hba.conf
---  ident_file                        | /opt/homebrew/var/postgresql@18/pg_ident.conf   |      | override           |                   | /opt/homebrew/var/postgresql@18/pg_ident.conf
---  lc_messages                       | en_US.UTF-8                                     |      | configuration file |                   | en_US.UTF-8
---  lc_monetary                       | en_US.UTF-8                                     |      | configuration file | C                 | en_US.UTF-8
---  lc_numeric                        | en_US.UTF-8                                     |      | configuration file | C                 | en_US.UTF-8
---  lc_time                           | en_US.UTF-8                                     |      | configuration file | C                 | en_US.UTF-8
---  log_timezone                      | America/New_York                                |      | configuration file | GMT               | America/New_York
---  max_connections                   | 100                                             |      | configuration file | 100               | 100
---  max_wal_size                      | 1024                                            | MB   | configuration file | 1024              | 1024
---  min_wal_size                      | 80                                              | MB   | configuration file | 80                | 80
---  pg_stat_statements.max            | 10000                                           |      | configuration file | 5000              | 10000
---  pg_stat_statements.track          | all                                             |      | configuration file | top               | all
---  pg_stat_statements.track_planning | on                                              |      | configuration file | off               | on
---  shared_buffers                    | 16384                                           | 8kB  | configuration file | 16384             | 16384
---  shared_preload_libraries          | pg_stat_statements                              |      | configuration file |                   | pg_stat_statements
---  TimeZone                          | America/New_York                                |      | configuration file | GMT               | America/New_York
---  transaction_deferrable            | off                                             |      | override           | off               | off
---  transaction_isolation             | read committed                                  |      | override           | read committed    | read committed
---  transaction_read_only             | off                                             |      | override           | off               | off
--- (27 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT variable_name, variable_value, variable_source, set_time, set_user, set_host
+FROM performance_schema.variables_info
+WHERE variable_source <> 'COMPILED'
+ORDER BY variable_name;

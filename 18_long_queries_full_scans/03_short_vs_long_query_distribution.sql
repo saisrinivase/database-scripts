@@ -1,48 +1,20 @@
 /*
-Purpose: Classify query mix into short/medium/long buckets for optimization strategy choice.
-Area: Long Queries and Full Scans
-Usage: Requires pg_stat_statements; thresholds are adjustable.
+MySQL DBA Script: Short Vs Long Query Distribution
+Purpose: Provide MySQL DBA diagnostics for short vs long query distribution.
+Area: Long Queries Full Scans
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-WITH classified AS (
-    SELECT
-        CASE
-            WHEN mean_exec_time < 10 THEN 'Short (<10ms)'
-            WHEN mean_exec_time < 100 THEN 'Medium (10-100ms)'
-            WHEN mean_exec_time < 1000 THEN 'Long (100ms-1s)'
-            ELSE 'Very long (>1s)'
-        END AS bucket,
-        calls,
-        total_exec_time
-    FROM pg_stat_statements
-)
-SELECT
-    bucket,
-    count(*) AS statement_count,
-    sum(calls) AS total_calls,
-    sum(total_exec_time) AS total_exec_time_ms
-FROM classified
-GROUP BY bucket
-ORDER BY
-    CASE bucket
-        WHEN 'Short (<10ms)' THEN 1
-        WHEN 'Medium (10-100ms)' THEN 2
-        WHEN 'Long (100ms-1s)' THEN 3
-        ELSE 4
-    END;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Short Vs Long Query Distribution') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---       bucket       | statement_count | total_calls | total_exec_time_ms 
--- -------------------+-----------------+-------------+--------------------
---  Short (<10ms)     |             688 |    39301614 | 21138847.442612693
---  Medium (10-100ms) |              68 |         226 |  6928.975448999999
---  Long (100ms-1s)   |              35 |         130 |       36590.310079
---  Very long (>1s)   |               3 |           9 | 10957.114957999998
--- (4 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT CASE
+         WHEN avg_timer_wait/1000000000000 < 1 THEN '<1s'
+         WHEN avg_timer_wait/1000000000000 < 10 THEN '1-10s'
+         WHEN avg_timer_wait/1000000000000 < 60 THEN '10-60s'
+         ELSE '>=60s'
+       END AS avg_latency_bucket,
+       COUNT(*) AS digest_count
+FROM performance_schema.events_statements_summary_by_digest
+GROUP BY avg_latency_bucket
+ORDER BY digest_count DESC;

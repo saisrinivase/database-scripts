@@ -1,37 +1,14 @@
 /*
-Purpose: Detect long-running transactions that can block VACUUM and generate bloat.
-Area: Activity and Locks
-Usage: Adjust interval threshold as needed.
+MySQL DBA Script: Long Running Transactions
+Purpose: Provide MySQL DBA diagnostics for long running transactions.
+Area: Activity Locks
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    pid,
-    usename AS user_name,
-    application_name,
-    client_addr,
-    xact_start,
-    now() - xact_start AS xact_age,
-    state,
-    wait_event_type,
-    wait_event,
-    left(query, 400) AS query_snippet
-FROM pg_stat_activity
-WHERE xact_start IS NOT NULL
-  AND now() - xact_start >= interval '5 minutes'
-ORDER BY xact_age DESC;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Long Running Transactions') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  pid | user_name | application_name | client_addr | xact_start | xact_age | state | wait_event_type | wait_event | query_snippet 
--- -----+-----------+------------------+-------------+------------+----------+-------+-----------------+------------+---------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No issue/candidate rows were found at capture time.
--- - This typically indicates healthy state for this check; rerun during peak load for validation.
--- SAMPLE_OUTPUT_END
+SELECT id, user, host, db, command, time AS seconds_running, state, info
+FROM information_schema.processlist
+WHERE command <> 'Sleep' AND time >= 300
+ORDER BY time DESC;

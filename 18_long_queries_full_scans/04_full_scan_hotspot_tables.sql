@@ -1,34 +1,15 @@
 /*
-Purpose: Identify large tables where sequential scans dominate access pattern.
-Area: Long Queries and Full Scans
-Usage: Candidate list for indexing/query rewrite review.
+MySQL DBA Script: Full Scan Hotspot Tables
+Purpose: Provide MySQL DBA diagnostics for full scan hotspot tables.
+Area: Long Queries Full Scans
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    s.schemaname AS schema_name,
-    s.relname AS table_name,
-    s.seq_scan,
-    s.idx_scan,
-    CASE
-        WHEN s.seq_scan + s.idx_scan = 0 THEN NULL
-        ELSE round(100.0 * s.seq_scan / (s.seq_scan + s.idx_scan), 2)
-    END AS seq_scan_pct,
-    pg_total_relation_size(s.relid) AS total_bytes,
-    pg_size_pretty(pg_total_relation_size(s.relid)) AS total_pretty,
-    s.n_live_tup AS estimated_live_rows
-FROM pg_stat_user_tables s
-WHERE pg_total_relation_size(s.relid) >= 512::bigint * 1024 * 1024
-ORDER BY seq_scan_pct DESC NULLS LAST, total_bytes DESC;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Full Scan Hotspot Tables') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name |    table_name    | seq_scan | idx_scan | seq_scan_pct | total_bytes | total_pretty | estimated_live_rows 
--- -------------+------------------+----------+----------+--------------+-------------+--------------+---------------------
---  public      | pgbench_accounts |        2 | 10665646 |         0.00 | 31716564992 | 30 GB        |           200000029
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
+SELECT object_schema, object_name, count_read, count_fetch, count_insert, count_update, count_delete
+FROM performance_schema.table_io_waits_summary_by_table
+WHERE object_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+ORDER BY count_fetch DESC
+LIMIT 100;

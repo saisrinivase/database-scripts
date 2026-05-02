@@ -1,33 +1,19 @@
 /*
-Purpose: Rank all databases by total size.
+MySQL DBA Script: Databases Size
+Purpose: Provide MySQL DBA diagnostics for databases size.
 Area: Database Size
-Usage: Connect to any database in the instance.
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    d.datname AS database_name,
-    pg_database_size(d.datname) AS size_bytes,
-    pg_size_pretty(pg_database_size(d.datname)) AS size_pretty
-FROM pg_database d
-ORDER BY size_bytes DESC;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Databases Size') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---            database_name           | size_bytes  | size_pretty 
--- -----------------------------------+-------------+-------------
---  pgbench_test                      | 32236762815 | 30 GB
---  script_validation_20260218_172749 |   468563647 | 447 MB
---  perf_test                         |   436410047 | 416 MB
---  postgres                          |    40007359 | 38 MB
---  hypopg_lab                        |    36173503 | 34 MB
---  appdb                             |     8058559 | 7870 kB
---  template1                         |     8033983 | 7846 kB
---  template0                         |     7791119 | 7609 kB
--- (8 rows)
--- 
--- SAMPLE_OUTPUT_END
-
+SELECT table_schema AS schema_name,
+       ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS total_mb,
+       ROUND(SUM(data_length) / 1024 / 1024, 2) AS data_mb,
+       ROUND(SUM(index_length) / 1024 / 1024, 2) AS index_mb,
+       COUNT(*) AS table_count
+FROM information_schema.tables
+WHERE table_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+GROUP BY table_schema
+ORDER BY total_mb DESC;

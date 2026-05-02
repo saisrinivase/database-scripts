@@ -1,102 +1,51 @@
-# Performance Tuning Coverage Map
+# MySQL Performance Tuning Coverage
 
-Purpose: Map performance topics to script areas so teams can quickly diagnose root causes.
+This document applies to the `mysql` branch.
 
-## Topic to Area Mapping
+## Script Areas
 
-- `Optimize PostgreSQL for high speed and tune database parameters`
-  - `27_high_speed_tuning/01_bottleneck_overview_dashboard.sql`
-  - `27_high_speed_tuning/05_parameter_tuning_advisor.sql`
-  - `27_high_speed_tuning/06_query_tuning_action_queue.sql`
+- `00_environment`: MySQL server, version, plugin, component, and schema inventory. (3 scripts)
+- `01_database_size`: Schema, tablespace, table, and storage size diagnostics. (3 scripts)
+- `02_table_storage`: Table storage, row counts, fragmentation, and storage attributes. (4 scripts)
+- `03_index_analysis`: Index inventory, unused index candidates, duplicate indexes, and maintenance signals. (4 scripts)
+- `04_lob_blob_storage`: BLOB/TEXT/JSON footprint, large column inventory, and row format checks. (4 scripts)
+- `05_partitioning`: Partition inventory, partition sizing, partition index posture, and candidates. (7 scripts)
+- `06_activity_locks`: Active threads, blocking, metadata locks, waits, and long transactions. (4 scripts)
+- `07_table_fragmentation_reclaim`: Fragmentation estimates, OPTIMIZE candidates, purge pressure, and stale statistics. (5 scripts)
+- `08_replication_ha`: Replication, Group Replication, binary log generation, lag, and HA posture. (4 scripts)
+- `09_security_roles`: Users, roles, grants, default roles, passwords, and privilege exposure. (4 scripts)
+- `10_maintenance_monitoring`: InnoDB checkpoint, cache hit, top statements, variable drift, and connection capacity. (5 scripts)
+- `11_performance_tuning`: Top statements, latency, temp tables, I/O-heavy statements, variables, and routines. (6 scripts)
+- `12_planner_statistics`: Optimizer statistics, full scan hotspots, histograms, and optimizer variables. (6 scripts)
+- `13_io_redo_checkpoints`: File I/O, table/index I/O, binary log, redo, checkpoint, and temporary table pressure. (7 scripts)
+- `14_connection_workload`: Connection distribution, idle sessions, thread states, limits, and XA state. (6 scripts)
+- `15_capacity_forecasting`: Capacity snapshot repository, capture scripts, and growth reports. (8 scripts)
+- `16_internals_deep_dive`: Transactions, table files, dictionary size, dependencies, LOB storage, and purge profile. (6 scripts)
+- `17_execution_plans`: EXPLAIN prerequisites, EXPLAIN ANALYZE templates, generated plan commands, and red flags. (4 scripts)
+- `18_long_queries_full_scans`: Long-running statements and full table scan diagnostics. (4 scripts)
+- `19_dml_optimization`: Write-heavy tables, update pressure, foreign key indexes, and fragmentation. (4 scripts)
+- `20_design_matters`: Schema design risks such as missing primary keys, wide tables, over-indexing, and nullable-heavy tables. (4 scripts)
+- `21_configuration_parameters`: Core performance, redo/binlog, optimizer statistics, and connection variable baselines. (4 scripts)
+- `22_application_orm_performance`: ORM patterns, select-star risk, chatty SQL, parse pressure, and idle transactions. (4 scripts)
+- `23_functions_dynamic_sql`: Routine inventory, dynamic SQL, SQL SECURITY, and trigger diagnostics. (4 scripts)
+- `24_complex_filter_search`: LIKE, JSON, fulltext, spatial, and search index diagnostics. (4 scripts)
+- `25_oltp_olap_goals`: Workload classification and OLTP/OLAP pressure indicators. (4 scripts)
+- `26_physical_cloud_diagnostics`: Platform fingerprint, storage, wait, checkpoint, and cloud signals. (4 scripts)
+- `27_high_speed_tuning`: Fast triage dashboards, wait detail, missing indexes, and action queues. (6 scripts)
+- `27_mysql_health_validation`: MySQL health reports, sanity checks, and optional lab issue scripts. (9 scripts)
+- `28_sql_resource_attribution`: Statement resource attribution by digest, schema, account, and infrastructure tier. (4 scripts)
+- `29_object_inventory_health`: Deep object inventory for tables, keys, routines, triggers, grants, partitions, and external links. (18 scripts)
+- `30_backup_restore_pitr_dr`: Binary log, backup, PITR, replica, and disaster recovery evidence. (5 scripts)
+- `31_logging_error_signatures`: Error log, slow query digests, waits, locks, and deadlock indicators. (4 scripts)
+- `32_upgrade_patch_readiness`: Version, plugin, invalid/risky object, charset/collation, and upgrade readiness checks. (6 scripts)
+- `33_innodb_memory_pressure`: InnoDB checkpoint, redo, purge, parallelism, buffer pool, and temp pressure. (5 scripts)
+- `34_consistency_integrity_checks`: Invalid metadata, CHECK TABLE command generation, corruption indicators, and MVCC risks. (5 scripts)
+- `35_pooler_proxy_diagnostics`: Connection saturation, proxy patterns, prepared statement cache, and pooling risks. (5 scripts)
+- `36_cloud_provider_signals`: Managed-service fingerprints, variable drift, replica/failover, storage, and incident evidence. (5 scripts)
+- `37_object_lifecycle_capacity`: Object lifecycle repository, snapshots, advisory views, and capacity reporting. (12 scripts)
 
-- `Detect bottlenecks and find missing indexes with ease`
-  - `27_high_speed_tuning/02_waits_and_blocking_details.sql`
-  - `27_high_speed_tuning/03_missing_index_candidates_from_scan_pressure.sql`
-  - `27_high_speed_tuning/04_missing_fk_index_candidates.sql`
+## Notes
 
-- `CPU/IO/Memory percentage by query and infrastructure-level attribution (pg_stat_statements proxy)`
-  - `28_pgss_resource_attribution/01_pgss_query_resource_percent.sql`
-  - `28_pgss_resource_attribution/02_pgss_resource_percent_by_database.sql`
-  - `28_pgss_resource_attribution/03_pgss_resource_percent_by_user.sql`
-  - `28_pgss_resource_attribution/04_pgss_query_infra_tier_classification.sql`
-
-- `Long Queries and Full Scans`
-  - `18_long_queries_full_scans/01_active_long_queries.sql`
-  - `18_long_queries_full_scans/02_long_queries_from_statements.sql`
-  - `18_long_queries_full_scans/04_full_scan_hotspot_tables.sql`
-  - `11_performance_tuning/04_io_bound_query_candidates.sql`
-
-- `Long Queries: Additional Techniques`
-  - `17_execution_plans/03_generate_explain_for_top_queries.sql`
-  - `17_execution_plans/04_plan_red_flag_candidates.sql`
-  - `11_performance_tuning/03_temp_file_heavy_queries.sql`
-  - `13_io_wal_checkpoints/06_temp_file_usage_by_database.sql`
-
-- `Optimizing Data Modification`
-  - `19_dml_optimization/01_write_heavy_tables.sql`
-  - `19_dml_optimization/02_hot_update_efficiency.sql`
-  - `19_dml_optimization/03_missing_fk_supporting_indexes.sql`
-  - `19_dml_optimization/04_dml_bloat_pressure.sql`
-
-- `Design Matters`
-  - `20_design_matters/01_tables_without_primary_keys.sql`
-  - `20_design_matters/02_wide_tables_profile.sql`
-  - `20_design_matters/03_overindexed_tables.sql`
-  - `20_design_matters/04_high_nullability_columns.sql`
-
-- `Configuration Parameters`
-  - `21_configuration_parameters/01_core_performance_settings.sql`
-  - `21_configuration_parameters/02_wal_checkpoint_settings.sql`
-  - `21_configuration_parameters/03_autovacuum_settings.sql`
-  - `21_configuration_parameters/04_connection_timeout_settings.sql`
-
-- `Application Development and Performance`
-  - `22_application_orm_performance/01_n_plus_one_query_candidates.sql`
-  - `22_application_orm_performance/03_chatty_small_result_queries.sql`
-  - `14_connection_workload/01_connections_by_user_app_db.sql`
-  - `14_connection_workload/02_idle_in_transaction_risk.sql`
-
-- `Functions`
-  - `23_functions_dynamic_sql/01_function_execution_hotspots.sql`
-  - `11_performance_tuning/06_function_hotspots.sql`
-
-- `Dynamic SQL`
-  - `23_functions_dynamic_sql/02_dynamic_sql_function_inventory.sql`
-  - `23_functions_dynamic_sql/03_volatile_and_security_definer_functions.sql`
-
-- `Avoiding ORM Pitfalls`
-  - `22_application_orm_performance/01_n_plus_one_query_candidates.sql`
-  - `22_application_orm_performance/02_select_star_candidates.sql`
-  - `22_application_orm_performance/04_app_idle_in_transaction_risk.sql`
-
-- `More Complex Filtering and Search`
-  - `24_complex_filter_search/01_like_ilike_query_candidates.sql`
-  - `24_complex_filter_search/02_jsonb_array_column_inventory.sql`
-  - `24_complex_filter_search/03_gin_gist_brin_index_inventory.sql`
-  - `24_complex_filter_search/04_full_text_search_inventory.sql`
-
-- `Ultimate Optimization Algorithm (Systemic Optimization)`
-  - `25_oltp_olap_goals/01_workload_signature_oltp_vs_olap.sql`
-  - `25_oltp_olap_goals/04_mixed_workload_pressure.sql`
-  - `26_physical_cloud_diagnostics/01_instance_platform_fingerprint.sql`
-  - `26_physical_cloud_diagnostics/02_io_latency_profile.sql`
-
-- `Identify optimization goals in OLTP and OLAP systems`
-  - `25_oltp_olap_goals/01_workload_signature_oltp_vs_olap.sql`
-  - `25_oltp_olap_goals/02_oltp_latency_goal_candidates.sql`
-  - `25_oltp_olap_goals/03_olap_throughput_candidates.sql`
-
-- `Understanding Execution Plans`
-  - `17_execution_plans/01_plan_capture_prerequisites.sql`
-  - `17_execution_plans/02_explain_analyze_template.sql`
-  - `17_execution_plans/03_generate_explain_for_top_queries.sql`
-  - `17_execution_plans/04_plan_red_flag_candidates.sql`
-
-## Root Cause Dimensions
-
-- `SQL/query shape`: long query, full scan, ORM chatty query, complex filter scripts.
-- `Schema/index design`: design matters, missing FK index, index and planner sections.
-- `Runtime behavior`: activity/locks, wait events, function hotspots.
-- `Storage and I/O`: database/table/index size, WAL/checkpoint, I/O latency scripts.
-- `Infrastructure (physical/cloud)`: platform fingerprint, fsync/checkpoint pressure, replication slot WAL retention.
-- `Workload goal alignment`: OLTP vs OLAP classification and mixed workload pressure.
+- Designed around MySQL 8.0 metadata and performance views.
+- Some features require `performance_schema` instruments/consumers to be enabled.
+- MySQL 5.7 and MariaDB compatibility varies by view and feature.

@@ -1,27 +1,12 @@
 /*
-Purpose: Template to read and understand execution plans for problematic queries.
+MySQL DBA Script: Explain Analyze Template
+Purpose: Provide MySQL DBA diagnostics for explain analyze template.
 Area: Execution Plans
-Usage: Replace `SELECT 1` with target SQL and run in a lower environment first.
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-EXPLAIN (ANALYZE, BUFFERS, VERBOSE, WAL, SETTINGS, FORMAT TEXT)
-SELECT 1;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Explain Analyze Template') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---                                       QUERY PLAN                                       
--- ---------------------------------------------------------------------------------------
---  Result  (cost=0.00..0.01 rows=1 width=4) (actual time=0.001..0.001 rows=1.00 loops=1)
---    Output: 1
---  Query Identifier: -3688696628780506391
---  Planning:
---    Buffers: shared hit=3
---  Planning Time: 0.057 ms
---  Execution Time: 0.033 ms
--- (7 rows)
--- 
--- SAMPLE_OUTPUT_END
+-- Replace the SELECT below with the target statement.
+EXPLAIN ANALYZE SELECT 1;

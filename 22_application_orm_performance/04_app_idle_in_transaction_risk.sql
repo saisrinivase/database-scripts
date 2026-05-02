@@ -1,33 +1,14 @@
 /*
-Purpose: Identify applications holding idle transactions that can block cleanup and increase latency.
-Area: Application Development and ORM Performance
-Usage: Coordinate fixes with transaction scope in application code.
+MySQL DBA Script: App Idle In Transaction Risk
+Purpose: Provide MySQL DBA diagnostics for app idle in transaction risk.
+Area: Application Orm Performance
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    application_name,
-    usename AS user_name,
-    datname AS database_name,
-    count(*) AS idle_in_txn_sessions,
-    min(xact_start) AS oldest_xact_start,
-    max(now() - xact_start) AS max_xact_age
-FROM pg_stat_activity
-WHERE state = 'idle in transaction'
-GROUP BY application_name, usename, datname
-ORDER BY idle_in_txn_sessions DESC, max_xact_age DESC;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: App Idle In Transaction Risk') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  application_name | user_name | database_name | idle_in_txn_sessions | oldest_xact_start | max_xact_age 
--- ------------------+-----------+---------------+----------------------+-------------------+--------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No issue/candidate rows were found at capture time.
--- - This typically indicates healthy state for this check; rerun during peak load for validation.
--- SAMPLE_OUTPUT_END
+SELECT id, user, host, db, command, time AS idle_seconds, state
+FROM information_schema.processlist
+WHERE command='Sleep'
+ORDER BY time DESC;

@@ -1,17 +1,17 @@
-# Backup, Restore, PITR, and DR Readiness
+# 30_backup_restore_pitr_dr
 
-Purpose: Operational SQL checks for backup/PITR/DR posture, evidence gaps, and quick restore-readiness decisions.
+Binary log, backup, PITR, replica, and disaster recovery evidence.
 
-## Run Order
+Scripts in this area: `5`.
 
-1. `01_backup_pitr_configuration_health.sql`
-2. `02_wal_archiving_gap_and_lag.sql`
-3. `03_restore_to_timestamp_quick_test.sql`
-4. `04_dr_rto_rpo_replication_evidence.sql`
-5. `05_backup_restore_evidence_contract.sql`
+## Usage
 
-## Notes
+Run with the mysql client, for example: `mysql -u root -p < 30_backup_restore_pitr_dr/<script>.sql`.
 
-- PostgreSQL catalog views can validate PITR prerequisites, archiving behavior, and replication evidence.
-- Last successful base-backup/restore duration usually comes from backup tooling; script `05` checks for an in-database evidence contract.
-- Scripts are read-only diagnostics.
+## Scripts
+
+- `01_backup_pitr_configuration_health.sql`
+- `02_binlog_gap_and_lag.sql`
+- `03_restore_to_timestamp_quick_test.sql`
+- `04_dr_rto_rpo_replication_evidence.sql`
+- `05_backup_restore_evidence_contract.sql`

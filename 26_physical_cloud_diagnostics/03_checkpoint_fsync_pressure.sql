@@ -1,59 +1,14 @@
 /*
-Purpose: Detect checkpoint and fsync pressure indicative of storage or config issues.
-Area: Physical and Cloud Diagnostics
-Usage: Review with WAL/checkpoint settings and cloud disk metrics.
+MySQL DBA Script: Checkpoint Fsync Pressure
+Purpose: Provide MySQL DBA diagnostics for checkpoint fsync pressure.
+Area: Physical Cloud Diagnostics
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT (current_setting('server_version_num')::int >= 170000) AS has_pg_stat_checkpointer \gset
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Checkpoint Fsync Pressure') AS script_name;
 
-\if :has_pg_stat_checkpointer
-SELECT
-    cp.num_timed AS checkpoints_timed,
-    cp.num_requested AS checkpoints_req,
-    cp.write_time AS checkpoint_write_time,
-    cp.sync_time AS checkpoint_sync_time,
-    cp.buffers_written AS buffers_checkpoint,
-    cp.slru_written,
-    bg.buffers_clean,
-    bg.maxwritten_clean,
-    bg.buffers_alloc,
-    CASE
-        WHEN cp.num_requested > cp.num_timed THEN 'Checkpoint pressure'
-        ELSE 'Normal checkpoint profile'
-    END AS recommendation,
-    cp.stats_reset AS checkpointer_stats_reset,
-    bg.stats_reset AS bgwriter_stats_reset
-FROM pg_stat_checkpointer cp
-CROSS JOIN pg_stat_bgwriter bg;
-\else
-SELECT
-    checkpoints_timed,
-    checkpoints_req,
-    checkpoint_write_time,
-    checkpoint_sync_time,
-    buffers_checkpoint,
-    NULL::bigint AS slru_written,
-    buffers_clean,
-    maxwritten_clean,
-    buffers_alloc,
-    CASE
-        WHEN checkpoints_req > checkpoints_timed THEN 'Checkpoint pressure'
-        ELSE 'Normal checkpoint profile'
-    END AS recommendation,
-    stats_reset AS checkpointer_stats_reset,
-    stats_reset AS bgwriter_stats_reset
-FROM pg_stat_bgwriter;
-\endif
-
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  checkpoints_timed | checkpoints_req | checkpoint_write_time | checkpoint_sync_time | buffers_checkpoint | slru_written | buffers_clean | maxwritten_clean | buffers_alloc |      recommendation       |   checkpointer_stats_reset    |     bgwriter_stats_reset      
--- -------------------+-----------------+-----------------------+----------------------+--------------------+--------------+---------------+------------------+---------------+---------------------------+-------------------------------+-------------------------------
---                851 |              59 |               4142695 |                48708 |              68025 |          216 |        277435 |             2551 |      10942175 | Normal checkpoint profile | 2026-01-31 20:40:48.109778-05 | 2026-01-31 20:40:48.109778-05
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
+SELECT variable_name, variable_value
+FROM performance_schema.global_status
+WHERE variable_name IN ('Innodb_checkpoint_age','Innodb_buffer_pool_pages_dirty','Innodb_buffer_pool_bytes_dirty','Innodb_os_log_written','Innodb_log_waits')
+ORDER BY variable_name;

@@ -1,5 +1,0 @@
- schema_name |   table_name    | est_rows | total_size |                             starter_pk_sql                              
--------------+-----------------+----------+------------+-------------------------------------------------------------------------
- public      | pgbench_history |  5331130 | 270 MB     | ALTER TABLE public.pgbench_history ADD COLUMN id bigserial PRIMARY KEY;
-(1 row)
-

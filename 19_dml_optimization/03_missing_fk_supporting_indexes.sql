@@ -1,61 +1,30 @@
 /*
-Purpose: Detect foreign keys lacking a matching index on referencing columns.
-Area: Optimizing Data Modification
-Usage: Missing FK indexes can hurt UPDATE/DELETE performance on parent tables.
+MySQL DBA Script: Missing Fk Supporting Indexes
+Purpose: Provide MySQL DBA diagnostics for missing fk supporting indexes.
+Area: Dml Optimization
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-WITH fk AS (
-    SELECT
-        c.oid AS constraint_oid,
-        c.conname,
-        c.conrelid,
-        c.confrelid,
-        c.conkey,
-        n.nspname AS schema_name,
-        t.relname AS table_name
-    FROM pg_constraint c
-    JOIN pg_class t
-        ON t.oid = c.conrelid
-    JOIN pg_namespace n
-        ON n.oid = t.relnamespace
-    WHERE c.contype = 'f'
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-),
-idx AS (
-    SELECT
-        i.indrelid,
-        i.indkey,
-        i.indisvalid,
-        i.indisready
-    FROM pg_index i
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Missing Fk Supporting Indexes') AS script_name;
+
+WITH fk_cols AS (
+  SELECT k.constraint_schema, k.table_name, k.constraint_name,
+         GROUP_CONCAT(k.column_name ORDER BY k.ordinal_position) AS fk_columns
+  FROM information_schema.key_column_usage k
+  WHERE k.referenced_table_name IS NOT NULL
+    AND k.constraint_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+  GROUP BY k.constraint_schema, k.table_name, k.constraint_name
+), idx_cols AS (
+  SELECT table_schema, table_name, index_name,
+         GROUP_CONCAT(column_name ORDER BY seq_in_index) AS index_columns
+  FROM information_schema.statistics
+  GROUP BY table_schema, table_name, index_name
 )
-SELECT
-    fk.schema_name,
-    fk.table_name,
-    fk.conname AS foreign_key_name,
-    fk.conkey AS fk_columns_attnums
-FROM fk
+SELECT f.constraint_schema AS table_schema, f.table_name, f.constraint_name, f.fk_columns
+FROM fk_cols f
 WHERE NOT EXISTS (
-    SELECT 1
-    FROM idx
-    WHERE idx.indrelid = fk.conrelid
-      AND idx.indisvalid
-      AND idx.indisready
-      AND (idx.indkey::smallint[])[1:array_length(fk.conkey, 1)] = fk.conkey
+  SELECT 1 FROM idx_cols i
+  WHERE i.table_schema=f.constraint_schema AND i.table_name=f.table_name AND i.index_columns LIKE CONCAT(f.fk_columns, '%')
 )
-ORDER BY fk.schema_name, fk.table_name, fk.conname;
-
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---    schema_name    |     table_name     |          foreign_key_name          | fk_columns_attnums 
--- ------------------+--------------------+------------------------------------+--------------------
---  migration_v1_lab | child_transactions | child_transactions_account_id_fkey | {2}
---  migration_v2_lab | child_events       | child_events_account_id_fkey       | {2}
--- (2 rows)
--- 
--- SAMPLE_OUTPUT_END
+ORDER BY table_schema, table_name;

@@ -1,16 +1,17 @@
-# Cloud Provider Signals (Optional)
+# 36_cloud_provider_signals
 
-Purpose: Optional checks for managed PostgreSQL environments to capture provider-specific failure domains and drift signals.
+Managed-service fingerprints, variable drift, replica/failover, storage, and incident evidence.
 
-## Run Order
+Scripts in this area: `5`.
 
-1. `01_managed_service_fingerprint.sql`
-2. `02_parameter_pending_restart_drift.sql`
-3. `03_replica_lag_failover_signals.sql`
-4. `04_storage_iops_temp_wal_pressure.sql`
-5. `05_cloud_incident_window_checklist.sql`
+## Usage
 
-## Notes
+Run with the mysql client, for example: `mysql -u root -p < 36_cloud_provider_signals/<script>.sql`.
 
-- These scripts are portable SQL-first diagnostics.
-- For full incident context, combine with provider consoles (RDS/Aurora, Cloud SQL/AlloyDB, etc.).
+## Scripts
+
+- `01_managed_service_fingerprint.sql`
+- `02_parameter_pending_restart_drift.sql`
+- `03_replica_lag_failover_signals.sql`
+- `04_storage_iops_temp_binlog_pressure.sql`
+- `05_cloud_incident_window_checklist.sql`

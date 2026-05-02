@@ -1,44 +1,11 @@
 /*
-Purpose: Verify settings required for reliable plan analysis and plan-related diagnostics.
+MySQL DBA Script: Plan Capture Prerequisites
+Purpose: Provide MySQL DBA diagnostics for plan capture prerequisites.
 Area: Execution Plans
-Usage: Run before plan troubleshooting; check values against standards.
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    name,
-    setting,
-    unit,
-    source,
-    boot_val,
-    reset_val
-FROM pg_settings
-WHERE name IN (
-    'shared_preload_libraries',
-    'compute_query_id',
-    'track_io_timing',
-    'track_activity_query_size',
-    'jit',
-    'log_min_duration_statement',
-    'plan_cache_mode'
-)
-ORDER BY name;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Plan Capture Prerequisites') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---             name            |      setting       | unit |       source       | boot_val |     reset_val      
--- ----------------------------+--------------------+------+--------------------+----------+--------------------
---  compute_query_id           | auto               |      | default            | auto     | auto
---  jit                        | on                 |      | default            | on       | on
---  log_min_duration_statement | -1                 | ms   | default            | -1       | -1
---  plan_cache_mode            | auto               |      | default            | auto     | auto
---  shared_preload_libraries   | pg_stat_statements |      | configuration file |          | pg_stat_statements
---  track_activity_query_size  | 1024               | B    | default            | 1024     | 1024
---  track_io_timing            | off                |      | default            | off      | off
--- (7 rows)
--- 
--- SAMPLE_OUTPUT_END
-
+SELECT @@version AS mysql_version, @@optimizer_switch AS optimizer_switch, @@performance_schema AS performance_schema_enabled;

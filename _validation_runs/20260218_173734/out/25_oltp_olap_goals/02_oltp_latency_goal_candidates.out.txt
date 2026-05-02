@@ -1,4 +1,0 @@
- queryid | calls | mean_exec_time | total_exec_time | rows | shared_blks_read | temp_blks_written | query_snippet 
----------+-------+----------------+-----------------+------+------------------+-------------------+---------------
-(0 rows)
-

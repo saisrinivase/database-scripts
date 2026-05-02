@@ -1,39 +1,15 @@
 /*
-Purpose: Inventory PL/pgSQL functions likely using dynamic SQL (EXECUTE keyword).
-Area: Functions and Dynamic SQL
-Usage: Review for SQL injection safety and plan stability.
+MySQL DBA Script: Dynamic Sql Function Inventory
+Purpose: Provide MySQL DBA diagnostics for dynamic sql function inventory.
+Area: Functions Dynamic Sql
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    n.nspname AS schema_name,
-    p.proname AS function_name,
-    pg_get_function_identity_arguments(p.oid) AS function_args,
-    l.lanname AS language_name,
-    p.prosecdef AS security_definer,
-    CASE WHEN p.prosrc ILIKE '%EXECUTE %' THEN true ELSE false END AS has_dynamic_sql
-FROM pg_proc p
-JOIN pg_namespace n
-    ON n.oid = p.pronamespace
-JOIN pg_language l
-    ON l.oid = p.prolang
-WHERE n.nspname !~ '^pg_'
-  AND n.nspname <> 'information_schema'
-  AND l.lanname = 'plpgsql'
-  AND p.prosrc ILIKE '%EXECUTE %'
-ORDER BY schema_name, function_name;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Dynamic Sql Function Inventory') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name | function_name | function_args | language_name | security_definer | has_dynamic_sql 
--- -------------+---------------+---------------+---------------+------------------+-----------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No rows matched in this environment at capture time.
--- - This can be expected when the related object/feature is not present or not in use.
--- SAMPLE_OUTPUT_END
+SELECT routine_schema, routine_name, routine_type, LEFT(routine_definition, 500) AS routine_definition
+FROM information_schema.routines
+WHERE routine_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+  AND (UPPER(routine_definition) LIKE '%PREPARE %' OR UPPER(routine_definition) LIKE '%EXECUTE %')
+ORDER BY routine_schema, routine_name;

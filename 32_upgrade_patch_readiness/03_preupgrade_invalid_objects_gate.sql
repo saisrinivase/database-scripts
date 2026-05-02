@@ -1,77 +1,15 @@
 /*
-Purpose: Identify invalid indexes and NOT VALID constraints that can break upgrade confidence.
-Area: Upgrade and Patch Readiness
-Usage: Resolve all CRITICAL rows before major version upgrades.
+MySQL DBA Script: Preupgrade Invalid Objects Gate
+Purpose: Provide MySQL DBA diagnostics for preupgrade invalid objects gate.
+Area: Upgrade Patch Readiness
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-WITH invalid_indexes AS (
-    SELECT
-        n.nspname AS schema_name,
-        c.relname AS object_name,
-        'INDEX'::text AS object_type,
-        CASE
-            WHEN i.indisvalid = false THEN 'indisvalid=false'
-            WHEN i.indisready = false THEN 'indisready=false'
-            ELSE 'other'
-        END AS issue,
-        pg_get_indexdef(c.oid) AS details,
-        'CRITICAL'::text AS severity
-    FROM pg_index i
-    JOIN pg_class c
-      ON c.oid = i.indexrelid
-    JOIN pg_namespace n
-      ON n.oid = c.relnamespace
-    WHERE (i.indisvalid = false OR i.indisready = false)
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-),
-not_valid_constraints AS (
-    SELECT
-        n.nspname AS schema_name,
-        con.conname AS object_name,
-        'CONSTRAINT'::text AS object_type,
-        'convalidated=false'::text AS issue,
-        pg_get_constraintdef(con.oid) AS details,
-        CASE
-            WHEN con.contype IN ('f', 'c') THEN 'HIGH'
-            ELSE 'MEDIUM'
-        END AS severity
-    FROM pg_constraint con
-    JOIN pg_class tbl
-      ON tbl.oid = con.conrelid
-    JOIN pg_namespace n
-      ON n.oid = tbl.relnamespace
-    WHERE con.convalidated = false
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-),
-combined AS (
-    SELECT *
-    FROM invalid_indexes
-    UNION ALL
-    SELECT *
-    FROM not_valid_constraints
-)
-SELECT *
-FROM combined
-ORDER BY
-    CASE severity
-        WHEN 'CRITICAL' THEN 1
-        WHEN 'HIGH' THEN 2
-        WHEN 'MEDIUM' THEN 3
-        ELSE 4
-    END,
-    schema_name,
-    object_name;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Preupgrade Invalid Objects Gate') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_new_areas_20260219_refresh2
---
---  schema_name | object_name | object_type | issue | details | severity 
--- -------------+-------------+-------------+-------+---------+----------
--- (0 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT table_schema, table_name, engine, table_collation, create_options
+FROM information_schema.tables
+WHERE table_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+  AND (engine IS NULL OR table_collation IS NULL)
+ORDER BY table_schema, table_name;

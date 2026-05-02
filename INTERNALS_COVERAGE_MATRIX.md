@@ -1,44 +1,51 @@
-# Internals Coverage Matrix
+# MySQL Internals Coverage Matrix
 
-Purpose: Map administration topics to PostgreSQL internals sources and ready-to-run scripts.
+This document applies to the `mysql` branch.
 
-## Topic Coverage
+## Script Areas
 
-| Topic | Core Internals Sources | Primary Scripts |
-|---|---|---|
-| Instance baseline | `version()`, `pg_postmaster_start_time()`, `pg_settings` | `00_environment/01_server_instance_overview.sql` |
-| Extension baseline | `pg_extension`, `pg_namespace` | `00_environment/02_extensions_installed.sql` |
-| Catalog object footprint | `pg_class`, `pg_namespace` | `00_environment/03_database_catalog_overview.sql`, `16_internals_deep_dive/03_system_catalog_size_profile.sql` |
-| Database size | `pg_database`, `pg_database_size()` | `01_database_size/01_databases_size.sql` |
-| Tablespace size | `pg_tablespace`, `pg_tablespace_size()` | `01_database_size/03_tablespaces_size.sql` |
-| Table/index/TOAST composition | `pg_class`, `pg_relation_size()`, `pg_indexes_size()` | `02_table_storage/01_table_size_breakdown.sql`, `16_internals_deep_dive/05_fsm_vm_toast_size_breakdown.sql` |
-| Index usage/utilization | `pg_stat_user_indexes`, `pg_index` | `03_index_analysis/01_index_size_and_usage.sql`, `03_index_analysis/02_unused_indexes_candidates.sql` |
-| Duplicate index internals | `pg_index` metadata vectors | `03_index_analysis/03_duplicate_indexes.sql` |
-| TOAST internals | `pg_class.reltoastrelid` | `04_toast_lob_blob/01_tables_with_toast.sql`, `04_toast_lob_blob/02_toast_heavy_tables.sql` |
-| Large object (BLOB/LOB) footprint | `pg_largeobject` | `04_toast_lob_blob/03_large_objects_summary.sql`, `04_toast_lob_blob/04_top_large_objects.sql` |
-| Partition metadata | `pg_inherits`, `pg_get_partkeydef()` | `05_partitioning/01_partitioned_tables_overview.sql` |
-| Session/lock internals | `pg_stat_activity`, `pg_blocking_pids()` | `06_activity_locks/01_active_sessions.sql`, `06_activity_locks/02_blocking_and_blocked_sessions.sql` |
-| Vacuum/bloat internals | `pg_stat_user_tables`, `relfrozenxid`, `pg_stat_progress_vacuum` | `07_vacuum_bloat/01_table_bloat_estimate.sql`, `07_vacuum_bloat/03_freeze_age_risk.sql`, `07_vacuum_bloat/05_vacuum_progress.sql` |
-| Replication state | `pg_stat_replication`, `pg_is_in_recovery()` | `08_replication_ha/01_primary_replication_status.sql`, `08_replication_ha/02_standby_replay_status.sql` |
-| Replication slot retention | `pg_replication_slots`, LSN diff functions | `08_replication_ha/03_replication_slots_health.sql` |
-| WAL internals | `pg_stat_wal`, `pg_stat_archiver`, LSN functions | `08_replication_ha/04_wal_generation_rate.sql`, `13_io_wal_checkpoints/04_wal_archiver_health.sql` |
-| Security/privilege internals | `pg_roles`, `pg_auth_members`, `pg_default_acl`, `information_schema` | `09_security_roles/*.sql` |
-| Checkpoints and writer internals | `pg_stat_bgwriter` | `10_maintenance_monitoring/01_bgwriter_checkpoint_stats.sql`, `13_io_wal_checkpoints/05_checkpoint_pressure_indicators.sql` |
-| Query-level performance | `pg_stat_statements`, `pg_stat_user_functions` | `11_performance_tuning/*.sql` |
-| Planner stats health | `pg_stat_user_tables`, `pg_stats`, `pg_statistic_ext` | `12_planner_statistics/*.sql` |
-| I/O internals | `pg_stat_database`, `pg_statio_*`, `pg_stat_io` | `13_io_wal_checkpoints/*.sql` |
-| Connection behavior internals | `pg_stat_activity`, `pg_roles`, `pg_prepared_xacts` | `14_connection_workload/*.sql` |
-| Capacity trend internals | Snapshot tables + runtime stats views | `15_capacity_forecasting/*.sql` |
-| XID/multixact aging | `pg_database.datfrozenxid`, `datminmxid`, `pg_class.relfrozenxid` | `16_internals_deep_dive/01_database_xid_multixact_age.sql`, `16_internals_deep_dive/06_visibility_and_freeze_profile.sql` |
-| Storage file mapping | `pg_relation_filenode()`, `pg_relation_filepath()` | `16_internals_deep_dive/02_relation_filenode_mapping.sql` |
-| Dependency graph internals | `pg_depend` | `16_internals_deep_dive/04_dependency_fanout_objects.sql` |
-| Object type inventory | `pg_class`, `pg_proc`, `pg_type`, `pg_tablespace`, `pg_trigger`, `information_schema.*` | `29_object_inventory_health/01_object_type_inventory.sql` |
-| PK/FK and join-index health | `pg_constraint`, `pg_index`, `pg_stat_user_tables`, `pg_attribute` | `29_object_inventory_health/02_table_pk_fk_health.sql`, `29_object_inventory_health/04_missing_fk_supporting_indexes.sql`, `29_object_inventory_health/05_missing_join_column_indexes.sql` |
-| Identifier naming and migration mapping | `pg_class`, `pg_attribute`, `pg_proc`, `pg_namespace` | `29_object_inventory_health/06_identifier_casing_risks.sql`, `29_object_inventory_health/15_oracle_package_synonym_mapping.sql` |
-| Ingest/federation/object query diagnostics | `pg_stat_progress_copy`, `pg_foreign_*`, `pg_stat_statements` | `29_object_inventory_health/13_insert_copy_activity.sql`, `29_object_inventory_health/14_fdw_inventory.sql`, `29_object_inventory_health/18_object_query_hotspots_pgss.sql` |
+- `00_environment`: MySQL server, version, plugin, component, and schema inventory. (3 scripts)
+- `01_database_size`: Schema, tablespace, table, and storage size diagnostics. (3 scripts)
+- `02_table_storage`: Table storage, row counts, fragmentation, and storage attributes. (4 scripts)
+- `03_index_analysis`: Index inventory, unused index candidates, duplicate indexes, and maintenance signals. (4 scripts)
+- `04_lob_blob_storage`: BLOB/TEXT/JSON footprint, large column inventory, and row format checks. (4 scripts)
+- `05_partitioning`: Partition inventory, partition sizing, partition index posture, and candidates. (7 scripts)
+- `06_activity_locks`: Active threads, blocking, metadata locks, waits, and long transactions. (4 scripts)
+- `07_table_fragmentation_reclaim`: Fragmentation estimates, OPTIMIZE candidates, purge pressure, and stale statistics. (5 scripts)
+- `08_replication_ha`: Replication, Group Replication, binary log generation, lag, and HA posture. (4 scripts)
+- `09_security_roles`: Users, roles, grants, default roles, passwords, and privilege exposure. (4 scripts)
+- `10_maintenance_monitoring`: InnoDB checkpoint, cache hit, top statements, variable drift, and connection capacity. (5 scripts)
+- `11_performance_tuning`: Top statements, latency, temp tables, I/O-heavy statements, variables, and routines. (6 scripts)
+- `12_planner_statistics`: Optimizer statistics, full scan hotspots, histograms, and optimizer variables. (6 scripts)
+- `13_io_redo_checkpoints`: File I/O, table/index I/O, binary log, redo, checkpoint, and temporary table pressure. (7 scripts)
+- `14_connection_workload`: Connection distribution, idle sessions, thread states, limits, and XA state. (6 scripts)
+- `15_capacity_forecasting`: Capacity snapshot repository, capture scripts, and growth reports. (8 scripts)
+- `16_internals_deep_dive`: Transactions, table files, dictionary size, dependencies, LOB storage, and purge profile. (6 scripts)
+- `17_execution_plans`: EXPLAIN prerequisites, EXPLAIN ANALYZE templates, generated plan commands, and red flags. (4 scripts)
+- `18_long_queries_full_scans`: Long-running statements and full table scan diagnostics. (4 scripts)
+- `19_dml_optimization`: Write-heavy tables, update pressure, foreign key indexes, and fragmentation. (4 scripts)
+- `20_design_matters`: Schema design risks such as missing primary keys, wide tables, over-indexing, and nullable-heavy tables. (4 scripts)
+- `21_configuration_parameters`: Core performance, redo/binlog, optimizer statistics, and connection variable baselines. (4 scripts)
+- `22_application_orm_performance`: ORM patterns, select-star risk, chatty SQL, parse pressure, and idle transactions. (4 scripts)
+- `23_functions_dynamic_sql`: Routine inventory, dynamic SQL, SQL SECURITY, and trigger diagnostics. (4 scripts)
+- `24_complex_filter_search`: LIKE, JSON, fulltext, spatial, and search index diagnostics. (4 scripts)
+- `25_oltp_olap_goals`: Workload classification and OLTP/OLAP pressure indicators. (4 scripts)
+- `26_physical_cloud_diagnostics`: Platform fingerprint, storage, wait, checkpoint, and cloud signals. (4 scripts)
+- `27_high_speed_tuning`: Fast triage dashboards, wait detail, missing indexes, and action queues. (6 scripts)
+- `27_mysql_health_validation`: MySQL health reports, sanity checks, and optional lab issue scripts. (9 scripts)
+- `28_sql_resource_attribution`: Statement resource attribution by digest, schema, account, and infrastructure tier. (4 scripts)
+- `29_object_inventory_health`: Deep object inventory for tables, keys, routines, triggers, grants, partitions, and external links. (18 scripts)
+- `30_backup_restore_pitr_dr`: Binary log, backup, PITR, replica, and disaster recovery evidence. (5 scripts)
+- `31_logging_error_signatures`: Error log, slow query digests, waits, locks, and deadlock indicators. (4 scripts)
+- `32_upgrade_patch_readiness`: Version, plugin, invalid/risky object, charset/collation, and upgrade readiness checks. (6 scripts)
+- `33_innodb_memory_pressure`: InnoDB checkpoint, redo, purge, parallelism, buffer pool, and temp pressure. (5 scripts)
+- `34_consistency_integrity_checks`: Invalid metadata, CHECK TABLE command generation, corruption indicators, and MVCC risks. (5 scripts)
+- `35_pooler_proxy_diagnostics`: Connection saturation, proxy patterns, prepared statement cache, and pooling risks. (5 scripts)
+- `36_cloud_provider_signals`: Managed-service fingerprints, variable drift, replica/failover, storage, and incident evidence. (5 scripts)
+- `37_object_lifecycle_capacity`: Object lifecycle repository, snapshots, advisory views, and capacity reporting. (12 scripts)
 
-## Gaps to Expand Next
+## Notes
 
-- Backup/restore validation (`pg_backup_start`, archive restore checks, recovery verification).
-- DDL/event auditing baselines (event triggers and schema drift history).
-- Per-application service-level dashboards (latency/error budgets from SQL counters).
+- Designed around MySQL 8.0 metadata and performance views.
+- Some features require `performance_schema` instruments/consumers to be enabled.
+- MySQL 5.7 and MariaDB compatibility varies by view and feature.

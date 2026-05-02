@@ -1,32 +1,14 @@
 /*
-Purpose: Capture connection distribution snapshot for pool/capacity trending.
+MySQL DBA Script: Capture Connection Snapshot
+Purpose: Provide MySQL DBA diagnostics for capture connection snapshot.
 Area: Capacity Forecasting
-Usage: Schedule at higher frequency (for example every 5 minutes).
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-INSERT INTO dba_metrics.connection_snapshots (
-    captured_at,
-    database_name,
-    user_name,
-    application_name,
-    state,
-    connection_count
-)
-SELECT
-    now() AS captured_at,
-    datname AS database_name,
-    usename AS user_name,
-    application_name,
-    state,
-    count(*)::int AS connection_count
-FROM pg_stat_activity
-GROUP BY datname, usename, application_name, state;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Capture Connection Snapshot') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
--- INSERT 0 3
--- SAMPLE_OUTPUT_END
+SELECT user, host, db, command, COUNT(*) AS connections, MAX(time) AS max_seconds
+FROM information_schema.processlist
+GROUP BY user, host, db, command
+ORDER BY connections DESC;

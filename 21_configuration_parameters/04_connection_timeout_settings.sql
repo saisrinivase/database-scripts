@@ -1,43 +1,14 @@
 /*
-Purpose: Show connection and timeout settings that influence application behavior and contention.
+MySQL DBA Script: Connection Timeout Settings
+Purpose: Provide MySQL DBA diagnostics for connection timeout settings.
 Area: Configuration Parameters
-Usage: Validate with connection pooling and app retry strategy.
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    name,
-    setting,
-    unit,
-    source
-FROM pg_settings
-WHERE name IN (
-    'max_connections',
-    'superuser_reserved_connections',
-    'statement_timeout',
-    'lock_timeout',
-    'idle_in_transaction_session_timeout',
-    'tcp_keepalives_idle',
-    'tcp_keepalives_interval',
-    'tcp_keepalives_count'
-)
-ORDER BY name;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Connection Timeout Settings') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---                 name                 | setting | unit |       source       
--- -------------------------------------+---------+------+--------------------
---  idle_in_transaction_session_timeout | 0       | ms   | default
---  lock_timeout                        | 0       | ms   | default
---  max_connections                     | 100     |      | configuration file
---  statement_timeout                   | 0       | ms   | default
---  superuser_reserved_connections      | 3       |      | default
---  tcp_keepalives_count                | 0       |      | default
---  tcp_keepalives_idle                 | 0       | s    | default
---  tcp_keepalives_interval             | 0       | s    | default
--- (8 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT variable_name, variable_value
+FROM performance_schema.global_variables
+WHERE variable_name IN ('max_connections','connect_timeout','wait_timeout','interactive_timeout','net_read_timeout','net_write_timeout','thread_cache_size','max_user_connections')
+ORDER BY variable_name;

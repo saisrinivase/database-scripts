@@ -1,17 +1,18 @@
-# Upgrade and Patch Readiness (15 -> 16 -> 17 -> 18)
+# 32_upgrade_patch_readiness
 
-Purpose: Operational SQL checks for pre-upgrade risks, compatibility drift, and post-upgrade regression watchlists.
+Version, plugin, invalid/risky object, charset/collation, and upgrade readiness checks.
 
-## Run Order
+Scripts in this area: `6`.
 
-1. `01_version_upgrade_path_overview.sql`
-2. `02_extension_version_drift_dependencies.sql`
-3. `03_preupgrade_invalid_objects_gate.sql`
-4. `04_collation_version_mismatch_risk.sql`
-5. `05_postupgrade_query_regression_watchlist_pgss.sql`
-6. `06_config_file_unknown_or_deprecated_gucs.sql`
+## Usage
 
-## Notes
+Run with the mysql client, for example: `mysql -u root -p < 32_upgrade_patch_readiness/<script>.sql`.
 
-- This area does not execute upgrade steps; it provides evidence and blockers before change windows.
-- Combine with staging rehearsal and `pg_upgrade` or logical migration runbooks.
+## Scripts
+
+- `01_version_upgrade_path_overview.sql`
+- `02_plugin_version_drift_dependencies.sql`
+- `03_preupgrade_invalid_objects_gate.sql`
+- `04_charset_collation_mismatch_risk.sql`
+- `05_postupgrade_statement_regression_watchlist.sql`
+- `06_deprecated_variable_settings.sql`

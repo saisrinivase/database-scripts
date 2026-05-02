@@ -1,73 +1,15 @@
 /*
-Purpose: Detect invalid indexes and unvalidated constraints that indicate integrity or migration risk.
-Area: Consistency and Integrity Checks
-Usage: Investigate all rows; invalid metadata can break optimizer behavior and DDL safety.
+MySQL DBA Script: Invalid Indexes And Constraints
+Purpose: Provide MySQL DBA diagnostics for invalid indexes and constraints.
+Area: Consistency Integrity Checks
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-WITH invalid_indexes AS (
-    SELECT
-        n.nspname AS schema_name,
-        c.relname AS object_name,
-        'INDEX'::text AS object_type,
-        CASE
-            WHEN i.indisvalid = false THEN 'indisvalid=false'
-            WHEN i.indisready = false THEN 'indisready=false'
-            WHEN i.indcheckxmin = true THEN 'indcheckxmin=true'
-            ELSE 'other_index_integrity_flag'
-        END AS issue,
-        pg_get_indexdef(c.oid) AS details,
-        pg_size_pretty(pg_relation_size(c.oid)) AS index_size,
-        'HIGH'::text AS severity
-    FROM pg_index i
-    JOIN pg_class c
-      ON c.oid = i.indexrelid
-    JOIN pg_namespace n
-      ON n.oid = c.relnamespace
-    WHERE (i.indisvalid = false OR i.indisready = false OR i.indcheckxmin = true)
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-),
-not_valid_constraints AS (
-    SELECT
-        n.nspname AS schema_name,
-        con.conname AS object_name,
-        'CONSTRAINT'::text AS object_type,
-        'convalidated=false'::text AS issue,
-        pg_get_constraintdef(con.oid) AS details,
-        NULL::text AS index_size,
-        CASE WHEN con.contype = 'f' THEN 'HIGH' ELSE 'MEDIUM' END AS severity
-    FROM pg_constraint con
-    JOIN pg_class tbl
-      ON tbl.oid = con.conrelid
-    JOIN pg_namespace n
-      ON n.oid = tbl.relnamespace
-    WHERE con.convalidated = false
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-),
-combined AS (
-    SELECT *
-    FROM invalid_indexes
-    UNION ALL
-    SELECT *
-    FROM not_valid_constraints
-)
-SELECT *
-FROM combined
-ORDER BY
-    CASE severity WHEN 'HIGH' THEN 1 WHEN 'MEDIUM' THEN 2 ELSE 3 END,
-    schema_name,
-    object_name;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Invalid Indexes And Constraints') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_new_areas_20260219_refresh2
---
---  schema_name | object_name | object_type | issue | details | index_size | severity 
--- -------------+-------------+-------------+-------+---------+------------+----------
--- (0 rows)
--- 
--- SAMPLE_OUTPUT_END
-
+SELECT table_schema, table_name, engine, table_collation, create_options
+FROM information_schema.tables
+WHERE table_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+  AND (engine IS NULL OR table_collation IS NULL)
+ORDER BY table_schema, table_name;

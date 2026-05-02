@@ -1,34 +1,15 @@
 /*
-Purpose: Identify highly privileged roles (superuser, replication, bypass RLS).
-Area: Security and Roles
-Usage: Review regularly for least-privilege compliance.
+MySQL DBA Script: High Privilege Roles
+Purpose: Provide MySQL DBA diagnostics for high privilege roles.
+Area: Security Roles
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    rolname AS role_name,
-    rolsuper AS is_superuser,
-    rolreplication AS can_replicate,
-    rolbypassrls AS bypasses_row_level_security,
-    rolcreaterole AS can_create_roles,
-    rolcreatedb AS can_create_databases,
-    rolcanlogin AS can_login
-FROM pg_roles
-WHERE rolsuper
-   OR rolreplication
-   OR rolbypassrls
-   OR rolcreaterole
-ORDER BY role_name;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: High Privilege Roles') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  role_name | is_superuser | can_replicate | bypasses_row_level_security | can_create_roles | can_create_databases | can_login 
--- -----------+--------------+---------------+-----------------------------+------------------+----------------------+-----------
---  postgres  | t            | t             | f                           | t                | t                    | t
---  saiendla  | t            | t             | t                           | t                | t                    | t
--- (2 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT user, host, Select_priv, Insert_priv, Update_priv, Delete_priv, Create_priv, Drop_priv,
+       Reload_priv, Shutdown_priv, Process_priv, File_priv, Grant_priv, Super_priv, Create_user_priv
+FROM mysql.user
+WHERE Super_priv='Y' OR Grant_priv='Y' OR Create_user_priv='Y' OR File_priv='Y' OR Process_priv='Y'
+ORDER BY user, host;

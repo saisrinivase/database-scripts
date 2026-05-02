@@ -1,69 +1,23 @@
 /*
-Purpose: Detect duplicate index definitions on the same table.
+MySQL DBA Script: Duplicate Indexes
+Purpose: Provide MySQL DBA diagnostics for duplicate indexes.
 Area: Index Analysis
-Usage: Validate access patterns before removing duplicates.
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Duplicate Indexes') AS script_name;
+
 WITH idx AS (
-    SELECT
-        n.nspname AS schema_name,
-        c.relname AS table_name,
-        i.indexrelid,
-        ci.relname AS index_name,
-        i.indrelid,
-        i.indkey,
-        i.indclass,
-        i.indcollation,
-        i.indoption,
-        i.indpred,
-        i.indexprs,
-        i.indisunique,
-        i.indisprimary,
-        pg_relation_size(i.indexrelid) AS index_bytes
-    FROM pg_index i
-    JOIN pg_class c
-        ON c.oid = i.indrelid
-    JOIN pg_class ci
-        ON ci.oid = i.indexrelid
-    JOIN pg_namespace n
-        ON n.oid = c.relnamespace
-    WHERE n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
+  SELECT table_schema, table_name, index_name, non_unique,
+         GROUP_CONCAT(column_name ORDER BY seq_in_index) AS columns_key
+  FROM information_schema.statistics
+  WHERE table_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+  GROUP BY table_schema, table_name, index_name, non_unique
 )
-SELECT
-    schema_name,
-    table_name,
-    array_agg(index_name ORDER BY index_name) AS duplicate_indexes,
-    sum(index_bytes) AS total_duplicate_bytes,
-    pg_size_pretty(sum(index_bytes)) AS total_duplicate_pretty
+SELECT table_schema, table_name, columns_key, COUNT(*) AS index_count,
+       GROUP_CONCAT(index_name ORDER BY index_name SEPARATOR ', ') AS indexes
 FROM idx
-GROUP BY
-    schema_name,
-    table_name,
-    indrelid,
-    indkey,
-    indclass,
-    indcollation,
-    indoption,
-    indpred,
-    indexprs,
-    indisunique,
-    indisprimary
-HAVING count(*) > 1
-ORDER BY total_duplicate_bytes DESC;
-
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name | table_name | duplicate_indexes | total_duplicate_bytes | total_duplicate_pretty 
--- -------------+------------+-------------------+-----------------------+------------------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No issue/candidate rows were found at capture time.
--- - This typically indicates healthy state for this check; rerun during peak load for validation.
--- SAMPLE_OUTPUT_END
+GROUP BY table_schema, table_name, columns_key
+HAVING COUNT(*) > 1
+ORDER BY index_count DESC, table_schema, table_name;

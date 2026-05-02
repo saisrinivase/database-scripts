@@ -1,40 +1,18 @@
 /*
-Purpose: Identify user tables without primary keys.
+MySQL DBA Script: Tables Without Primary Keys
+Purpose: Provide MySQL DBA diagnostics for tables without primary keys.
 Area: Design Matters
-Usage: Missing PKs often hurt data integrity and query/index design.
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    n.nspname AS schema_name,
-    c.relname AS table_name,
-    pg_size_pretty(pg_total_relation_size(c.oid)) AS total_size
-FROM pg_class c
-JOIN pg_namespace n
-    ON n.oid = c.relnamespace
-LEFT JOIN pg_constraint con
-    ON con.conrelid = c.oid
-   AND con.contype = 'p'
-WHERE c.relkind = 'r'
-  AND n.nspname !~ '^pg_'
-  AND n.nspname <> 'information_schema'
-  AND con.oid IS NULL
-ORDER BY pg_total_relation_size(c.oid) DESC;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Tables Without Primary Keys') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name |       table_name        | total_size 
--- -------------+-------------------------+------------
---  public      | pgbench_history         | 270 MB
---  dba_metrics | wal_snapshots           | 16 kB
---  dba_metrics | table_size_snapshots    | 16 kB
---  dba_metrics | database_size_snapshots | 16 kB
---  dba_metrics | index_size_snapshots    | 16 kB
---  dba_metrics | connection_snapshots    | 16 kB
--- (6 rows)
--- 
--- SAMPLE_OUTPUT_END
-
+SELECT t.table_schema, t.table_name, t.engine, t.table_rows
+FROM information_schema.tables t
+LEFT JOIN information_schema.table_constraints c
+  ON c.table_schema=t.table_schema AND c.table_name=t.table_name AND c.constraint_type='PRIMARY KEY'
+WHERE t.table_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+  AND t.table_type='BASE TABLE'
+  AND c.constraint_name IS NULL
+ORDER BY t.table_rows DESC;

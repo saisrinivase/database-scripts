@@ -1,4 +1,0 @@
- slot_name | slot_type | active | temporary | restart_lsn | confirmed_flush_lsn | retained_wal_bytes | retained_wal_pretty | wal_status | safe_wal_size 
------------+-----------+--------+-----------+-------------+---------------------+--------------------+---------------------+------------+---------------
-(0 rows)
-

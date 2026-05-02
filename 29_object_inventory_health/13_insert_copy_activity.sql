@@ -1,76 +1,16 @@
 /*
-Purpose: Monitor INSERT/COPY pressure using active COPY progress and table write counters.
-Area: Object Inventory and Health
-Usage: Run during load windows or ETL batches to identify ingest hotspots.
+MySQL DBA Script: Insert Copy Activity
+Purpose: Provide MySQL DBA diagnostics for insert copy activity.
+Area: Object Inventory Health
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    'copy_progress'::text AS section,
-    c.pid,
-    c.datname,
-    coalesce(format('%I.%I', n.nspname, r.relname), '(n/a)') AS relation_name,
-    c.command,
-    c.type,
-    c.bytes_processed,
-    c.bytes_total,
-    c.tuples_processed
-FROM pg_stat_progress_copy c
-LEFT JOIN pg_class r ON r.oid = c.relid
-LEFT JOIN pg_namespace n ON n.oid = r.relnamespace
-UNION ALL
-SELECT
-    'table_write_counters'::text AS section,
-    NULL::integer AS pid,
-    current_database() AS datname,
-    format('%I.%I', s.schemaname, s.relname) AS relation_name,
-    'n_tup_ins=' || s.n_tup_ins::text AS command,
-    'n_tup_upd=' || s.n_tup_upd::text AS type,
-    s.n_tup_del::bigint AS bytes_processed,
-    NULL::bigint AS bytes_total,
-    s.n_mod_since_analyze::bigint AS tuples_processed
-FROM pg_stat_user_tables s
-ORDER BY section, bytes_processed DESC NULLS LAST, relation_name;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Insert Copy Activity') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---        section        | pid |   datname    |              relation_name               |       command       |       type        | bytes_processed | bytes_total | tuples_processed 
--- ----------------------+-----+--------------+------------------------------------------+---------------------+-------------------+-----------------+-------------+------------------
---  table_write_counters |     | pgbench_test | migration_v2_lab.bloat_pressure_table    | n_tup_ins=90000     | n_tup_upd=0       |           48000 |             |                0
---  table_write_counters |     | pgbench_test | migration_v1_lab.dml_bloat_table         | n_tup_ins=25000     | n_tup_upd=0       |           13000 |             |                0
---  table_write_counters |     | pgbench_test | dba_metrics.connection_snapshots         | n_tup_ins=6         | n_tup_upd=0       |               0 |             |                6
---  table_write_counters |     | pgbench_test | dba_metrics.database_size_snapshots      | n_tup_ins=14        | n_tup_upd=0       |               0 |             |               14
---  table_write_counters |     | pgbench_test | dba_metrics.index_size_snapshots         | n_tup_ins=51        | n_tup_upd=0       |               0 |             |               51
---  table_write_counters |     | pgbench_test | dba_metrics.table_size_snapshots         | n_tup_ins=57        | n_tup_upd=0       |               0 |             |               57
---  table_write_counters |     | pgbench_test | dba_metrics.wal_snapshots                | n_tup_ins=2         | n_tup_upd=0       |               0 |             |                2
---  table_write_counters |     | pgbench_test | migration_v1_lab.child_transactions      | n_tup_ins=120000    | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v1_lab.orders_no_pk            | n_tup_ins=10000     | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v1_lab.parent_accounts         | n_tup_ins=10000     | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v1_lab.product_catalog         | n_tup_ins=50000     | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v1_lab.sales_orders            | n_tup_ins=1000      | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v1_lab.stale_stats_table       | n_tup_ins=60000     | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.amount_mapping_risk     | n_tup_ins=120000    | n_tup_upd=120000  |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.child_events            | n_tup_ins=250000    | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.customer_contact_compat | n_tup_ins=90000     | n_tup_upd=51429   |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.customer_staging_no_pk  | n_tup_ins=60000     | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.issue_manifest          | n_tup_ins=11        | n_tup_upd=0       |               0 |             |               11
---  table_write_counters |     | pgbench_test | migration_v2_lab.mv_daily_order_volume   | n_tup_ins=2         | n_tup_upd=0       |               0 |             |                2
---  table_write_counters |     | pgbench_test | migration_v2_lab.order_fact              | n_tup_ins=300000    | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.parent_accounts         | n_tup_ins=50000     | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.partitioned_events      | n_tup_ins=0         | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.partitioned_events_2025 | n_tup_ins=52194     | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.partitioned_events_2026 | n_tup_ins=47806     | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.quoted_orders           | n_tup_ins=5000      | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.sales_catalog           | n_tup_ins=120000    | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.stale_stats_table       | n_tup_ins=180000    | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | migration_v2_lab.trigger_audit_demo      | n_tup_ins=0         | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | public.pgbench_accounts                  | n_tup_ins=200000000 | n_tup_upd=5332823 |               0 |             |          5332823
---  table_write_counters |     | pgbench_test | public.pgbench_branches                  | n_tup_ins=2000      | n_tup_upd=5332823 |               0 |             |                0
---  table_write_counters |     | pgbench_test | public.pgbench_history                   | n_tup_ins=5332823   | n_tup_upd=0       |               0 |             |                0
---  table_write_counters |     | pgbench_test | public.pgbench_tellers                   | n_tup_ins=20000     | n_tup_upd=5332823 |               0 |             |                0
--- (32 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT object_schema, object_name, count_insert, count_update, count_delete,
+       count_write, sum_timer_write/1000000000000 AS write_seconds
+FROM performance_schema.table_io_waits_summary_by_table
+WHERE object_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+ORDER BY count_write DESC
+LIMIT 100;

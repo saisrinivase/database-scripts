@@ -1,79 +1,30 @@
 /*
-Purpose: Find foreign keys where referencing columns are not backed by a suitable index prefix.
-Area: Object Inventory and Health
-Usage: Create suggested indexes after validating workload and existing composite index strategy.
+MySQL DBA Script: Missing Fk Supporting Indexes
+Purpose: Provide MySQL DBA diagnostics for missing fk supporting indexes.
+Area: Object Inventory Health
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-WITH fk AS (
-    SELECT
-        c.oid AS constraint_oid,
-        c.conname,
-        c.conrelid,
-        c.conkey,
-        n.nspname AS schema_name,
-        t.relname AS table_name
-    FROM pg_constraint c
-    JOIN pg_class t ON t.oid = c.conrelid
-    JOIN pg_namespace n ON n.oid = t.relnamespace
-    WHERE c.contype = 'f'
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-),
-fk_cols AS (
-    SELECT
-        f.constraint_oid,
-        string_agg(quote_ident(a.attname), ', ' ORDER BY k.ord) AS fk_columns,
-        min(a.attname) AS first_fk_col
-    FROM fk f
-    JOIN LATERAL unnest(f.conkey) WITH ORDINALITY AS k(attnum, ord)
-      ON true
-    JOIN pg_attribute a
-      ON a.attrelid = f.conrelid
-     AND a.attnum = k.attnum
-    GROUP BY f.constraint_oid
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Missing Fk Supporting Indexes') AS script_name;
+
+WITH fk_cols AS (
+  SELECT k.constraint_schema, k.table_name, k.constraint_name,
+         GROUP_CONCAT(k.column_name ORDER BY k.ordinal_position) AS fk_columns
+  FROM information_schema.key_column_usage k
+  WHERE k.referenced_table_name IS NOT NULL
+    AND k.constraint_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+  GROUP BY k.constraint_schema, k.table_name, k.constraint_name
+), idx_cols AS (
+  SELECT table_schema, table_name, index_name,
+         GROUP_CONCAT(column_name ORDER BY seq_in_index) AS index_columns
+  FROM information_schema.statistics
+  GROUP BY table_schema, table_name, index_name
 )
-SELECT
-    f.schema_name,
-    f.table_name,
-    f.conname AS foreign_key_name,
-    c.fk_columns,
-    format(
-        'CREATE INDEX CONCURRENTLY %I ON %I.%I (%s);',
-        left('idx_' || f.table_name || '_' || replace(f.conname, ' ', '_'), 60),
-        f.schema_name,
-        f.table_name,
-        c.fk_columns
-    ) AS suggested_index_sql
-FROM fk f
-JOIN fk_cols c
-  ON c.constraint_oid = f.constraint_oid
+SELECT f.constraint_schema AS table_schema, f.table_name, f.constraint_name, f.fk_columns
+FROM fk_cols f
 WHERE NOT EXISTS (
-    SELECT 1
-    FROM pg_index i
-    WHERE i.indrelid = f.conrelid
-      AND i.indisvalid
-      AND i.indisready
-      AND (
-          (i.indkey::smallint[])[
-              array_lower(i.indkey::smallint[], 1):
-              array_lower(i.indkey::smallint[], 1) + array_length(f.conkey, 1) - 1
-          ]
-      ) = f.conkey
+  SELECT 1 FROM idx_cols i
+  WHERE i.table_schema=f.constraint_schema AND i.table_name=f.table_name AND i.index_columns LIKE CONCAT(f.fk_columns, '%')
 )
-ORDER BY f.schema_name, f.table_name, f.conname;
-
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name | table_name | foreign_key_name | fk_columns | suggested_index_sql 
--- -------------+------------+------------------+------------+---------------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No matching rows were returned at capture time.
--- - Rerun during peak workload or after seeding representative test cases for non-zero examples.
--- SAMPLE_OUTPUT_END
+ORDER BY table_schema, table_name;

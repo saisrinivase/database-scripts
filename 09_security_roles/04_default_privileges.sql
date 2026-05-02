@@ -1,33 +1,13 @@
 /*
-Purpose: Inspect default privileges that apply to future objects.
-Area: Security and Roles
-Usage: Helps detect unexpected inherited access.
+MySQL DBA Script: Default Privileges
+Purpose: Provide MySQL DBA diagnostics for default privileges.
+Area: Security Roles
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    n.nspname AS schema_name,
-    r.rolname AS owner_role,
-    d.defaclobjtype AS object_type,
-    d.defaclacl AS default_acl
-FROM pg_default_acl d
-LEFT JOIN pg_namespace n
-    ON n.oid = d.defaclnamespace
-JOIN pg_roles r
-    ON r.oid = d.defaclrole
-ORDER BY schema_name NULLS FIRST, owner_role, object_type;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Default Privileges') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name | owner_role | object_type | default_acl 
--- -------------+------------+-------------+-------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No matching rows were returned at capture time.
--- - Rerun during peak workload or after seeding representative test cases for non-zero examples.
--- SAMPLE_OUTPUT_END
+SELECT user, host, default_role_user, default_role_host
+FROM mysql.default_roles
+ORDER BY user, host;

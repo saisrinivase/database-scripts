@@ -1,43 +1,11 @@
 /*
-Purpose: Check whether a backup/restore evidence table exists for trend reporting (duration, size, success).
-Area: Backup, Restore, PITR, and DR
-Usage: Optional control-table contract for operational audits.
+MySQL DBA Script: Backup Restore Evidence Contract
+Purpose: Provide MySQL DBA diagnostics for backup restore evidence contract.
+Area: Backup Restore Pitr Dr
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT (to_regclass('dba_metrics.backup_restore_history') IS NOT NULL) AS has_backup_history_contract \gset
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Backup Restore Evidence Contract') AS script_name;
 
-\if :has_backup_history_contract
-SELECT
-    run_id,
-    backup_type,
-    backup_tool,
-    backup_start_ts,
-    backup_end_ts,
-    round(extract(epoch FROM (backup_end_ts - backup_start_ts)) / 60.0, 2) AS duration_minutes,
-    backup_size_bytes,
-    round(backup_size_bytes / 1024.0 / 1024.0 / 1024.0, 2) AS backup_size_gb,
-    success,
-    restore_tested,
-    restore_target_ts,
-    restore_validation_ts,
-    notes
-FROM dba_metrics.backup_restore_history
-ORDER BY backup_end_ts DESC
-LIMIT 50;
-\else
-SELECT
-    'MISSING_BACKUP_RESTORE_EVIDENCE' AS status,
-    'Create dba_metrics.backup_restore_history to store last success, duration trend, size trend, and restore drill proof.' AS guidance,
-    'Expected columns: run_id, backup_type, backup_tool, backup_start_ts, backup_end_ts, backup_size_bytes, success, restore_tested, restore_target_ts, restore_validation_ts, notes.' AS suggested_contract;
-\endif
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_new_areas_20260219_refresh
---
---              status              |                                                       guidance                                                        |                                                                                suggested_contract                                                                                
--- ---------------------------------+-----------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
---  MISSING_BACKUP_RESTORE_EVIDENCE | Create dba_metrics.backup_restore_history to store last success, duration trend, size trend, and restore drill proof. | Expected columns: run_id, backup_type, backup_tool, backup_start_ts, backup_end_ts, backup_size_bytes, success, restore_tested, restore_target_ts, restore_validation_ts, notes.
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
+SELECT 'Review binary log coordinates or GTID set from backup metadata before PITR restore' AS restore_test_note;

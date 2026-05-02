@@ -1,0 +1,17 @@
+/*
+MySQL DBA Script: Storage Iops Temp Binlog Pressure
+Purpose: Provide MySQL DBA diagnostics for storage iops temp binlog pressure.
+Area: Cloud Provider Signals
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
+*/
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Storage Iops Temp Binlog Pressure') AS script_name;
+
+SELECT file_name, event_name, count_read, count_write,
+       sum_number_of_bytes_read, sum_number_of_bytes_write,
+       sum_timer_read/1000000000000 AS read_seconds,
+       sum_timer_write/1000000000000 AS write_seconds
+FROM performance_schema.file_summary_by_instance
+ORDER BY (sum_timer_read + sum_timer_write) DESC
+LIMIT 100;

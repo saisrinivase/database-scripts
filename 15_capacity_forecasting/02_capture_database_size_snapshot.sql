@@ -1,22 +1,15 @@
 /*
-Purpose: Capture point-in-time database sizes for growth tracking.
+MySQL DBA Script: Capture Database Size Snapshot
+Purpose: Provide MySQL DBA diagnostics for capture database size snapshot.
 Area: Capacity Forecasting
-Usage: Schedule daily/hourly after repository creation.
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-INSERT INTO dba_metrics.database_size_snapshots (captured_at, database_name, size_bytes)
-SELECT
-    now() AS captured_at,
-    datname AS database_name,
-    pg_database_size(datname) AS size_bytes
-FROM pg_database
-WHERE datallowconn;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Capture Database Size Snapshot') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
--- INSERT 0 7
--- SAMPLE_OUTPUT_END
+INSERT INTO dba_capacity_schema_snap (schema_name, data_bytes, index_bytes, free_bytes)
+SELECT table_schema, SUM(data_length), SUM(index_length), SUM(data_free)
+FROM information_schema.tables
+WHERE table_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+GROUP BY table_schema;

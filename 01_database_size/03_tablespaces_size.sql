@@ -1,26 +1,19 @@
 /*
-Purpose: Show tablespace usage to identify storage pressure by tablespace.
+MySQL DBA Script: Tablespaces Size
+Purpose: Provide MySQL DBA diagnostics for tablespaces size.
 Area: Database Size
-Usage: Run as role with access to tablespace stats.
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    spcname AS tablespace_name,
-    pg_tablespace_size(oid) AS size_bytes,
-    pg_size_pretty(pg_tablespace_size(oid)) AS size_pretty
-FROM pg_tablespace
-ORDER BY size_bytes DESC;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Tablespaces Size') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  tablespace_name | size_bytes  | size_pretty 
--- -----------------+-------------+-------------
---  pg_default      | 33241900424 | 31 GB
---  pg_global       |      586116 | 572 kB
--- (2 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT name AS tablespace_name,
+       space_type,
+       row_format,
+       page_size,
+       ROUND(file_size/1024/1024,2) AS file_mb,
+       ROUND(allocated_size/1024/1024,2) AS allocated_mb,
+       state
+FROM information_schema.innodb_tablespaces
+ORDER BY file_size DESC;

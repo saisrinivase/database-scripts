@@ -1,77 +1,14 @@
 /*
-Purpose: Detect ETL/KETTLE-like activity patterns from active sessions and role naming.
-Area: Object Inventory and Health
-Usage: Correlate ETL windows with locking, I/O pressure, and long-running statements.
+MySQL DBA Script: Kettle Etl Activity Signals
+Purpose: Provide MySQL DBA diagnostics for kettle etl activity signals.
+Area: Object Inventory Health
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-WITH etl_sessions AS (
-    SELECT
-        pid,
-        usename,
-        datname,
-        coalesce(application_name, '') AS application_name,
-        client_addr,
-        state,
-        wait_event_type,
-        wait_event,
-        now() - query_start AS query_age,
-        left(query, 240) AS query_snippet
-    FROM pg_stat_activity
-    WHERE backend_type = 'client backend'
-      AND (
-            application_name ~* '(kettle|pentaho|spoon|pan|kitchen|etl|batch)'
-         OR usename ~* '(etl|batch|kettle|pentaho)'
-      )
-),
-etl_roles AS (
-    SELECT
-        rolname,
-        rolsuper,
-        rolcreaterole,
-        rolcreatedb,
-        rolreplication
-    FROM pg_roles
-    WHERE rolname ~* '(etl|batch|kettle|pentaho)'
-)
-SELECT
-    'SESSION'::text AS signal_type,
-    pid::text AS signal_id,
-    usename AS principal,
-    datname AS database_name,
-    application_name,
-    state,
-    coalesce(wait_event_type, '') AS wait_event_type,
-    coalesce(wait_event, '') AS wait_event,
-    query_age::text AS duration,
-    query_snippet AS details
-FROM etl_sessions
-UNION ALL
-SELECT
-    'ROLE'::text,
-    rolname,
-    rolname,
-    '',
-    '',
-    CASE WHEN rolsuper THEN 'SUPERUSER' ELSE 'NON_SUPERUSER' END,
-    '',
-    '',
-    '',
-    format('create_role=%s create_db=%s replication=%s', rolcreaterole, rolcreatedb, rolreplication)
-FROM etl_roles
-ORDER BY signal_type, signal_id;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Kettle Etl Activity Signals') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  signal_type | signal_id | principal | database_name | application_name | state | wait_event_type | wait_event | duration | details 
--- -------------+-----------+-----------+---------------+------------------+-------+-----------------+------------+----------+---------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No KETTLE/ETL-like sessions or roles matched at capture time.
--- - This is expected outside ETL windows or when application_name/role naming differs.
--- SAMPLE_OUTPUT_END
+SELECT schema_name, digest, count_star, LEFT(digest_text,200) AS digest_text
+FROM performance_schema.events_statements_summary_by_digest
+WHERE UPPER(digest_text) LIKE '%KETTLE%' OR UPPER(digest_text) LIKE '%PENTAHO%'
+ORDER BY count_star DESC;

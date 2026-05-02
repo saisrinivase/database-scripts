@@ -1,4 +1,0 @@
- schema_name | table_name | n_tup_upd | n_tup_hot_upd | hot_update_pct | total_size 
--------------+------------+-----------+---------------+----------------+------------
-(0 rows)
-

@@ -1,37 +1,14 @@
 /*
-Purpose: Show connection distribution by user/application/client for pool right-sizing and hotspot detection.
-Area: Pooler and Proxy Diagnostics
-Usage: Look for many idle sessions per app/user and bursty client patterns.
+MySQL DBA Script: Connection Distribution By App User
+Purpose: Provide MySQL DBA diagnostics for connection distribution by app user.
+Area: Pooler Proxy Diagnostics
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    usename,
-    coalesce(nullif(application_name, ''), '(unknown_app)') AS application_name,
-    coalesce(client_addr::text, '(local)') AS client_addr,
-    count(*) AS total_sessions,
-    count(*) FILTER (WHERE state = 'active') AS active_sessions,
-    count(*) FILTER (WHERE state = 'idle') AS idle_sessions,
-    count(*) FILTER (WHERE state = 'idle in transaction') AS idle_in_tx_sessions,
-    round(avg(extract(epoch FROM (clock_timestamp() - backend_start)))::numeric, 2) AS avg_session_age_seconds,
-    round(max(extract(epoch FROM (clock_timestamp() - backend_start)))::numeric, 2) AS max_session_age_seconds,
-    CASE
-        WHEN count(*) FILTER (WHERE state = 'idle') >= 50 THEN 'HIGH_IDLE_POOL_FOOTPRINT'
-        WHEN count(*) FILTER (WHERE state = 'idle in transaction') > 0 THEN 'IDLE_IN_TX_RISK'
-        ELSE 'NORMAL'
-    END AS pattern_label
-FROM pg_stat_activity
-WHERE backend_type = 'client backend'
-GROUP BY usename, coalesce(nullif(application_name, ''), '(unknown_app)'), coalesce(client_addr::text, '(local)')
-ORDER BY total_sessions DESC, idle_sessions DESC
-LIMIT 120;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Connection Distribution By App User') AS script_name;
 
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_new_areas_20260219_refresh
---
---  usename  | application_name | client_addr | total_sessions | active_sessions | idle_sessions | idle_in_tx_sessions | avg_session_age_seconds | max_session_age_seconds | pattern_label 
--- ----------+------------------+-------------+----------------+-----------------+---------------+---------------------+-------------------------+-------------------------+---------------
---  saiendla | psql             | (local)     |              1 |               1 |             0 |                   0 |                    0.02 |                    0.02 | NORMAL
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
+SELECT user, host, db, command, COUNT(*) AS connections, MAX(time) AS max_seconds
+FROM information_schema.processlist
+GROUP BY user, host, db, command
+ORDER BY connections DESC;

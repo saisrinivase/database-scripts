@@ -1,31 +1,14 @@
 /*
-Purpose: Capture table-level size and tuple estimates for growth trending.
+MySQL DBA Script: Capture Table Size Snapshot
+Purpose: Provide MySQL DBA diagnostics for capture table size snapshot.
 Area: Capacity Forecasting
-Usage: Schedule periodically; can be heavy on very large catalogs.
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-INSERT INTO dba_metrics.table_size_snapshots (
-    captured_at,
-    schema_name,
-    table_name,
-    total_bytes,
-    estimated_live_rows,
-    estimated_dead_rows
-)
-SELECT
-    now() AS captured_at,
-    s.schemaname AS schema_name,
-    s.relname AS table_name,
-    pg_total_relation_size(s.relid) AS total_bytes,
-    s.n_live_tup AS estimated_live_rows,
-    s.n_dead_tup AS estimated_dead_rows
-FROM pg_stat_user_tables s;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Capture Table Size Snapshot') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
--- INSERT 0 32
--- SAMPLE_OUTPUT_END
+INSERT INTO dba_capacity_table_snap (table_schema, table_name, data_bytes, index_bytes, free_bytes, table_rows)
+SELECT table_schema, table_name, data_length, index_length, data_free, table_rows
+FROM information_schema.tables
+WHERE table_schema NOT IN ('mysql','sys','performance_schema','information_schema');

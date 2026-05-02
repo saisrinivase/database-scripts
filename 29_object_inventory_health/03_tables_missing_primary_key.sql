@@ -1,53 +1,18 @@
 /*
-Purpose: Identify tables missing primary keys and generate starter DDL suggestions.
-Area: Object Inventory and Health
-Usage: Review result before adding PKs on production tables with existing duplicate/null values.
+MySQL DBA Script: Tables Missing Primary Key
+Purpose: Provide MySQL DBA diagnostics for tables missing primary key.
+Area: Object Inventory Health
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-WITH candidates AS (
-    SELECT
-        n.nspname AS schema_name,
-        c.relname AS table_name,
-        c.oid AS relid,
-        c.reltuples::bigint AS est_rows,
-        pg_total_relation_size(c.oid) AS total_bytes
-    FROM pg_class c
-    JOIN pg_namespace n ON n.oid = c.relnamespace
-    LEFT JOIN pg_constraint p
-        ON p.conrelid = c.oid
-       AND p.contype = 'p'
-    WHERE c.relkind = 'r'
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-      AND p.oid IS NULL
-)
-SELECT
-    schema_name,
-    table_name,
-    est_rows,
-    pg_size_pretty(total_bytes) AS total_size,
-    format(
-        'ALTER TABLE %I.%I ADD COLUMN id bigserial PRIMARY KEY;',
-        schema_name,
-        table_name
-    ) AS starter_pk_sql
-FROM candidates
-ORDER BY total_bytes DESC, schema_name, table_name;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Tables Missing Primary Key') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name |       table_name        | est_rows | total_size |                                    starter_pk_sql                                    
--- -------------+-------------------------+----------+------------+--------------------------------------------------------------------------------------
---  public      | pgbench_history         |  5331130 | 270 MB     | ALTER TABLE public.pgbench_history ADD COLUMN id bigserial PRIMARY KEY;
---  dba_metrics | connection_snapshots    |       -1 | 16 kB      | ALTER TABLE dba_metrics.connection_snapshots ADD COLUMN id bigserial PRIMARY KEY;
---  dba_metrics | database_size_snapshots |       -1 | 16 kB      | ALTER TABLE dba_metrics.database_size_snapshots ADD COLUMN id bigserial PRIMARY KEY;
---  dba_metrics | index_size_snapshots    |       -1 | 16 kB      | ALTER TABLE dba_metrics.index_size_snapshots ADD COLUMN id bigserial PRIMARY KEY;
---  dba_metrics | table_size_snapshots    |       -1 | 16 kB      | ALTER TABLE dba_metrics.table_size_snapshots ADD COLUMN id bigserial PRIMARY KEY;
---  dba_metrics | wal_snapshots           |       -1 | 16 kB      | ALTER TABLE dba_metrics.wal_snapshots ADD COLUMN id bigserial PRIMARY KEY;
--- (6 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT t.table_schema, t.table_name, t.engine, t.table_rows
+FROM information_schema.tables t
+LEFT JOIN information_schema.table_constraints c
+  ON c.table_schema=t.table_schema AND c.table_name=t.table_name AND c.constraint_type='PRIMARY KEY'
+WHERE t.table_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+  AND t.table_type='BASE TABLE'
+  AND c.constraint_name IS NULL
+ORDER BY t.table_rows DESC;

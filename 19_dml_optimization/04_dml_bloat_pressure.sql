@@ -1,31 +1,19 @@
 /*
-Purpose: Show write-heavy tables with dead tuple pressure (bloat risk).
-Area: Optimizing Data Modification
-Usage: Candidate list for VACUUM tuning and batch rewrite strategies.
+MySQL DBA Script: Dml Bloat Pressure
+Purpose: Provide MySQL DBA diagnostics for dml bloat pressure.
+Area: Dml Optimization
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-SELECT
-    schemaname AS schema_name,
-    relname AS table_name,
-    n_live_tup,
-    n_dead_tup,
-    round(100.0 * n_dead_tup / NULLIF(n_live_tup + n_dead_tup, 0), 2) AS dead_tuple_pct,
-    (n_tup_ins + n_tup_upd + n_tup_del) AS total_writes,
-    pg_size_pretty(pg_total_relation_size(relid)) AS total_size
-FROM pg_stat_user_tables
-WHERE n_dead_tup > 0
-ORDER BY dead_tuple_pct DESC NULLS LAST, total_writes DESC;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Dml Bloat Pressure') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name |    table_name    | n_live_tup | n_dead_tup | dead_tuple_pct | total_writes | total_size 
--- -------------+------------------+------------+------------+----------------+--------------+------------
---  public      | pgbench_branches |       2000 |         81 |           3.89 |      5334823 | 7048 kB
---  public      | pgbench_accounts |  200000029 |    4232485 |           2.07 |    205332823 | 30 GB
--- (2 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT table_schema, table_name, engine,
+       ROUND(data_free/1024/1024,2) AS free_mb,
+       ROUND((data_length+index_length)/1024/1024,2) AS total_mb,
+       ROUND(data_free / NULLIF(data_length + index_length + data_free,0) * 100,2) AS free_pct,
+       CONCAT('OPTIMIZE TABLE `', table_schema, '`.`', table_name, '`;') AS review_command
+FROM information_schema.tables
+WHERE table_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+  AND data_free > 0
+ORDER BY data_free DESC;

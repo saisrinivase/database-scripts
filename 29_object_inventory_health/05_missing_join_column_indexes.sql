@@ -1,87 +1,15 @@
 /*
-Purpose: Suggest indexes for likely join columns (id/key-style columns) under scan pressure.
-Area: Object Inventory and Health
-Usage: Heuristic-only; validate each candidate with EXPLAIN (ANALYZE, BUFFERS).
+MySQL DBA Script: Missing Join Column Indexes
+Purpose: Provide MySQL DBA diagnostics for missing join column indexes.
+Area: Object Inventory Health
+Usage: Run with the mysql client or MySQL Shell in SQL mode as a user with privileges to read information_schema, performance_schema, sys, and mysql metadata where referenced.
+Notes: Review findings before taking action. Some scripts require performance_schema consumers/instruments to be enabled.
 */
-WITH table_pressure AS (
-    SELECT
-        st.relid,
-        st.schemaname AS schema_name,
-        st.relname AS table_name,
-        st.seq_scan,
-        st.idx_scan,
-        st.seq_tup_read,
-        c.reltuples::bigint AS est_rows
-    FROM pg_stat_user_tables st
-    JOIN pg_class c ON c.oid = st.relid
-    WHERE c.reltuples >= 10000
-      AND st.seq_tup_read >= 100000
-      AND st.seq_scan >= st.idx_scan
-),
-joinish_columns AS (
-    SELECT
-        p.relid,
-        p.schema_name,
-        p.table_name,
-        a.attnum,
-        a.attname AS column_name,
-        p.est_rows,
-        p.seq_scan,
-        p.idx_scan,
-        p.seq_tup_read,
-        s.n_distinct
-    FROM table_pressure p
-    JOIN pg_attribute a
-      ON a.attrelid = p.relid
-     AND a.attnum > 0
-     AND NOT a.attisdropped
-    LEFT JOIN pg_stats s
-      ON s.schemaname = p.schema_name
-     AND s.tablename = p.table_name
-     AND s.attname = a.attname
-    WHERE a.attname ~* '(^id$|_id$|_key$|_code$)'
-),
-missing AS (
-    SELECT j.*
-    FROM joinish_columns j
-    WHERE NOT EXISTS (
-        SELECT 1
-        FROM pg_index i
-        WHERE i.indrelid = j.relid
-          AND i.indisvalid
-          AND i.indisready
-          AND (i.indkey::smallint[])[array_lower(i.indkey::smallint[], 1)] = j.attnum
-    )
-)
-SELECT
-    schema_name,
-    table_name,
-    column_name,
-    est_rows,
-    seq_scan,
-    idx_scan,
-    seq_tup_read,
-    n_distinct,
-    format(
-        'CREATE INDEX CONCURRENTLY %I ON %I.%I (%I);',
-        left('idx_' || table_name || '_' || column_name, 60),
-        schema_name,
-        table_name,
-        column_name
-    ) AS suggested_index_sql
-FROM missing
-ORDER BY seq_tup_read DESC, est_rows DESC, schema_name, table_name, column_name;
+/* MySQL client settings: run with mysql, MySQL Shell SQL mode, or a compatible client. */
+SELECT CONCAT('Running: Missing Join Column Indexes') AS script_name;
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---    schema_name    | table_name | column_name | est_rows | seq_scan | idx_scan | seq_tup_read | n_distinct |                                       suggested_index_sql                                        
--- ------------------+------------+-------------+----------+----------+----------+--------------+------------+--------------------------------------------------------------------------------------------------
---  migration_v2_lab | order_fact | account_id  |   300000 |       11 |        0 |      1200000 |   -0.14671 | CREATE INDEX CONCURRENTLY idx_order_fact_account_id ON migration_v2_lab.order_fact (account_id);
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
+SELECT object_schema, object_name, count_read, count_fetch, count_insert, count_update, count_delete
+FROM performance_schema.table_io_waits_summary_by_table
+WHERE object_schema NOT IN ('mysql','sys','performance_schema','information_schema')
+ORDER BY count_fetch DESC
+LIMIT 100;
