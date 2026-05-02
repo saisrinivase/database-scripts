@@ -2,7 +2,7 @@
 
 Plan capture, DBMS_XPLAN templates, and plan red-flag candidates.
 
-Scripts in this area: `4`.
+Scripts in this area: `8`.
 
 ## Usage
 
@@ -14,3 +14,7 @@ Run with SQL*Plus or SQLcl, for example: `sqlplus / as sysdba @17_execution_plan
 - `02_dbms_xplan_template.sql`
 - `03_generate_xplan_for_top_sql.sql`
 - `04_plan_red_flag_candidates.sql`
+- `05_display_awr_plan_by_sql_id.sql`
+- `06_plan_hash_change_history.sql`
+- `07_sql_plan_baseline_inventory.sql`
+- `08_sql_profile_inventory.sql`

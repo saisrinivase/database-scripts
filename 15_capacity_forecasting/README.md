@@ -2,7 +2,7 @@
 
 Capacity snapshot repository, capture scripts, and growth reports.
 
-Scripts in this area: `8`.
+Scripts in this area: `12`.
 
 ## Usage
 
@@ -18,3 +18,7 @@ Run with SQL*Plus or SQLcl, for example: `sqlplus / as sysdba @15_capacity_forec
 - `06_capture_redo_snapshot.sql`
 - `07_database_growth_report.sql`
 - `08_table_growth_report.sql`
+- `09_capture_tablespace_usage_snapshot.sql`
+- `10_tablespace_growth_report.sql`
+- `11_archive_growth_forecast.sql`
+- `12_segment_growth_report_awr.sql`

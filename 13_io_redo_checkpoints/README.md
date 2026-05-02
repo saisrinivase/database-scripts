@@ -2,7 +2,7 @@
 
 Datafile I/O, object I/O, redo, archiver, checkpoint, and temp pressure.
 
-Scripts in this area: `7`.
+Scripts in this area: `10`.
 
 ## Usage
 
@@ -17,3 +17,6 @@ Run with SQL*Plus or SQLcl, for example: `sqlplus / as sysdba @13_io_redo_checkp
 - `05_checkpoint_pressure_indicators.sql`
 - `06_temp_file_usage_by_database.sql`
 - `07_oracle_io_overview.sql`
+- `08_asm_diskgroup_usage.sql`
+- `09_datafile_io_latency.sql`
+- `10_temp_spill_by_session.sql`
