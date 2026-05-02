@@ -1,31 +1,27 @@
 /*
-Purpose: Show backend process distribution by backend_type.
-Area: Connection and Workload
-Usage: Distinguish client backends from maintenance/background workers.
+Oracle DBA Script: Backend Type Distribution
+Purpose: Provide Oracle DBA diagnostics for backend type distribution.
+Area: Connection Workload
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    backend_type,
-    count(*) AS backend_count
-FROM pg_stat_activity
-GROUP BY backend_type
-ORDER BY backend_count DESC, backend_type;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Backend Type Distribution
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---          backend_type         | backend_count 
--- ------------------------------+---------------
---  io worker                    |             3
---  autovacuum launcher          |             1
---  background writer            |             1
---  checkpointer                 |             1
---  client backend               |             1
---  logical replication launcher |             1
---  walwriter                    |             1
--- (7 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT inst_id, type, server, status, COUNT(*) AS session_count
+FROM gv$session
+GROUP BY inst_id, type, server, status
+ORDER BY session_count DESC;

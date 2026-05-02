@@ -1,39 +1,28 @@
 /*
-Purpose: Inventory full-text search building blocks (tsvector/tsquery related columns and indexes).
-Area: Complex Filtering and Search
-Usage: Use when evaluating search architecture.
+Oracle DBA Script: Full Text Search Inventory
+Purpose: Provide Oracle DBA diagnostics for full text search inventory.
+Area: Complex Filter Search
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    n.nspname AS schema_name,
-    c.relname AS table_name,
-    a.attname AS column_name,
-    pg_catalog.format_type(a.atttypid, a.atttypmod) AS data_type
-FROM pg_attribute a
-JOIN pg_class c
-    ON c.oid = a.attrelid
-JOIN pg_namespace n
-    ON n.oid = c.relnamespace
-WHERE c.relkind = 'r'
-  AND a.attnum > 0
-  AND NOT a.attisdropped
-  AND n.nspname !~ '^pg_'
-  AND n.nspname <> 'information_schema'
-  AND pg_catalog.format_type(a.atttypid, a.atttypmod) IN ('tsvector', 'tsquery')
-ORDER BY schema_name, table_name, column_name;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Full Text Search Inventory
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name | table_name | column_name | data_type 
--- -------------+------------+-------------+-----------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No rows matched in this environment at capture time.
--- - This can be expected when the related object/feature is not present or not in use.
--- SAMPLE_OUTPUT_END
+SELECT owner, index_name, table_owner, table_name, index_type, parameters, status
+FROM dba_indexes
+WHERE owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+  AND (index_type = 'DOMAIN' OR UPPER(parameters) LIKE '%CONTEXT%' OR UPPER(parameters) LIKE '%CTXCAT%')
+ORDER BY owner, index_name;

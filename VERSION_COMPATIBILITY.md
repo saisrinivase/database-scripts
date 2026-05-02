@@ -1,46 +1,51 @@
-# PostgreSQL Version Compatibility
+# Oracle Version Compatibility
 
-Purpose: Document compatibility expectations for PostgreSQL 15-18.
+This document applies to the `oracle` branch.
 
-## Summary
+## Script Areas
 
-- Target versions: `PostgreSQL 15, 16, 17, 18`.
-- Validated in this workspace: `PostgreSQL 18.0` (full run, all scripts passed).
-- Validation artifact: `_validation_runs/20260218_174311/report.md`.
-- Object inventory pack validation artifact: `29_object_inventory_health/samples_20260218_pgbench_test/summary.tsv`.
+- `00_environment`: Oracle instance, database, option, and catalog inventory. (3 scripts)
+- `01_database_size`: Database, tablespace, datafile, temp file, and segment size diagnostics. (3 scripts)
+- `02_table_storage`: Table storage, segment allocation, row counts, and storage attributes. (4 scripts)
+- `03_index_analysis`: Index storage, visibility, duplication, selectivity, and maintenance candidates. (4 scripts)
+- `04_lob_blob_storage`: LOB/BLOB storage, SecureFiles, BasicFiles, compression, deduplication, and top LOB segments. (4 scripts)
+- `05_partitioning`: Partitioned table, partition segment, indexing, and recommendation checks. (7 scripts)
+- `06_activity_locks`: Active sessions, blockers, wait events, locks, and long-running transactions. (4 scripts)
+- `07_segment_space_reclaim`: Segment space reclaim, stale statistics, undo retention, and Segment Advisor signals. (5 scripts)
+- `08_replication_ha`: Data Guard, archivelog, redo generation, standby apply, and high availability posture. (4 scripts)
+- `09_security_roles`: Users, roles, system privileges, object grants, profiles, and exposure checks. (4 scripts)
+- `10_maintenance_monitoring`: DB writer, cache, checkpoint, top SQL, parameter drift, and capacity monitoring. (5 scripts)
+- `11_performance_tuning`: Top SQL, temp-heavy SQL, I/O-heavy SQL, parameter tuning, and PL/SQL hotspots. (6 scripts)
+- `12_planner_statistics`: Optimizer statistics quality, stale objects, histogram and extension inventory, and optimizer parameters. (6 scripts)
+- `13_io_redo_checkpoints`: Datafile I/O, object I/O, redo, archiver, checkpoint, and temp pressure. (7 scripts)
+- `14_connection_workload`: Session distribution, idle sessions, connection capacity, and distributed transaction status. (6 scripts)
+- `15_capacity_forecasting`: Capacity snapshot repository, capture scripts, and growth reports. (8 scripts)
+- `16_internals_deep_dive`: Undo, extents, segment internals, dependencies, LOB internals, and retention profiles. (6 scripts)
+- `17_execution_plans`: Plan capture, DBMS_XPLAN templates, and plan red-flag candidates. (4 scripts)
+- `18_long_queries_full_scans`: Long-running SQL and full scan workload diagnostics. (4 scripts)
+- `19_dml_optimization`: Write-heavy tables, row movement, index support for foreign keys, and DML pressure. (4 scripts)
+- `20_design_matters`: Schema design anti-patterns such as missing primary keys, wide tables, and high-null columns. (4 scripts)
+- `21_configuration_parameters`: Oracle initialization parameter baselines for performance, redo, stats, and connections. (4 scripts)
+- `22_application_orm_performance`: Application and ORM query patterns, select-star risk, chatty SQL, and idle transaction behavior. (4 scripts)
+- `23_functions_dynamic_sql`: PL/SQL procedure/function execution, dynamic SQL, security definer analogs, and triggers. (4 scripts)
+- `24_complex_filter_search`: LIKE, JSON, XML, Oracle Text, spatial, and domain index diagnostics. (4 scripts)
+- `25_oltp_olap_goals`: Workload classification and OLTP/OLAP pressure indicators. (4 scripts)
+- `26_physical_cloud_diagnostics`: Platform fingerprint, storage, wait, checkpoint, and managed-service signals. (4 scripts)
+- `27_high_speed_tuning`: Fast triage dashboards and action queues for bottleneck diagnosis. (6 scripts)
+- `27_oracle_health_validation`: Oracle health reports, sanity gates, and optional lab issue scripts. (9 scripts)
+- `28_sql_resource_attribution`: SQL resource attribution by SQL ID, service, parsing schema, and infrastructure tier. (4 scripts)
+- `29_object_inventory_health`: Deep object inventory and health checks for tables, indexes, constraints, PL/SQL, partitions, grants, DB links, and synonyms. (18 scripts)
+- `30_backup_restore_pitr_dr`: RMAN, archivelog, restore point, PITR, and Data Guard evidence. (5 scripts)
+- `31_logging_error_signatures`: ADR, alert log, trace, error signatures, slow SQL, lock waits, and deadlock indicators. (4 scripts)
+- `32_upgrade_patch_readiness`: Version, component, SQL patch, invalid object, NLS, and post-upgrade regression checks. (6 scripts)
+- `33_db_writer_memory_pressure`: DB writer, checkpoint, redo writer, stats jobs, parallel workers, SGA/PGA, and temp spill pressure. (5 scripts)
+- `34_consistency_integrity_checks`: Invalid objects, corruption views, LOB dictionary signals, and validate-structure commands. (5 scripts)
+- `35_pooler_proxy_diagnostics`: Connection saturation, session distribution, cursor cache, shared server, and proxy/client signals. (5 scripts)
+- `36_cloud_provider_signals`: Managed-service fingerprints, parameter drift, replica lag/failover, and incident-window evidence. (5 scripts)
+- `37_object_lifecycle_capacity`: Object lifecycle repository, DDL trigger, snapshots, advisory views, and capacity reports. (12 scripts)
 
-## Guarded Cross-Version Scripts
+## Notes
 
-These scripts auto-switch logic with `psql` meta commands (`\gset`, `\if`) for view/column differences:
-
-- `07_vacuum_bloat/05_vacuum_progress.sql`
-  - Uses `max_dead_tuples/num_dead_tuples` on 15/16.
-  - Uses `max_dead_tuple_bytes/dead_tuple_bytes/num_dead_item_ids` on 17/18.
-
-- `10_maintenance_monitoring/01_bgwriter_checkpoint_stats.sql`
-- `13_io_wal_checkpoints/05_checkpoint_pressure_indicators.sql`
-- `26_physical_cloud_diagnostics/03_checkpoint_fsync_pressure.sql`
-- `27_high_speed_tuning/01_bottleneck_overview_dashboard.sql`
-  - Uses `pg_stat_bgwriter` checkpoint columns on 15/16.
-  - Uses `pg_stat_checkpointer` + `pg_stat_bgwriter` split metrics on 17/18.
-
-- `13_io_wal_checkpoints/07_pg_stat_io_overview_pg16_plus.sql`
-  - Runs full query on 16+.
-  - Returns informational message on 15.
-
-- `29_object_inventory_health/18_object_query_hotspots_pgss.sql`
-  - Uses `psql` guard logic.
-  - Runs hotspot query when `pg_stat_statements` is installed.
-  - Returns guidance row when extension is missing.
-
-## Feature/Extension Requirements
-
-- `pg_stat_statements` required for query-level performance and resource attribution scripts.
-- `pg_stat_wal` scripts require PostgreSQL 14+ (covered by 15-18 target).
-- `pg_stat_io` requires PostgreSQL 16+.
-- `pg_stat_progress_copy` is used in `29_object_inventory_health/13_insert_copy_activity.sql` (available in 15-18 target range).
-
-## Important Execution Note
-
-- Version-guarded scripts rely on `psql` meta commands.
-- Recommended execution path: `psql -f <script.sql>`.
+- Designed around Oracle Database 19c+ catalog and dynamic performance views.
+- `DBA_HIST_*`, ASH, SQL Monitor, and similar history views may require Diagnostics Pack licensing.
+- Use SQL*Plus or SQLcl for substitution variables and `DBMS_XPLAN` output.

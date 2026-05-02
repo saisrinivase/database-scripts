@@ -1,55 +1,27 @@
 /*
-Purpose: List configuration parameters that differ from built-in defaults.
-Area: Maintenance and Monitoring
-Usage: Good baseline for environment drift checks.
+Oracle DBA Script: Non Default Config
+Purpose: Provide Oracle DBA diagnostics for non default config.
+Area: Maintenance Monitoring
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    name,
-    setting,
-    unit,
-    source,
-    boot_val,
-    reset_val
-FROM pg_settings
-WHERE source <> 'default'
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
+
+PROMPT Non Default Config
+
+SELECT name AS parameter_name, value, isdefault, ismodified, issys_modifiable, description
+FROM v$parameter
+WHERE isdefault = 'FALSE' OR ismodified <> 'FALSE'
 ORDER BY name;
-
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---                name                |                     setting                     | unit |       source       |     boot_val      |                    reset_val                    
--- -----------------------------------+-------------------------------------------------+------+--------------------+-------------------+-------------------------------------------------
---  application_name                  | psql                                            |      | client             |                   | psql
---  autovacuum_worker_slots           | 16                                              |      | configuration file | 16                | 16
---  config_file                       | /opt/homebrew/var/postgresql@18/postgresql.conf |      | override           |                   | /opt/homebrew/var/postgresql@18/postgresql.conf
---  data_directory                    | /opt/homebrew/var/postgresql@18                 |      | override           |                   | /opt/homebrew/var/postgresql@18
---  DateStyle                         | ISO, MDY                                        |      | configuration file | ISO, MDY          | ISO, MDY
---  default_text_search_config        | pg_catalog.english                              |      | configuration file | pg_catalog.simple | pg_catalog.english
---  dynamic_shared_memory_type        | posix                                           |      | configuration file | posix             | posix
---  full_page_writes                  | off                                             |      | configuration file | on                | off
---  hba_file                          | /opt/homebrew/var/postgresql@18/pg_hba.conf     |      | override           |                   | /opt/homebrew/var/postgresql@18/pg_hba.conf
---  ident_file                        | /opt/homebrew/var/postgresql@18/pg_ident.conf   |      | override           |                   | /opt/homebrew/var/postgresql@18/pg_ident.conf
---  lc_messages                       | en_US.UTF-8                                     |      | configuration file |                   | en_US.UTF-8
---  lc_monetary                       | en_US.UTF-8                                     |      | configuration file | C                 | en_US.UTF-8
---  lc_numeric                        | en_US.UTF-8                                     |      | configuration file | C                 | en_US.UTF-8
---  lc_time                           | en_US.UTF-8                                     |      | configuration file | C                 | en_US.UTF-8
---  log_timezone                      | America/New_York                                |      | configuration file | GMT               | America/New_York
---  max_connections                   | 100                                             |      | configuration file | 100               | 100
---  max_wal_size                      | 1024                                            | MB   | configuration file | 1024              | 1024
---  min_wal_size                      | 80                                              | MB   | configuration file | 80                | 80
---  pg_stat_statements.max            | 10000                                           |      | configuration file | 5000              | 10000
---  pg_stat_statements.track          | all                                             |      | configuration file | top               | all
---  pg_stat_statements.track_planning | on                                              |      | configuration file | off               | on
---  shared_buffers                    | 16384                                           | 8kB  | configuration file | 16384             | 16384
---  shared_preload_libraries          | pg_stat_statements                              |      | configuration file |                   | pg_stat_statements
---  TimeZone                          | America/New_York                                |      | configuration file | GMT               | America/New_York
---  transaction_deferrable            | off                                             |      | override           | off               | off
---  transaction_isolation             | read committed                                  |      | override           | read committed    | read committed
---  transaction_read_only             | off                                             |      | override           | off               | off
--- (27 rows)
--- 
--- SAMPLE_OUTPUT_END

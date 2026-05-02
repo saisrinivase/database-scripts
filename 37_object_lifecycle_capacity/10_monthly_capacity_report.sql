@@ -1,60 +1,27 @@
 /*
-Purpose: Produce a monthly DBA report for database growth, object growth, and action queue.
-Area: Object Lifecycle and Capacity Monitoring
-Usage: Run monthly after regular snapshots are collected.
+Oracle DBA Script: Monthly Capacity Report
+Purpose: Provide Oracle DBA diagnostics for monthly capacity report.
+Area: Object Lifecycle Capacity
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    month_start,
-    database_name,
-    size_pretty,
-    growth_pretty,
-    growth_pct
-FROM dba_metrics.vw_database_growth_monthly
-ORDER BY month_start DESC
-LIMIT 12;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
-SELECT
-    month_start,
-    schema_name,
-    object_name,
-    object_type,
-    total_size_pretty,
-    growth_pretty,
-    growth_pct
-FROM dba_metrics.vw_object_growth_monthly
-WHERE growth_bytes IS NOT NULL
-ORDER BY month_start DESC, growth_bytes DESC
-LIMIT 30;
+PROMPT Monthly Capacity Report
 
-SELECT
-    finding_type,
-    severity,
-    schema_name,
-    table_name,
-    object_name,
-    pg_size_pretty(metric_bytes) AS metric_size,
-    metric_value,
-    lifecycle_status,
-    recommendation
-FROM dba_metrics.vw_capacity_action_queue
-LIMIT 40;
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_37_verify_20260220_safedrop_final
---
---  month_start | database_name | size_pretty | growth_pretty | growth_pct 
--- -------------+---------------+-------------+---------------+------------
---  2026-02-01  | pgbench_test  | 35 GB       | 0 bytes       |           
--- (1 row)
--- 
---  month_start | schema_name | object_name | object_type | total_size_pretty | growth_pretty | growth_pct 
--- -------------+-------------+-------------+-------------+-------------------+---------------+------------
--- (0 rows)
--- 
---  finding_type | severity | schema_name | table_name | object_name | metric_size | metric_value | lifecycle_status | recommendation 
--- --------------+----------+-------------+------------+-------------+-------------+--------------+------------------+----------------
--- (0 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT owner, object_type, snap_day, ROUND(SUM(max_bytes)/1024/1024,2) AS total_mb
+FROM dba_object_growth_v
+GROUP BY owner, object_type, snap_day
+ORDER BY snap_day DESC, total_mb DESC;

@@ -1,81 +1,28 @@
 /*
-Purpose: Capture active lock-wait chains and deadlock-prone signatures from current activity.
-Area: Logging and Error Signatures
-Usage: Run during incidents; repeat snapshots to see evolving blockers.
+Oracle DBA Script: Lock Wait Deadlock Signatures
+Purpose: Provide Oracle DBA diagnostics for lock wait deadlock signatures.
+Area: Logging Error Signatures
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-WITH waiting AS (
-    SELECT
-        a.pid AS blocked_pid,
-        a.usename AS blocked_user,
-        a.application_name AS blocked_app,
-        a.state AS blocked_state,
-        a.wait_event_type,
-        a.wait_event,
-        now() - a.query_start AS blocked_query_age,
-        pg_blocking_pids(a.pid) AS blocker_pids,
-        left(a.query, 160) AS blocked_query
-    FROM pg_stat_activity a
-    WHERE a.wait_event_type = 'Lock'
-      AND a.pid <> pg_backend_pid()
-),
-expanded AS (
-    SELECT
-        w.blocked_pid,
-        w.blocked_user,
-        w.blocked_app,
-        w.blocked_state,
-        w.wait_event_type,
-        w.wait_event,
-        w.blocked_query_age,
-        unnest(w.blocker_pids) AS blocking_pid,
-        w.blocked_query
-    FROM waiting w
-),
-blocking AS (
-    SELECT
-        e.blocked_pid,
-        e.blocked_user,
-        e.blocked_app,
-        e.blocked_state,
-        e.wait_event_type,
-        e.wait_event,
-        e.blocked_query_age,
-        e.blocking_pid,
-        b.usename AS blocking_user,
-        b.application_name AS blocking_app,
-        b.state AS blocking_state,
-        now() - b.query_start AS blocking_query_age,
-        left(b.query, 160) AS blocking_query,
-        e.blocked_query
-    FROM expanded e
-    LEFT JOIN pg_stat_activity b
-      ON b.pid = e.blocking_pid
-)
-SELECT
-    blocked_pid,
-    blocked_user,
-    blocked_app,
-    blocked_state,
-    wait_event_type,
-    wait_event,
-    round(extract(epoch FROM blocked_query_age)::numeric, 2) AS blocked_query_age_sec,
-    blocking_pid,
-    blocking_user,
-    blocking_app,
-    blocking_state,
-    round(extract(epoch FROM blocking_query_age)::numeric, 2) AS blocking_query_age_sec,
-    blocked_query,
-    blocking_query
-FROM blocking
-ORDER BY blocked_query_age DESC, blocked_pid;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Lock Wait Deadlock Signatures
 
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_new_areas_20260219_refresh
---
---  blocked_pid | blocked_user | blocked_app | blocked_state | wait_event_type | wait_event | blocked_query_age_sec | blocking_pid | blocking_user | blocking_app | blocking_state | blocking_query_age_sec | blocked_query | blocking_query 
--- -------------+--------------+-------------+---------------+-----------------+------------+-----------------------+--------------+---------------+--------------+----------------+------------------------+---------------+----------------
--- (0 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT inst_id, sid, serial# AS serial_num, username, event, seconds_in_wait, blocking_session, sql_id
+FROM gv$session
+WHERE wait_class = 'Application'
+   OR event LIKE 'enq:%'
+ORDER BY seconds_in_wait DESC;

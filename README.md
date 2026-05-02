@@ -1,88 +1,72 @@
-# saisrinivase - PostgreSQL Administration Scripts (360-Degree)
+# saisrinivase - Oracle Database Administration Scripts (360-Degree)
 
-Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
+Purpose: Central, area-based SQL script repository for Oracle Database DBAs and engineers.
 
 ## Quick Start
 
-1. Pick an area folder based on your issue (size, locks, performance, migration, internals, etc.).
-2. Run a script with `psql -d <database> -f <area>/<script>.sql`.
-3. Compare your result with the embedded sample output at the bottom of the same script.
-4. Use coverage maps (`PERFORMANCE_TUNING_COVERAGE.md`, `OBJECT_COVERAGE_MATRIX.md`, `INTERNALS_COVERAGE_MATRIX.md`) for cross-area troubleshooting.
+1. Switch to this branch: `git checkout oracle`.
+2. Pick an area folder based on the issue you are troubleshooting.
+3. Run a script with SQL*Plus or SQLcl, for example: `sqlplus / as sysdba @00_environment/01_server_instance_overview.sql`.
+4. Most scripts are read-only diagnostics. DDL/lab scripts include clear `CREATE` or `DBMS_SCHEDULER` statements and should be reviewed before execution.
 
 ## Scope
 
-- Coverage: `38` operational areas.
-- Current SQL scripts: `198`.
-- Script style: every SQL file includes `Purpose`, `Area`, and `Usage` headers.
-- Goal: any DBA/engineer can open an area and run purpose-specific scripts quickly.
+- Coverage: `39` operational areas.
+- Current Oracle SQL scripts: `210`.
+- Script style: every SQL file includes Purpose, Area, Usage, and Notes headers.
+- Primary views used: `DBA_*`, `ALL_*`, `V$*`, `GV$*`, `DBA_HIST_*`, and Oracle built-in packages such as `DBMS_XPLAN`, `DBMS_STATS`, and `DBMS_SCHEDULER`.
 
 ## Area Index
 
-- `00_environment`: instance fingerprint, extension baseline, catalog object inventory.
-- `01_database_size`: database/tablespace size and top-level storage breakdown.
-- `02_table_storage`: table-level storage distribution and growth baselines.
-- `03_index_analysis`: index size/use, unused and duplicate index candidates.
-- `04_toast_lob_blob`: TOAST, LOB/BLOB footprint and heavy-object detection.
-- `05_partitioning`: partition inventory, distribution, recommendation heuristics, SME scorecard, target-table advisor, 5GB+ lab generator.
-- `06_activity_locks`: active sessions, blockers, waits, long transactions.
-- `07_vacuum_bloat`: bloat heuristics, freeze age, autovacuum visibility.
-- `08_replication_ha`: replication lag, slots, standby replay, WAL rates.
-- `09_security_roles`: role privilege and object-access auditing.
-- `10_maintenance_monitoring`: checkpoints, cache ratio, config drift, connection capacity.
-- `11_performance_tuning`: query-level hotspots and tuning-related settings.
-- `12_planner_statistics`: planner stats quality, analyze drift, extended stats candidates.
-- `13_io_wal_checkpoints`: read/write pressure, temp usage, WAL archiver/checkpoint stress.
-- `14_connection_workload`: connection behavior, limits, backend type, transaction hygiene.
-- `15_capacity_forecasting`: snapshot repository, capture scripts, growth reports.
-- `16_internals_deep_dive`: XID/multixact aging, relfilenodes, dependency and fork internals.
-- `17_execution_plans`: plan diagnostics, EXPLAIN templates, plan red-flag candidates.
-- `18_long_queries_full_scans`: long query tracking and full-scan hotspots.
-- `19_dml_optimization`: write amplification, HOT update ratio, FK index support.
-- `20_design_matters`: schema design anti-pattern diagnostics.
-- `21_configuration_parameters`: performance-related configuration baselines.
-- `22_application_orm_performance`: ORM and application-side performance pitfalls.
-- `23_functions_dynamic_sql`: function and dynamic SQL performance/security review.
-- `24_complex_filter_search`: LIKE/ILIKE, JSON/array, GIN/GiST/BRIN and FTS diagnostics.
-- `25_oltp_olap_goals`: workload goal alignment and classification.
-- `26_physical_cloud_diagnostics`: physical/cloud root-cause indicators.
-- `27_high_speed_tuning`: fast bottleneck triage, parameter advisor, missing-index detection.
-- `27_migration_validation`: Oracle-to-PostgreSQL migration health checks and issue simulation/fix flows.
-- `28_pgss_resource_attribution`: pg_stat_statements-based CPU/IO/memory-spill percentage attribution.
-- `29_object_inventory_health`: deep diagnostics for TABLE/VIEW/MVIEW/TABLESPACE/SEQUENCE/INDEX/TRIGGER/GRANT/FUNCTION/PROCEDURE/PARTITION/TYPE/FDW/INSERT-COPY, plus PACKAGE/SYNONYM mapping and KETTLE signals.
-- `30_backup_restore_pitr_dr`: backup/PITR checks, archive readiness, restore-to-timestamp quick test, DR evidence.
-- `31_logging_error_signatures`: logging sanity, error-signature indicators, slow-query/log correlation.
-- `32_upgrade_patch_readiness`: pre-upgrade gates, extension drift/dependencies, collation mismatch, post-upgrade watchlists.
-- `33_bgwriter_memory_pressure`: checkpointer/bgwriter, WAL writer/archiver, autovacuum, parallel workers, spill pressure triage.
-- `34_consistency_integrity_checks`: invalid object checks, checksum posture, TOAST/catalog anomaly signals, amcheck readiness.
-- `35_pooler_proxy_diagnostics`: saturation/churn indicators, prepared statement risk, transaction pooling incompatibility, proxy inventory.
-- `36_cloud_provider_signals`: optional managed-service fingerprint, parameter drift, replica lag/failover, cloud incident checklist.
+- `00_environment` (3 scripts): Oracle instance, database, option, and catalog inventory.
+- `01_database_size` (3 scripts): Database, tablespace, datafile, temp file, and segment size diagnostics.
+- `02_table_storage` (4 scripts): Table storage, segment allocation, row counts, and storage attributes.
+- `03_index_analysis` (4 scripts): Index storage, visibility, duplication, selectivity, and maintenance candidates.
+- `04_lob_blob_storage` (4 scripts): LOB/BLOB storage, SecureFiles, BasicFiles, compression, deduplication, and top LOB segments.
+- `05_partitioning` (7 scripts): Partitioned table, partition segment, indexing, and recommendation checks.
+- `06_activity_locks` (4 scripts): Active sessions, blockers, wait events, locks, and long-running transactions.
+- `07_segment_space_reclaim` (5 scripts): Segment space reclaim, stale statistics, undo retention, and Segment Advisor signals.
+- `08_replication_ha` (4 scripts): Data Guard, archivelog, redo generation, standby apply, and high availability posture.
+- `09_security_roles` (4 scripts): Users, roles, system privileges, object grants, profiles, and exposure checks.
+- `10_maintenance_monitoring` (5 scripts): DB writer, cache, checkpoint, top SQL, parameter drift, and capacity monitoring.
+- `11_performance_tuning` (6 scripts): Top SQL, temp-heavy SQL, I/O-heavy SQL, parameter tuning, and PL/SQL hotspots.
+- `12_planner_statistics` (6 scripts): Optimizer statistics quality, stale objects, histogram and extension inventory, and optimizer parameters.
+- `13_io_redo_checkpoints` (7 scripts): Datafile I/O, object I/O, redo, archiver, checkpoint, and temp pressure.
+- `14_connection_workload` (6 scripts): Session distribution, idle sessions, connection capacity, and distributed transaction status.
+- `15_capacity_forecasting` (8 scripts): Capacity snapshot repository, capture scripts, and growth reports.
+- `16_internals_deep_dive` (6 scripts): Undo, extents, segment internals, dependencies, LOB internals, and retention profiles.
+- `17_execution_plans` (4 scripts): Plan capture, DBMS_XPLAN templates, and plan red-flag candidates.
+- `18_long_queries_full_scans` (4 scripts): Long-running SQL and full scan workload diagnostics.
+- `19_dml_optimization` (4 scripts): Write-heavy tables, row movement, index support for foreign keys, and DML pressure.
+- `20_design_matters` (4 scripts): Schema design anti-patterns such as missing primary keys, wide tables, and high-null columns.
+- `21_configuration_parameters` (4 scripts): Oracle initialization parameter baselines for performance, redo, stats, and connections.
+- `22_application_orm_performance` (4 scripts): Application and ORM query patterns, select-star risk, chatty SQL, and idle transaction behavior.
+- `23_functions_dynamic_sql` (4 scripts): PL/SQL procedure/function execution, dynamic SQL, security definer analogs, and triggers.
+- `24_complex_filter_search` (4 scripts): LIKE, JSON, XML, Oracle Text, spatial, and domain index diagnostics.
+- `25_oltp_olap_goals` (4 scripts): Workload classification and OLTP/OLAP pressure indicators.
+- `26_physical_cloud_diagnostics` (4 scripts): Platform fingerprint, storage, wait, checkpoint, and managed-service signals.
+- `27_high_speed_tuning` (6 scripts): Fast triage dashboards and action queues for bottleneck diagnosis.
+- `27_oracle_health_validation` (9 scripts): Oracle health reports, sanity gates, and optional lab issue scripts.
+- `28_sql_resource_attribution` (4 scripts): SQL resource attribution by SQL ID, service, parsing schema, and infrastructure tier.
+- `29_object_inventory_health` (18 scripts): Deep object inventory and health checks for tables, indexes, constraints, PL/SQL, partitions, grants, DB links, and synonyms.
+- `30_backup_restore_pitr_dr` (5 scripts): RMAN, archivelog, restore point, PITR, and Data Guard evidence.
+- `31_logging_error_signatures` (4 scripts): ADR, alert log, trace, error signatures, slow SQL, lock waits, and deadlock indicators.
+- `32_upgrade_patch_readiness` (6 scripts): Version, component, SQL patch, invalid object, NLS, and post-upgrade regression checks.
+- `33_db_writer_memory_pressure` (5 scripts): DB writer, checkpoint, redo writer, stats jobs, parallel workers, SGA/PGA, and temp spill pressure.
+- `34_consistency_integrity_checks` (5 scripts): Invalid objects, corruption views, LOB dictionary signals, and validate-structure commands.
+- `35_pooler_proxy_diagnostics` (5 scripts): Connection saturation, session distribution, cursor cache, shared server, and proxy/client signals.
+- `36_cloud_provider_signals` (5 scripts): Managed-service fingerprints, parameter drift, replica lag/failover, and incident-window evidence.
+- `37_object_lifecycle_capacity` (12 scripts): Object lifecycle repository, DDL trigger, snapshots, advisory views, and capacity reports.
 
-Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionally retained for backward compatibility.
+## Privileges
 
-## Coverage Maps
-
-- Performance topic map: `PERFORMANCE_TUNING_COVERAGE.md`
-- Object topic map: `OBJECT_COVERAGE_MATRIX.md`
-- Internals topic map: `INTERNALS_COVERAGE_MATRIX.md`
-- Fast triage order: `27_high_speed_tuning/README.md`
-- Version compatibility details: `VERSION_COMPATIBILITY.md`
-
-## Sample Output Convention
-
-- Every SQL script includes embedded sample output at the bottom.
-- Markers: `-- SAMPLE_OUTPUT_BEGIN` and `-- SAMPLE_OUTPUT_END`.
-- Samples are for quick understanding; values vary by environment and runtime state.
-- Historical full validation outputs are retained in `_validation_runs/`.
+- Best experience: run as a DBA account or an account with `SELECT_CATALOG_ROLE` plus access to dynamic performance views.
+- RAC-aware scripts use `GV$` views where useful.
+- AWR/ASH/SQL history scripts may require the Oracle Diagnostics Pack license. Confirm licensing before using those views in production.
 
 ## Operational Notes
 
-- Candidate scripts (index drop, partitioning, extended statistics, etc.) are advisory; review plans and workload before changes.
-- Target support: PostgreSQL `15` through `18`.
-- Current validated execution in this workspace: PostgreSQL `18.0`.
-- Some scripts use `psql` guards (`\\if`, `\\gset`) to support differences between `15/16` and `17/18` views/columns.
-Extension/feature dependencies:
-- `pg_stat_statements` for statement-level tuning scripts.
-- `pg_stat_wal` (PostgreSQL 14+) for WAL counter scripts.
-- `pg_stat_io` (PostgreSQL 16+) for detailed I/O scripts.
-- Access to `pg_largeobject` for large object analysis.
-- Capacity area (`15_capacity_forecasting`) stores snapshots in schema `dba_metrics`; run repository/create script first.
+- Scripts are advisory diagnostics unless they contain explicit DDL or PL/SQL blocks.
+- Review generated commands such as `ANALYZE TABLE ... VALIDATE STRUCTURE` before running them.
+- Capacity and lifecycle repository scripts create local DBA-owned tables/views only when you run those setup scripts.
+- Target baseline: Oracle Database 19c and newer, with many scripts also useful on 12c/18c depending on view availability.

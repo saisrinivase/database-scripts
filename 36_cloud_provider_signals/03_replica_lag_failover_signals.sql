@@ -1,53 +1,26 @@
 /*
-Purpose: Provide portable failover and replica-lag signals for managed or self-managed platforms.
+Oracle DBA Script: Replica Lag Failover Signals
+Purpose: Provide Oracle DBA diagnostics for replica lag failover signals.
 Area: Cloud Provider Signals
-Usage: Run on primary and standby; compare role-specific output.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT (pg_is_in_recovery()) AS is_standby \gset
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
-\if :is_standby
-SELECT
-    'standby' AS node_role,
-    pg_postmaster_start_time() AS postmaster_start_time,
-    pg_last_wal_receive_lsn() AS last_received_lsn,
-    pg_last_wal_replay_lsn() AS last_replayed_lsn,
-    pg_wal_lsn_diff(pg_last_wal_receive_lsn(), pg_last_wal_replay_lsn()) AS replay_gap_bytes,
-    pg_last_xact_replay_timestamp() AS last_replay_timestamp,
-    round(extract(epoch FROM (clock_timestamp() - pg_last_xact_replay_timestamp()))::numeric, 2) AS replay_delay_seconds,
-    CASE
-        WHEN pg_last_xact_replay_timestamp() IS NULL THEN 'NO_REPLAY_SIGNAL'
-        WHEN clock_timestamp() - pg_last_xact_replay_timestamp() > interval '60 seconds' THEN 'LAG_RISK'
-        ELSE 'HEALTHY_REPLAY'
-    END AS lag_status
-;
-\else
-SELECT
-    'primary' AS node_role,
-    pg_postmaster_start_time() AS postmaster_start_time,
-    application_name,
-    client_addr,
-    state,
-    sync_state,
-    sent_lsn,
-    replay_lsn,
-    pg_wal_lsn_diff(sent_lsn, replay_lsn) AS send_replay_gap_bytes,
-    coalesce(extract(epoch FROM replay_lag), 0)::numeric(18,2) AS replay_lag_seconds,
-    CASE
-        WHEN state <> 'streaming' THEN 'REPLICA_NOT_STREAMING'
-        WHEN coalesce(extract(epoch FROM replay_lag), 0) > 60 THEN 'LAG_RISK'
-        ELSE 'HEALTHY_STREAMING'
-    END AS lag_status
-FROM pg_stat_replication
-ORDER BY replay_lag_seconds DESC NULLS LAST, send_replay_gap_bytes DESC NULLS LAST;
-\endif
+PROMPT Replica Lag Failover Signals
 
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_new_areas_20260219_refresh
---
---  node_role | postmaster_start_time | application_name | client_addr | state | sync_state | sent_lsn | replay_lsn | send_replay_gap_bytes | replay_lag_seconds | lag_status 
--- -----------+-----------------------+------------------+-------------+-------+------------+----------+------------+-----------------------+--------------------+------------
--- (0 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT name, value, unit, time_computed, datum_time
+FROM v$dataguard_stats
+ORDER BY name;

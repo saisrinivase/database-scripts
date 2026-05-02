@@ -1,53 +1,32 @@
 /*
-Purpose: Identify tables missing primary keys and generate starter DDL suggestions.
-Area: Object Inventory and Health
-Usage: Review result before adding PKs on production tables with existing duplicate/null values.
+Oracle DBA Script: Tables Missing Primary Key
+Purpose: Provide Oracle DBA diagnostics for tables missing primary key.
+Area: Object Inventory Health
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-WITH candidates AS (
-    SELECT
-        n.nspname AS schema_name,
-        c.relname AS table_name,
-        c.oid AS relid,
-        c.reltuples::bigint AS est_rows,
-        pg_total_relation_size(c.oid) AS total_bytes
-    FROM pg_class c
-    JOIN pg_namespace n ON n.oid = c.relnamespace
-    LEFT JOIN pg_constraint p
-        ON p.conrelid = c.oid
-       AND p.contype = 'p'
-    WHERE c.relkind = 'r'
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-      AND p.oid IS NULL
-)
-SELECT
-    schema_name,
-    table_name,
-    est_rows,
-    pg_size_pretty(total_bytes) AS total_size,
-    format(
-        'ALTER TABLE %I.%I ADD COLUMN id bigserial PRIMARY KEY;',
-        schema_name,
-        table_name
-    ) AS starter_pk_sql
-FROM candidates
-ORDER BY total_bytes DESC, schema_name, table_name;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Tables Missing Primary Key
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name |       table_name        | est_rows | total_size |                                    starter_pk_sql                                    
--- -------------+-------------------------+----------+------------+--------------------------------------------------------------------------------------
---  public      | pgbench_history         |  5331130 | 270 MB     | ALTER TABLE public.pgbench_history ADD COLUMN id bigserial PRIMARY KEY;
---  dba_metrics | connection_snapshots    |       -1 | 16 kB      | ALTER TABLE dba_metrics.connection_snapshots ADD COLUMN id bigserial PRIMARY KEY;
---  dba_metrics | database_size_snapshots |       -1 | 16 kB      | ALTER TABLE dba_metrics.database_size_snapshots ADD COLUMN id bigserial PRIMARY KEY;
---  dba_metrics | index_size_snapshots    |       -1 | 16 kB      | ALTER TABLE dba_metrics.index_size_snapshots ADD COLUMN id bigserial PRIMARY KEY;
---  dba_metrics | table_size_snapshots    |       -1 | 16 kB      | ALTER TABLE dba_metrics.table_size_snapshots ADD COLUMN id bigserial PRIMARY KEY;
---  dba_metrics | wal_snapshots           |       -1 | 16 kB      | ALTER TABLE dba_metrics.wal_snapshots ADD COLUMN id bigserial PRIMARY KEY;
--- (6 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT t.owner, t.table_name, t.num_rows, t.partitioned, t.iot_type
+FROM dba_tables t
+WHERE t.owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+  AND t.temporary = 'N'
+  AND NOT EXISTS (
+      SELECT 1 FROM dba_constraints c
+      WHERE c.owner = t.owner AND c.table_name = t.table_name AND c.constraint_type = 'P'
+  )
+ORDER BY t.num_rows DESC NULLS LAST;

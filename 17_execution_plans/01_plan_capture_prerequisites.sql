@@ -1,44 +1,27 @@
 /*
-Purpose: Verify settings required for reliable plan analysis and plan-related diagnostics.
+Oracle DBA Script: Plan Capture Prerequisites
+Purpose: Provide Oracle DBA diagnostics for plan capture prerequisites.
 Area: Execution Plans
-Usage: Run before plan troubleshooting; check values against standards.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    name,
-    setting,
-    unit,
-    source,
-    boot_val,
-    reset_val
-FROM pg_settings
-WHERE name IN (
-    'shared_preload_libraries',
-    'compute_query_id',
-    'track_io_timing',
-    'track_activity_query_size',
-    'jit',
-    'log_min_duration_statement',
-    'plan_cache_mode'
-)
-ORDER BY name;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Plan Capture Prerequisites
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---             name            |      setting       | unit |       source       | boot_val |     reset_val      
--- ----------------------------+--------------------+------+--------------------+----------+--------------------
---  compute_query_id           | auto               |      | default            | auto     | auto
---  jit                        | on                 |      | default            | on       | on
---  log_min_duration_statement | -1                 | ms   | default            | -1       | -1
---  plan_cache_mode            | auto               |      | default            | auto     | auto
---  shared_preload_libraries   | pg_stat_statements |      | configuration file |          | pg_stat_statements
---  track_activity_query_size  | 1024               | B    | default            | 1024     | 1024
---  track_io_timing            | off                |      | default            | off      | off
--- (7 rows)
--- 
--- SAMPLE_OUTPUT_END
-
+SELECT owner, object_name, object_type, status
+FROM dba_objects
+WHERE object_name IN ('PLAN_TABLE','DBMS_XPLAN')
+ORDER BY owner, object_name;

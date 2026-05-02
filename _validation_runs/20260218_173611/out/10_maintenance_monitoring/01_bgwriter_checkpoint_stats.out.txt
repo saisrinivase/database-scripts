@@ -1,5 +1,0 @@
- checkpoints_timed | checkpoints_req | checkpoint_write_time | checkpoint_sync_time | buffers_checkpoint | slru_written | buffers_clean | maxwritten_clean | buffers_alloc |   checkpointer_stats_reset    |     bgwriter_stats_reset      
--------------------+-----------------+-----------------------+----------------------+--------------------+--------------+---------------+------------------+---------------+-------------------------------+-------------------------------
-               826 |              59 |               2788826 |                48655 |              27276 |          210 |        244345 |             2422 |      10825264 | 2026-01-31 20:40:48.109778-05 | 2026-01-31 20:40:48.109778-05
-(1 row)
-

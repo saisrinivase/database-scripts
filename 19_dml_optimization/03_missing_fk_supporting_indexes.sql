@@ -1,61 +1,44 @@
 /*
-Purpose: Detect foreign keys lacking a matching index on referencing columns.
-Area: Optimizing Data Modification
-Usage: Missing FK indexes can hurt UPDATE/DELETE performance on parent tables.
+Oracle DBA Script: Missing Fk Supporting Indexes
+Purpose: Provide Oracle DBA diagnostics for missing fk supporting indexes.
+Area: Dml Optimization
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-WITH fk AS (
-    SELECT
-        c.oid AS constraint_oid,
-        c.conname,
-        c.conrelid,
-        c.confrelid,
-        c.conkey,
-        n.nspname AS schema_name,
-        t.relname AS table_name
-    FROM pg_constraint c
-    JOIN pg_class t
-        ON t.oid = c.conrelid
-    JOIN pg_namespace n
-        ON n.oid = t.relnamespace
-    WHERE c.contype = 'f'
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-),
-idx AS (
-    SELECT
-        i.indrelid,
-        i.indkey,
-        i.indisvalid,
-        i.indisready
-    FROM pg_index i
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
+
+PROMPT Missing Fk Supporting Indexes
+
+WITH fk_cols AS (
+    SELECT c.owner, c.table_name, c.constraint_name,
+           LISTAGG(cc.column_name, ',') WITHIN GROUP (ORDER BY cc.position) AS fk_columns
+    FROM dba_constraints c
+    JOIN dba_cons_columns cc ON cc.owner = c.owner AND cc.constraint_name = c.constraint_name
+    WHERE c.constraint_type = 'R'
+      AND c.owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+    GROUP BY c.owner, c.table_name, c.constraint_name
+), idx_cols AS (
+    SELECT index_owner AS owner, table_name,
+           LISTAGG(column_name, ',') WITHIN GROUP (ORDER BY column_position) AS index_columns
+    FROM dba_ind_columns
+    GROUP BY index_owner, table_name, index_name
 )
-SELECT
-    fk.schema_name,
-    fk.table_name,
-    fk.conname AS foreign_key_name,
-    fk.conkey AS fk_columns_attnums
-FROM fk
+SELECT f.owner, f.table_name, f.constraint_name, f.fk_columns
+FROM fk_cols f
 WHERE NOT EXISTS (
-    SELECT 1
-    FROM idx
-    WHERE idx.indrelid = fk.conrelid
-      AND idx.indisvalid
-      AND idx.indisready
-      AND (idx.indkey::smallint[])[1:array_length(fk.conkey, 1)] = fk.conkey
+    SELECT 1 FROM idx_cols i
+    WHERE i.owner = f.owner AND i.table_name = f.table_name AND i.index_columns LIKE f.fk_columns || '%'
 )
-ORDER BY fk.schema_name, fk.table_name, fk.conname;
-
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---    schema_name    |     table_name     |          foreign_key_name          | fk_columns_attnums 
--- ------------------+--------------------+------------------------------------+--------------------
---  migration_v1_lab | child_transactions | child_transactions_account_id_fkey | {2}
---  migration_v2_lab | child_events       | child_events_account_id_fkey       | {2}
--- (2 rows)
--- 
--- SAMPLE_OUTPUT_END
+ORDER BY f.owner, f.table_name, f.constraint_name;

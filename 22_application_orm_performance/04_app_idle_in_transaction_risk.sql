@@ -1,33 +1,29 @@
 /*
-Purpose: Identify applications holding idle transactions that can block cleanup and increase latency.
-Area: Application Development and ORM Performance
-Usage: Coordinate fixes with transaction scope in application code.
+Oracle DBA Script: App Idle In Transaction Risk
+Purpose: Provide Oracle DBA diagnostics for app idle in transaction risk.
+Area: Application Orm Performance
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    application_name,
-    usename AS user_name,
-    datname AS database_name,
-    count(*) AS idle_in_txn_sessions,
-    min(xact_start) AS oldest_xact_start,
-    max(now() - xact_start) AS max_xact_age
-FROM pg_stat_activity
-WHERE state = 'idle in transaction'
-GROUP BY application_name, usename, datname
-ORDER BY idle_in_txn_sessions DESC, max_xact_age DESC;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT App Idle In Transaction Risk
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  application_name | user_name | database_name | idle_in_txn_sessions | oldest_xact_start | max_xact_age 
--- ------------------+-----------+---------------+----------------------+-------------------+--------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No issue/candidate rows were found at capture time.
--- - This typically indicates healthy state for this check; rerun during peak load for validation.
--- SAMPLE_OUTPUT_END
+SELECT inst_id, sid, serial# AS serial_num, username, status, last_call_et AS idle_seconds,
+       module, machine, program, sql_id, logon_time
+FROM gv$session
+WHERE username IS NOT NULL
+  AND status = 'INACTIVE'
+ORDER BY last_call_et DESC;

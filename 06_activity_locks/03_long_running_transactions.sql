@@ -1,37 +1,31 @@
 /*
-Purpose: Detect long-running transactions that can block VACUUM and generate bloat.
-Area: Activity and Locks
-Usage: Adjust interval threshold as needed.
+Oracle DBA Script: Long Running Transactions
+Purpose: Provide Oracle DBA diagnostics for long running transactions.
+Area: Activity Locks
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    pid,
-    usename AS user_name,
-    application_name,
-    client_addr,
-    xact_start,
-    now() - xact_start AS xact_age,
-    state,
-    wait_event_type,
-    wait_event,
-    left(query, 400) AS query_snippet
-FROM pg_stat_activity
-WHERE xact_start IS NOT NULL
-  AND now() - xact_start >= interval '5 minutes'
-ORDER BY xact_age DESC;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Long Running Transactions
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  pid | user_name | application_name | client_addr | xact_start | xact_age | state | wait_event_type | wait_event | query_snippet 
--- -----+-----------+------------------+-------------+------------+----------+-------+-----------------+------------+---------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No issue/candidate rows were found at capture time.
--- - This typically indicates healthy state for this check; rerun during peak load for validation.
--- SAMPLE_OUTPUT_END
+SELECT inst_id, sid, serial# AS serial_num, username, status, sql_id,
+       event, wait_class, last_call_et AS seconds_since_call,
+       ROUND(last_call_et/60,2) AS minutes_since_call, module, machine, program
+FROM gv$session
+WHERE username IS NOT NULL
+  AND status = 'ACTIVE'
+  AND last_call_et >= 300
+ORDER BY last_call_et DESC;

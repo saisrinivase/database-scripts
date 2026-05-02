@@ -1,38 +1,29 @@
 /*
-Purpose: Identify tables where modifications have outpaced analyze activity.
-Area: Planner and Statistics
-Usage: Use thresholds to prioritize manual ANALYZE or autovacuum tuning.
+Oracle DBA Script: Tables Needing Analyze
+Purpose: Provide Oracle DBA diagnostics for tables needing analyze.
+Area: Planner Statistics
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    schemaname AS schema_name,
-    relname AS table_name,
-    n_live_tup,
-    n_mod_since_analyze,
-    round(100.0 * n_mod_since_analyze / NULLIF(n_live_tup, 0), 2) AS mods_vs_live_pct,
-    last_analyze,
-    last_autoanalyze
-FROM pg_stat_user_tables
-WHERE n_mod_since_analyze > 0
-ORDER BY n_mod_since_analyze DESC;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Tables Needing Analyze
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---    schema_name    |       table_name        | n_live_tup | n_mod_since_analyze | mods_vs_live_pct |         last_analyze          | last_autoanalyze 
--- ------------------+-------------------------+------------+---------------------+------------------+-------------------------------+------------------
---  public           | pgbench_accounts        |  200000029 |             5332823 |             2.67 | 2026-01-31 21:38:08.216354-05 | 
---  dba_metrics      | table_size_snapshots    |         25 |                  25 |           100.00 |                               | 
---  dba_metrics      | index_size_snapshots    |         21 |                  21 |           100.00 |                               | 
---  migration_v2_lab | issue_manifest          |         11 |                  11 |           100.00 |                               | 
---  dba_metrics      | database_size_snapshots |          7 |                   7 |           100.00 |                               | 
---  dba_metrics      | connection_snapshots    |          3 |                   3 |           100.00 |                               | 
---  migration_v2_lab | mv_daily_order_volume   |          1 |                   2 |           200.00 |                               | 
---  dba_metrics      | wal_snapshots           |          1 |                   1 |           100.00 |                               | 
--- (8 rows)
--- 
--- SAMPLE_OUTPUT_END
-
+SELECT owner, table_name, stale_stats, num_rows, blocks, sample_size, last_analyzed
+FROM dba_tab_statistics
+WHERE object_type = 'TABLE'
+  AND owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+  AND (stale_stats = 'YES' OR last_analyzed IS NULL)
+ORDER BY last_analyzed NULLS FIRST, num_rows DESC NULLS LAST;

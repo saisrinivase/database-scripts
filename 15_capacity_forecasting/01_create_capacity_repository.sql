@@ -1,69 +1,40 @@
 /*
-Purpose: Create local repository tables for periodic capacity snapshots.
+Oracle DBA Script: Create Capacity Repository
+Purpose: Provide Oracle DBA diagnostics for create capacity repository.
 Area: Capacity Forecasting
-Usage: Run once in a DBA utility database before capture scripts.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-CREATE SCHEMA IF NOT EXISTS dba_metrics;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
-CREATE TABLE IF NOT EXISTS dba_metrics.database_size_snapshots (
-    captured_at timestamptz NOT NULL DEFAULT now(),
-    database_name text NOT NULL,
-    size_bytes bigint NOT NULL
+PROMPT Create Capacity Repository
+
+CREATE TABLE dba_capacity_database_snap (
+    snap_time TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    database_name VARCHAR2(128),
+    allocated_bytes NUMBER,
+    segment_bytes NUMBER,
+    tempfile_bytes NUMBER,
+    redo_bytes NUMBER
 );
 
-CREATE TABLE IF NOT EXISTS dba_metrics.table_size_snapshots (
-    captured_at timestamptz NOT NULL DEFAULT now(),
-    schema_name text NOT NULL,
-    table_name text NOT NULL,
-    total_bytes bigint NOT NULL,
-    estimated_live_rows bigint,
-    estimated_dead_rows bigint
+CREATE TABLE dba_capacity_segment_snap (
+    snap_time TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    owner VARCHAR2(128),
+    segment_name VARCHAR2(128),
+    segment_type VARCHAR2(30),
+    tablespace_name VARCHAR2(128),
+    bytes NUMBER
 );
-
-CREATE TABLE IF NOT EXISTS dba_metrics.index_size_snapshots (
-    captured_at timestamptz NOT NULL DEFAULT now(),
-    schema_name text NOT NULL,
-    table_name text NOT NULL,
-    index_name text NOT NULL,
-    index_bytes bigint NOT NULL,
-    idx_scan bigint
-);
-
-CREATE TABLE IF NOT EXISTS dba_metrics.connection_snapshots (
-    captured_at timestamptz NOT NULL DEFAULT now(),
-    database_name text,
-    user_name text,
-    application_name text,
-    state text,
-    connection_count integer NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS dba_metrics.wal_snapshots (
-    captured_at timestamptz NOT NULL DEFAULT now(),
-    wal_records bigint,
-    wal_fpi bigint,
-    wal_bytes numeric,
-    stats_reset timestamptz
-);
-
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
--- psql:15_capacity_forecasting/01_create_capacity_repository.sql:6: NOTICE:  schema "dba_metrics" already exists, skipping
--- CREATE SCHEMA
--- psql:15_capacity_forecasting/01_create_capacity_repository.sql:12: NOTICE:  relation "database_size_snapshots" already exists, skipping
--- CREATE TABLE
--- psql:15_capacity_forecasting/01_create_capacity_repository.sql:21: NOTICE:  relation "table_size_snapshots" already exists, skipping
--- CREATE TABLE
--- psql:15_capacity_forecasting/01_create_capacity_repository.sql:30: NOTICE:  relation "index_size_snapshots" already exists, skipping
--- CREATE TABLE
--- psql:15_capacity_forecasting/01_create_capacity_repository.sql:39: NOTICE:  relation "connection_snapshots" already exists, skipping
--- CREATE TABLE
--- psql:15_capacity_forecasting/01_create_capacity_repository.sql:47: NOTICE:  relation "wal_snapshots" already exists, skipping
--- CREATE TABLE
--- SAMPLE_OUTPUT_END
-

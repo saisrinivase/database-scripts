@@ -1,40 +1,27 @@
 /*
-Purpose: List trigger functions and their table bindings.
-Area: Functions and Dynamic SQL
-Usage: Heavy trigger paths can dominate DML latency.
+Oracle DBA Script: Trigger Function Inventory
+Purpose: Provide Oracle DBA diagnostics for trigger function inventory.
+Area: Functions Dynamic Sql
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    tn.nspname AS table_schema,
-    tc.relname AS table_name,
-    t.tgname AS trigger_name,
-    fn.nspname AS function_schema,
-    p.proname AS function_name,
-    t.tgenabled,
-    pg_get_triggerdef(t.oid, true) AS trigger_def
-FROM pg_trigger t
-JOIN pg_class tc
-    ON tc.oid = t.tgrelid
-JOIN pg_namespace tn
-    ON tn.oid = tc.relnamespace
-JOIN pg_proc p
-    ON p.oid = t.tgfoid
-JOIN pg_namespace fn
-    ON fn.oid = p.pronamespace
-WHERE NOT t.tgisinternal
-  AND tn.nspname !~ '^pg_'
-  AND tn.nspname <> 'information_schema'
-ORDER BY table_schema, table_name, trigger_name;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Trigger Function Inventory
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---    table_schema   |     table_name     |    trigger_name    | function_schema  |   function_name   | tgenabled |                                                                        trigger_def                                                                        
--- ------------------+--------------------+--------------------+------------------+-------------------+-----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------
---  migration_v2_lab | trigger_audit_demo | trg_set_updated_at | migration_v2_lab | fn_set_updated_at | O         | CREATE TRIGGER trg_set_updated_at BEFORE UPDATE ON migration_v2_lab.trigger_audit_demo FOR EACH ROW EXECUTE FUNCTION migration_v2_lab.fn_set_updated_at()
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
+SELECT owner, trigger_name, trigger_type, triggering_event, table_owner, table_name, status, description
+FROM dba_triggers
+WHERE owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+ORDER BY owner, table_name, trigger_name;

@@ -1,61 +1,29 @@
 /*
-Purpose: Report database growth between first and latest snapshots in repository.
+Oracle DBA Script: Database Growth Report
+Purpose: Provide Oracle DBA diagnostics for database growth report.
 Area: Capacity Forecasting
-Usage: Requires captured data in dba_metrics.database_size_snapshots.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-WITH ranked AS (
-    SELECT
-        database_name,
-        captured_at,
-        size_bytes,
-        row_number() OVER (PARTITION BY database_name ORDER BY captured_at ASC) AS rn_first,
-        row_number() OVER (PARTITION BY database_name ORDER BY captured_at DESC) AS rn_last
-    FROM dba_metrics.database_size_snapshots
-),
-first_snap AS (
-    SELECT database_name, captured_at AS first_captured_at, size_bytes AS first_size_bytes
-    FROM ranked
-    WHERE rn_first = 1
-),
-last_snap AS (
-    SELECT database_name, captured_at AS last_captured_at, size_bytes AS last_size_bytes
-    FROM ranked
-    WHERE rn_last = 1
-)
-SELECT
-    l.database_name,
-    f.first_captured_at,
-    l.last_captured_at,
-    f.first_size_bytes,
-    l.last_size_bytes,
-    (l.last_size_bytes - f.first_size_bytes) AS growth_bytes,
-    pg_size_pretty((l.last_size_bytes - f.first_size_bytes)::bigint) AS growth_pretty,
-    CASE
-        WHEN extract(epoch FROM (l.last_captured_at - f.first_captured_at)) > 0
-            THEN ((l.last_size_bytes - f.first_size_bytes) / extract(epoch FROM (l.last_captured_at - f.first_captured_at)))::numeric(20,2)
-        ELSE NULL
-    END AS growth_bytes_per_second
-FROM last_snap l
-JOIN first_snap f
-    ON f.database_name = l.database_name
-ORDER BY growth_bytes DESC;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Database Growth Report
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---            database_name           |       first_captured_at       |       last_captured_at        | first_size_bytes | last_size_bytes | growth_bytes | growth_pretty | growth_bytes_per_second 
--- -----------------------------------+-------------------------------+-------------------------------+------------------+-----------------+--------------+---------------+-------------------------
---  pgbench_test                      | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |      32205059775 |     32236762815 |     31703040 | 30 MB         |               147650.80
---  hypopg_lab                        | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |         36173503 |        36173503 |            0 | 0 bytes       |                    0.00
---  perf_test                         | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |        436410047 |       436410047 |            0 | 0 bytes       |                    0.00
---  appdb                             | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |          8058559 |         8058559 |            0 | 0 bytes       |                    0.00
---  postgres                          | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |         40007359 |        40007359 |            0 | 0 bytes       |                    0.00
---  script_validation_20260218_172749 | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |        468563647 |       468563647 |            0 | 0 bytes       |                    0.00
---  template1                         | 2026-02-18 19:39:57.460654-05 | 2026-02-18 19:43:32.176999-05 |          8033983 |         8033983 |            0 | 0 bytes       |                    0.00
--- (7 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT database_name, TRUNC(snap_time) AS snap_day,
+       ROUND(MAX(allocated_bytes)/1024/1024/1024,2) AS allocated_gb,
+       ROUND(MAX(segment_bytes)/1024/1024/1024,2) AS segment_gb
+FROM dba_capacity_database_snap
+GROUP BY database_name, TRUNC(snap_time)
+ORDER BY snap_day DESC;

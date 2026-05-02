@@ -1,4 +1,0 @@
- parent_schema | parent_table | partition_schema | partition_name | partition_bytes | partition_pretty 
----------------+--------------+------------------+----------------+-----------------+------------------
-(0 rows)
-

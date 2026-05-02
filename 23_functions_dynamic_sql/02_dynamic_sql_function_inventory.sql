@@ -1,39 +1,28 @@
 /*
-Purpose: Inventory PL/pgSQL functions likely using dynamic SQL (EXECUTE keyword).
-Area: Functions and Dynamic SQL
-Usage: Review for SQL injection safety and plan stability.
+Oracle DBA Script: Dynamic Sql Function Inventory
+Purpose: Provide Oracle DBA diagnostics for dynamic sql function inventory.
+Area: Functions Dynamic Sql
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    n.nspname AS schema_name,
-    p.proname AS function_name,
-    pg_get_function_identity_arguments(p.oid) AS function_args,
-    l.lanname AS language_name,
-    p.prosecdef AS security_definer,
-    CASE WHEN p.prosrc ILIKE '%EXECUTE %' THEN true ELSE false END AS has_dynamic_sql
-FROM pg_proc p
-JOIN pg_namespace n
-    ON n.oid = p.pronamespace
-JOIN pg_language l
-    ON l.oid = p.prolang
-WHERE n.nspname !~ '^pg_'
-  AND n.nspname <> 'information_schema'
-  AND l.lanname = 'plpgsql'
-  AND p.prosrc ILIKE '%EXECUTE %'
-ORDER BY schema_name, function_name;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Dynamic Sql Function Inventory
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name | function_name | function_args | language_name | security_definer | has_dynamic_sql 
--- -------------+---------------+---------------+---------------+------------------+-----------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No rows matched in this environment at capture time.
--- - This can be expected when the related object/feature is not present or not in use.
--- SAMPLE_OUTPUT_END
+SELECT owner, name, type, line, SUBSTR(text,1,200) AS source_text
+FROM dba_source
+WHERE owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+  AND REGEXP_LIKE(UPPER(text), 'EXECUTE IMMEDIATE|DBMS_SQL')
+ORDER BY owner, name, type, line;

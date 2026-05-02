@@ -1,102 +1,51 @@
-# Performance Tuning Coverage Map
+# Oracle Performance Tuning Coverage
 
-Purpose: Map performance topics to script areas so teams can quickly diagnose root causes.
+This document applies to the `oracle` branch.
 
-## Topic to Area Mapping
+## Script Areas
 
-- `Optimize PostgreSQL for high speed and tune database parameters`
-  - `27_high_speed_tuning/01_bottleneck_overview_dashboard.sql`
-  - `27_high_speed_tuning/05_parameter_tuning_advisor.sql`
-  - `27_high_speed_tuning/06_query_tuning_action_queue.sql`
+- `00_environment`: Oracle instance, database, option, and catalog inventory. (3 scripts)
+- `01_database_size`: Database, tablespace, datafile, temp file, and segment size diagnostics. (3 scripts)
+- `02_table_storage`: Table storage, segment allocation, row counts, and storage attributes. (4 scripts)
+- `03_index_analysis`: Index storage, visibility, duplication, selectivity, and maintenance candidates. (4 scripts)
+- `04_lob_blob_storage`: LOB/BLOB storage, SecureFiles, BasicFiles, compression, deduplication, and top LOB segments. (4 scripts)
+- `05_partitioning`: Partitioned table, partition segment, indexing, and recommendation checks. (7 scripts)
+- `06_activity_locks`: Active sessions, blockers, wait events, locks, and long-running transactions. (4 scripts)
+- `07_segment_space_reclaim`: Segment space reclaim, stale statistics, undo retention, and Segment Advisor signals. (5 scripts)
+- `08_replication_ha`: Data Guard, archivelog, redo generation, standby apply, and high availability posture. (4 scripts)
+- `09_security_roles`: Users, roles, system privileges, object grants, profiles, and exposure checks. (4 scripts)
+- `10_maintenance_monitoring`: DB writer, cache, checkpoint, top SQL, parameter drift, and capacity monitoring. (5 scripts)
+- `11_performance_tuning`: Top SQL, temp-heavy SQL, I/O-heavy SQL, parameter tuning, and PL/SQL hotspots. (6 scripts)
+- `12_planner_statistics`: Optimizer statistics quality, stale objects, histogram and extension inventory, and optimizer parameters. (6 scripts)
+- `13_io_redo_checkpoints`: Datafile I/O, object I/O, redo, archiver, checkpoint, and temp pressure. (7 scripts)
+- `14_connection_workload`: Session distribution, idle sessions, connection capacity, and distributed transaction status. (6 scripts)
+- `15_capacity_forecasting`: Capacity snapshot repository, capture scripts, and growth reports. (8 scripts)
+- `16_internals_deep_dive`: Undo, extents, segment internals, dependencies, LOB internals, and retention profiles. (6 scripts)
+- `17_execution_plans`: Plan capture, DBMS_XPLAN templates, and plan red-flag candidates. (4 scripts)
+- `18_long_queries_full_scans`: Long-running SQL and full scan workload diagnostics. (4 scripts)
+- `19_dml_optimization`: Write-heavy tables, row movement, index support for foreign keys, and DML pressure. (4 scripts)
+- `20_design_matters`: Schema design anti-patterns such as missing primary keys, wide tables, and high-null columns. (4 scripts)
+- `21_configuration_parameters`: Oracle initialization parameter baselines for performance, redo, stats, and connections. (4 scripts)
+- `22_application_orm_performance`: Application and ORM query patterns, select-star risk, chatty SQL, and idle transaction behavior. (4 scripts)
+- `23_functions_dynamic_sql`: PL/SQL procedure/function execution, dynamic SQL, security definer analogs, and triggers. (4 scripts)
+- `24_complex_filter_search`: LIKE, JSON, XML, Oracle Text, spatial, and domain index diagnostics. (4 scripts)
+- `25_oltp_olap_goals`: Workload classification and OLTP/OLAP pressure indicators. (4 scripts)
+- `26_physical_cloud_diagnostics`: Platform fingerprint, storage, wait, checkpoint, and managed-service signals. (4 scripts)
+- `27_high_speed_tuning`: Fast triage dashboards and action queues for bottleneck diagnosis. (6 scripts)
+- `27_oracle_health_validation`: Oracle health reports, sanity gates, and optional lab issue scripts. (9 scripts)
+- `28_sql_resource_attribution`: SQL resource attribution by SQL ID, service, parsing schema, and infrastructure tier. (4 scripts)
+- `29_object_inventory_health`: Deep object inventory and health checks for tables, indexes, constraints, PL/SQL, partitions, grants, DB links, and synonyms. (18 scripts)
+- `30_backup_restore_pitr_dr`: RMAN, archivelog, restore point, PITR, and Data Guard evidence. (5 scripts)
+- `31_logging_error_signatures`: ADR, alert log, trace, error signatures, slow SQL, lock waits, and deadlock indicators. (4 scripts)
+- `32_upgrade_patch_readiness`: Version, component, SQL patch, invalid object, NLS, and post-upgrade regression checks. (6 scripts)
+- `33_db_writer_memory_pressure`: DB writer, checkpoint, redo writer, stats jobs, parallel workers, SGA/PGA, and temp spill pressure. (5 scripts)
+- `34_consistency_integrity_checks`: Invalid objects, corruption views, LOB dictionary signals, and validate-structure commands. (5 scripts)
+- `35_pooler_proxy_diagnostics`: Connection saturation, session distribution, cursor cache, shared server, and proxy/client signals. (5 scripts)
+- `36_cloud_provider_signals`: Managed-service fingerprints, parameter drift, replica lag/failover, and incident-window evidence. (5 scripts)
+- `37_object_lifecycle_capacity`: Object lifecycle repository, DDL trigger, snapshots, advisory views, and capacity reports. (12 scripts)
 
-- `Detect bottlenecks and find missing indexes with ease`
-  - `27_high_speed_tuning/02_waits_and_blocking_details.sql`
-  - `27_high_speed_tuning/03_missing_index_candidates_from_scan_pressure.sql`
-  - `27_high_speed_tuning/04_missing_fk_index_candidates.sql`
+## Notes
 
-- `CPU/IO/Memory percentage by query and infrastructure-level attribution (pg_stat_statements proxy)`
-  - `28_pgss_resource_attribution/01_pgss_query_resource_percent.sql`
-  - `28_pgss_resource_attribution/02_pgss_resource_percent_by_database.sql`
-  - `28_pgss_resource_attribution/03_pgss_resource_percent_by_user.sql`
-  - `28_pgss_resource_attribution/04_pgss_query_infra_tier_classification.sql`
-
-- `Long Queries and Full Scans`
-  - `18_long_queries_full_scans/01_active_long_queries.sql`
-  - `18_long_queries_full_scans/02_long_queries_from_statements.sql`
-  - `18_long_queries_full_scans/04_full_scan_hotspot_tables.sql`
-  - `11_performance_tuning/04_io_bound_query_candidates.sql`
-
-- `Long Queries: Additional Techniques`
-  - `17_execution_plans/03_generate_explain_for_top_queries.sql`
-  - `17_execution_plans/04_plan_red_flag_candidates.sql`
-  - `11_performance_tuning/03_temp_file_heavy_queries.sql`
-  - `13_io_wal_checkpoints/06_temp_file_usage_by_database.sql`
-
-- `Optimizing Data Modification`
-  - `19_dml_optimization/01_write_heavy_tables.sql`
-  - `19_dml_optimization/02_hot_update_efficiency.sql`
-  - `19_dml_optimization/03_missing_fk_supporting_indexes.sql`
-  - `19_dml_optimization/04_dml_bloat_pressure.sql`
-
-- `Design Matters`
-  - `20_design_matters/01_tables_without_primary_keys.sql`
-  - `20_design_matters/02_wide_tables_profile.sql`
-  - `20_design_matters/03_overindexed_tables.sql`
-  - `20_design_matters/04_high_nullability_columns.sql`
-
-- `Configuration Parameters`
-  - `21_configuration_parameters/01_core_performance_settings.sql`
-  - `21_configuration_parameters/02_wal_checkpoint_settings.sql`
-  - `21_configuration_parameters/03_autovacuum_settings.sql`
-  - `21_configuration_parameters/04_connection_timeout_settings.sql`
-
-- `Application Development and Performance`
-  - `22_application_orm_performance/01_n_plus_one_query_candidates.sql`
-  - `22_application_orm_performance/03_chatty_small_result_queries.sql`
-  - `14_connection_workload/01_connections_by_user_app_db.sql`
-  - `14_connection_workload/02_idle_in_transaction_risk.sql`
-
-- `Functions`
-  - `23_functions_dynamic_sql/01_function_execution_hotspots.sql`
-  - `11_performance_tuning/06_function_hotspots.sql`
-
-- `Dynamic SQL`
-  - `23_functions_dynamic_sql/02_dynamic_sql_function_inventory.sql`
-  - `23_functions_dynamic_sql/03_volatile_and_security_definer_functions.sql`
-
-- `Avoiding ORM Pitfalls`
-  - `22_application_orm_performance/01_n_plus_one_query_candidates.sql`
-  - `22_application_orm_performance/02_select_star_candidates.sql`
-  - `22_application_orm_performance/04_app_idle_in_transaction_risk.sql`
-
-- `More Complex Filtering and Search`
-  - `24_complex_filter_search/01_like_ilike_query_candidates.sql`
-  - `24_complex_filter_search/02_jsonb_array_column_inventory.sql`
-  - `24_complex_filter_search/03_gin_gist_brin_index_inventory.sql`
-  - `24_complex_filter_search/04_full_text_search_inventory.sql`
-
-- `Ultimate Optimization Algorithm (Systemic Optimization)`
-  - `25_oltp_olap_goals/01_workload_signature_oltp_vs_olap.sql`
-  - `25_oltp_olap_goals/04_mixed_workload_pressure.sql`
-  - `26_physical_cloud_diagnostics/01_instance_platform_fingerprint.sql`
-  - `26_physical_cloud_diagnostics/02_io_latency_profile.sql`
-
-- `Identify optimization goals in OLTP and OLAP systems`
-  - `25_oltp_olap_goals/01_workload_signature_oltp_vs_olap.sql`
-  - `25_oltp_olap_goals/02_oltp_latency_goal_candidates.sql`
-  - `25_oltp_olap_goals/03_olap_throughput_candidates.sql`
-
-- `Understanding Execution Plans`
-  - `17_execution_plans/01_plan_capture_prerequisites.sql`
-  - `17_execution_plans/02_explain_analyze_template.sql`
-  - `17_execution_plans/03_generate_explain_for_top_queries.sql`
-  - `17_execution_plans/04_plan_red_flag_candidates.sql`
-
-## Root Cause Dimensions
-
-- `SQL/query shape`: long query, full scan, ORM chatty query, complex filter scripts.
-- `Schema/index design`: design matters, missing FK index, index and planner sections.
-- `Runtime behavior`: activity/locks, wait events, function hotspots.
-- `Storage and I/O`: database/table/index size, WAL/checkpoint, I/O latency scripts.
-- `Infrastructure (physical/cloud)`: platform fingerprint, fsync/checkpoint pressure, replication slot WAL retention.
-- `Workload goal alignment`: OLTP vs OLAP classification and mixed workload pressure.
+- Designed around Oracle Database 19c+ catalog and dynamic performance views.
+- `DBA_HIST_*`, ASH, SQL Monitor, and similar history views may require Diagnostics Pack licensing.
+- Use SQL*Plus or SQLcl for substitution variables and `DBMS_XPLAN` output.

@@ -1,266 +1,33 @@
 /*
-Purpose: Create procedures to capture periodic lifecycle/capacity snapshots and purge old history.
-Area: Object Lifecycle and Capacity Monitoring
-Usage: Run after repository tables are created; then schedule CALL dba_metrics.sp_capture_operational_snapshot(...).
+Oracle DBA Script: Create Snapshot Procedures
+Purpose: Provide Oracle DBA diagnostics for create snapshot procedures.
+Area: Object Lifecycle Capacity
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-CREATE SCHEMA IF NOT EXISTS dba_metrics;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
-CREATE OR REPLACE PROCEDURE dba_metrics.sp_capture_operational_snapshot(
-    p_source text DEFAULT 'manual',
-    p_notes text DEFAULT NULL
-)
-LANGUAGE plpgsql
-AS $$
-DECLARE
-    v_run_id bigint;
-    v_captured_at timestamptz := clock_timestamp();
-    v_db_name text := current_database();
-    v_stats_reset timestamptz;
+PROMPT Create Snapshot Procedures
+
+CREATE OR REPLACE PROCEDURE capture_dba_lifecycle_snapshot AS
 BEGIN
-    SELECT stats_reset
-    INTO v_stats_reset
-    FROM pg_stat_database
-    WHERE datname = current_database();
-
-    INSERT INTO dba_metrics.capture_run (
-        captured_at,
-        database_name,
-        capture_source,
-        notes
-    )
-    VALUES (
-        v_captured_at,
-        v_db_name,
-        coalesce(nullif(trim(p_source), ''), 'manual'),
-        p_notes
-    )
-    RETURNING run_id INTO v_run_id;
-
-    INSERT INTO dba_metrics.index_usage_snap (
-        run_id,
-        captured_at,
-        database_name,
-        stats_reset,
-        index_oid,
-        table_oid,
-        schema_name,
-        table_name,
-        index_name,
-        idx_scan,
-        idx_tup_read,
-        idx_tup_fetch,
-        index_size_bytes,
-        table_total_size_bytes,
-        is_unique,
-        is_primary,
-        is_valid,
-        is_ready,
-        is_live,
-        constraint_name
-    )
-    SELECT
-        v_run_id,
-        v_captured_at,
-        v_db_name,
-        v_stats_reset,
-        ui.indexrelid,
-        ui.relid,
-        ui.schemaname,
-        ui.relname,
-        ui.indexrelname,
-        ui.idx_scan,
-        ui.idx_tup_read,
-        ui.idx_tup_fetch,
-        pg_relation_size(ui.indexrelid),
-        pg_total_relation_size(ui.relid),
-        i.indisunique,
-        i.indisprimary,
-        i.indisvalid,
-        i.indisready,
-        i.indislive,
-        con.conname
-    FROM pg_stat_user_indexes ui
-    JOIN pg_index i
-      ON i.indexrelid = ui.indexrelid
-    LEFT JOIN LATERAL (
-        SELECT c.conname
-        FROM pg_constraint c
-        WHERE c.conindid = ui.indexrelid
-        ORDER BY c.conname
-        LIMIT 1
-    ) con
-      ON true;
-
-    INSERT INTO dba_metrics.table_mod_snap (
-        run_id,
-        captured_at,
-        database_name,
-        stats_reset,
-        table_oid,
-        schema_name,
-        table_name,
-        n_tup_ins,
-        n_tup_upd,
-        n_tup_del,
-        n_tup_hot_upd,
-        n_live_tup,
-        n_dead_tup,
-        n_mod_since_analyze,
-        vacuum_count,
-        autovacuum_count,
-        analyze_count,
-        autoanalyze_count,
-        last_vacuum,
-        last_autovacuum,
-        last_analyze,
-        last_autoanalyze,
-        table_total_size_bytes
-    )
-    SELECT
-        v_run_id,
-        v_captured_at,
-        v_db_name,
-        v_stats_reset,
-        s.relid,
-        s.schemaname,
-        s.relname,
-        s.n_tup_ins,
-        s.n_tup_upd,
-        s.n_tup_del,
-        s.n_tup_hot_upd,
-        s.n_live_tup,
-        s.n_dead_tup,
-        s.n_mod_since_analyze,
-        s.vacuum_count,
-        s.autovacuum_count,
-        s.analyze_count,
-        s.autoanalyze_count,
-        s.last_vacuum,
-        s.last_autovacuum,
-        s.last_analyze,
-        s.last_autoanalyze,
-        pg_total_relation_size(s.relid)
-    FROM pg_stat_user_tables s;
-
-    INSERT INTO dba_metrics.object_size_snap (
-        run_id,
-        captured_at,
-        database_name,
-        object_oid,
-        schema_name,
-        object_name,
-        object_type,
-        relkind,
-        total_size_bytes,
-        relation_size_bytes,
-        toast_size_bytes,
-        index_size_bytes,
-        estimated_rows
-    )
-    SELECT
-        v_run_id,
-        v_captured_at,
-        v_db_name,
-        c.oid,
-        n.nspname,
-        c.relname,
-        CASE c.relkind
-            WHEN 'r' THEN 'TABLE'
-            WHEN 'p' THEN 'PARTITIONED_TABLE'
-            WHEN 'm' THEN 'MATERIALIZED_VIEW'
-            WHEN 'i' THEN 'INDEX'
-            WHEN 'S' THEN 'SEQUENCE'
-            ELSE 'OTHER'
-        END AS object_type,
-        c.relkind,
-        pg_total_relation_size(c.oid),
-        pg_relation_size(c.oid),
-        CASE
-            WHEN c.relkind IN ('r', 'm') AND c.reltoastrelid <> 0 THEN pg_total_relation_size(c.reltoastrelid)
-            ELSE 0
-        END AS toast_size_bytes,
-        CASE
-            WHEN c.relkind IN ('r', 'm', 'p') THEN pg_indexes_size(c.oid)
-            WHEN c.relkind = 'i' THEN pg_relation_size(c.oid)
-            ELSE 0
-        END AS index_size_bytes,
-        CASE WHEN c.reltuples >= 0 THEN c.reltuples::bigint ELSE NULL END AS estimated_rows
-    FROM pg_class c
-    JOIN pg_namespace n
-      ON n.oid = c.relnamespace
-    WHERE c.relkind IN ('r', 'p', 'm', 'i', 'S')
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema';
-
-    INSERT INTO dba_metrics.database_size_snap (
-        run_id,
-        captured_at,
-        database_name,
-        size_bytes
-    )
-    VALUES (
-        v_run_id,
-        v_captured_at,
-        v_db_name,
-        pg_database_size(v_db_name)
-    );
-
-    INSERT INTO dba_metrics.tablespace_size_snap (
-        run_id,
-        captured_at,
-        tablespace_name,
-        size_bytes
-    )
-    SELECT
-        v_run_id,
-        v_captured_at,
-        t.spcname,
-        pg_tablespace_size(t.oid)
-    FROM pg_tablespace t;
-
-    INSERT INTO dba_metrics.db_stats_reset_snap (
-        run_id,
-        captured_at,
-        database_name,
-        stats_reset
-    )
-    VALUES (
-        v_run_id,
-        v_captured_at,
-        v_db_name,
-        v_stats_reset
-    );
+  INSERT INTO dba_lifecycle_object_snap (owner, object_name, object_type, status, bytes, last_ddl_time)
+  SELECT o.owner, o.object_name, o.object_type, o.status, s.bytes, o.last_ddl_time
+  FROM dba_objects o
+  LEFT JOIN dba_segments s ON s.owner = o.owner AND s.segment_name = o.object_name
+  WHERE o.owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS');
+  COMMIT;
 END;
-$$;
-
-CREATE OR REPLACE PROCEDURE dba_metrics.sp_purge_history(
-    p_retain_months int DEFAULT 18
-)
-LANGUAGE plpgsql
-AS $$
-DECLARE
-    v_cutoff timestamptz;
-BEGIN
-    IF p_retain_months < 1 THEN
-        RAISE EXCEPTION 'p_retain_months must be >= 1';
-    END IF;
-
-    v_cutoff := date_trunc('day', clock_timestamp()) - make_interval(months => p_retain_months);
-
-    DELETE FROM dba_metrics.ddl_event_log
-    WHERE event_ts < v_cutoff;
-
-    DELETE FROM dba_metrics.capture_run
-    WHERE captured_at < v_cutoff;
-END;
-$$;
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_37_verify_20260220_safedrop_final
---
--- CREATE SCHEMA
--- CREATE PROCEDURE
--- CREATE PROCEDURE
--- SAMPLE_OUTPUT_END
+/

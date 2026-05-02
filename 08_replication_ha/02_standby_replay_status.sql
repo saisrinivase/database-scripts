@@ -1,28 +1,26 @@
 /*
-Purpose: Report recovery/replay state when connected to a standby node.
-Area: Replication and HA
-Usage: Run on standby for replay delay checks.
+Oracle DBA Script: Standby Replay Status
+Purpose: Provide Oracle DBA diagnostics for standby replay status.
+Area: Replication Ha
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    pg_is_in_recovery() AS is_standby,
-    pg_last_wal_receive_lsn() AS last_received_lsn,
-    pg_last_wal_replay_lsn() AS last_replayed_lsn,
-    pg_last_xact_replay_timestamp() AS last_replay_timestamp,
-    CASE
-        WHEN pg_last_xact_replay_timestamp() IS NULL THEN NULL
-        ELSE now() - pg_last_xact_replay_timestamp()
-    END AS replay_delay;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Standby Replay Status
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  is_standby | last_received_lsn | last_replayed_lsn | last_replay_timestamp | replay_delay 
--- ------------+-------------------+-------------------+-----------------------+--------------
---  f          |                   |                   |                       | 
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
+SELECT name, value, unit, time_computed, datum_time
+FROM v$dataguard_stats
+ORDER BY name;

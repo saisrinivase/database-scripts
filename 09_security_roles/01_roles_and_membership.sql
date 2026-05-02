@@ -1,53 +1,28 @@
 /*
-Purpose: List roles and inherited role memberships.
-Area: Security and Roles
-Usage: Run as privileged role to see complete membership.
+Oracle DBA Script: Roles And Membership
+Purpose: Provide Oracle DBA diagnostics for roles and membership.
+Area: Security Roles
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    r.rolname AS role_name,
-    r.rolcanlogin AS can_login,
-    r.rolsuper AS is_superuser,
-    r.rolcreatedb AS can_create_db,
-    r.rolcreaterole AS can_create_role,
-    m.rolname AS member_of_role
-FROM pg_roles r
-LEFT JOIN pg_auth_members am
-    ON am.member = r.oid
-LEFT JOIN pg_roles m
-    ON m.oid = am.roleid
-ORDER BY r.rolname, member_of_role;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Roles And Membership
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---           role_name          | can_login | is_superuser | can_create_db | can_create_role |    member_of_role    
--- -----------------------------+-----------+--------------+---------------+-----------------+----------------------
---  migration_v2_reader         | t         | f            | f             | f               | 
---  pg_checkpoint               | f         | f            | f             | f               | 
---  pg_create_subscription      | f         | f            | f             | f               | 
---  pg_database_owner           | f         | f            | f             | f               | 
---  pg_execute_server_program   | f         | f            | f             | f               | 
---  pg_maintain                 | f         | f            | f             | f               | 
---  pg_monitor                  | f         | f            | f             | f               | pg_read_all_settings
---  pg_monitor                  | f         | f            | f             | f               | pg_read_all_stats
---  pg_monitor                  | f         | f            | f             | f               | pg_stat_scan_tables
---  pg_read_all_data            | f         | f            | f             | f               | 
---  pg_read_all_settings        | f         | f            | f             | f               | 
---  pg_read_all_stats           | f         | f            | f             | f               | 
---  pg_read_server_files        | f         | f            | f             | f               | 
---  pg_signal_autovacuum_worker | f         | f            | f             | f               | 
---  pg_signal_backend           | f         | f            | f             | f               | 
---  pg_stat_scan_tables         | f         | f            | f             | f               | 
---  pg_use_reserved_connections | f         | f            | f             | f               | 
---  pg_write_all_data           | f         | f            | f             | f               | 
---  pg_write_server_files       | f         | f            | f             | f               | 
---  postgres                    | t         | t            | t             | t               | 
---  saiendla                    | t         | t            | t             | t               | 
--- (21 rows)
--- 
--- SAMPLE_OUTPUT_END
-
+SELECT u.username, u.account_status, u.lock_date, u.expiry_date, u.default_tablespace,
+       u.temporary_tablespace, u.profile, r.granted_role, r.admin_option, r.default_role
+FROM dba_users u
+LEFT JOIN dba_role_privs r ON r.grantee = u.username
+ORDER BY u.username, r.granted_role;

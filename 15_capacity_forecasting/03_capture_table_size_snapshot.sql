@@ -1,31 +1,29 @@
 /*
-Purpose: Capture table-level size and tuple estimates for growth trending.
+Oracle DBA Script: Capture Table Size Snapshot
+Purpose: Provide Oracle DBA diagnostics for capture table size snapshot.
 Area: Capacity Forecasting
-Usage: Schedule periodically; can be heavy on very large catalogs.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-INSERT INTO dba_metrics.table_size_snapshots (
-    captured_at,
-    schema_name,
-    table_name,
-    total_bytes,
-    estimated_live_rows,
-    estimated_dead_rows
-)
-SELECT
-    now() AS captured_at,
-    s.schemaname AS schema_name,
-    s.relname AS table_name,
-    pg_total_relation_size(s.relid) AS total_bytes,
-    s.n_live_tup AS estimated_live_rows,
-    s.n_dead_tup AS estimated_dead_rows
-FROM pg_stat_user_tables s;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Capture Table Size Snapshot
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
--- INSERT 0 32
--- SAMPLE_OUTPUT_END
+INSERT INTO dba_capacity_segment_snap (owner, segment_name, segment_type, tablespace_name, bytes)
+SELECT owner, segment_name, segment_type, tablespace_name, bytes
+FROM dba_segments
+WHERE segment_type LIKE 'TABLE%'
+  AND owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS');
+COMMIT;

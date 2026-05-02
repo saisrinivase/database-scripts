@@ -1,33 +1,28 @@
 /*
-Purpose: Show partitioned tables, partition key definition, and child count.
+Oracle DBA Script: Partitioned Tables Overview
+Purpose: Provide Oracle DBA diagnostics for partitioned tables overview.
 Area: Partitioning
-Usage: Run in target database.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    pn.nspname AS parent_schema,
-    pc.relname AS partitioned_table,
-    pg_get_partkeydef(pc.oid) AS partition_key,
-    count(i.inhrelid) AS partition_count
-FROM pg_class pc
-JOIN pg_namespace pn
-    ON pn.oid = pc.relnamespace
-LEFT JOIN pg_inherits i
-    ON i.inhparent = pc.oid
-WHERE pc.relkind = 'p'
-GROUP BY pn.nspname, pc.relname, pc.oid
-ORDER BY partition_count DESC, parent_schema, partitioned_table;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Partitioned Tables Overview
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---   parent_schema   | partitioned_table  |   partition_key    | partition_count 
--- ------------------+--------------------+--------------------+-----------------
---  migration_v2_lab | partitioned_events | RANGE (event_date) |               2
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
-
+SELECT owner, table_name, partitioning_type, subpartitioning_type,
+       partition_count, def_tablespace_name, interval, autolist, status
+FROM dba_part_tables
+WHERE owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+ORDER BY owner, table_name;

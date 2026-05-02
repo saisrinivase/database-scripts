@@ -1,32 +1,28 @@
 /*
-Purpose: Capture connection distribution snapshot for pool/capacity trending.
+Oracle DBA Script: Capture Connection Snapshot
+Purpose: Provide Oracle DBA diagnostics for capture connection snapshot.
 Area: Capacity Forecasting
-Usage: Schedule at higher frequency (for example every 5 minutes).
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-INSERT INTO dba_metrics.connection_snapshots (
-    captured_at,
-    database_name,
-    user_name,
-    application_name,
-    state,
-    connection_count
-)
-SELECT
-    now() AS captured_at,
-    datname AS database_name,
-    usename AS user_name,
-    application_name,
-    state,
-    count(*)::int AS connection_count
-FROM pg_stat_activity
-GROUP BY datname, usename, application_name, state;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Capture Connection Snapshot
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
--- INSERT 0 3
--- SAMPLE_OUTPUT_END
+SELECT SYSTIMESTAMP AS snap_time, inst_id, username, service_name, status, COUNT(*) AS session_count
+FROM gv$session
+WHERE username IS NOT NULL
+GROUP BY inst_id, username, service_name, status
+ORDER BY session_count DESC;

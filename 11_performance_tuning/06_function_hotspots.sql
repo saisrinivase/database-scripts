@@ -1,32 +1,27 @@
 /*
-Purpose: Identify expensive user-defined functions by total execution time.
+Oracle DBA Script: Function Hotspots
+Purpose: Provide Oracle DBA diagnostics for function hotspots.
 Area: Performance Tuning
-Usage: Requires track_functions enabled for non-zero timing counters.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    schemaname AS schema_name,
-    funcname AS function_name,
-    calls,
-    total_time,
-    self_time,
-    CASE WHEN calls = 0 THEN NULL ELSE total_time / calls END AS mean_time
-FROM pg_stat_user_functions
-ORDER BY total_time DESC
-LIMIT 100;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Function Hotspots
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name | function_name | calls | total_time | self_time | mean_time 
--- -------------+---------------+-------+------------+-----------+-----------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No matching rows were returned at capture time.
--- - Rerun during peak workload or after seeding representative test cases for non-zero examples.
--- SAMPLE_OUTPUT_END
+SELECT owner, object_name, procedure_name, object_type, status, last_ddl_time
+FROM dba_procedures
+WHERE owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+ORDER BY owner, object_name, procedure_name;

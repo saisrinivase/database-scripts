@@ -1,39 +1,27 @@
 /*
-Purpose: Show connection utilization against max_connections.
-Area: Maintenance and Monitoring
-Usage: Useful for capacity planning and pool sizing.
+Oracle DBA Script: Connection Capacity
+Purpose: Provide Oracle DBA diagnostics for connection capacity.
+Area: Maintenance Monitoring
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-WITH cfg AS (
-    SELECT current_setting('max_connections')::int AS max_connections
-),
-act AS (
-    SELECT
-        count(*) AS total_connections,
-        count(*) FILTER (WHERE state = 'active') AS active_connections,
-        count(*) FILTER (WHERE state = 'idle') AS idle_connections,
-        count(*) FILTER (WHERE state = 'idle in transaction') AS idle_in_txn_connections
-    FROM pg_stat_activity
-)
-SELECT
-    cfg.max_connections,
-    act.total_connections,
-    act.active_connections,
-    act.idle_connections,
-    act.idle_in_txn_connections,
-    round(100.0 * act.total_connections / NULLIF(cfg.max_connections, 0), 2) AS pct_used
-FROM cfg
-CROSS JOIN act;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Connection Capacity
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  max_connections | total_connections | active_connections | idle_connections | idle_in_txn_connections | pct_used 
--- -----------------+-------------------+--------------------+------------------+-------------------------+----------
---              100 |                 9 |                  1 |                0 |                       0 |     9.00
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
+SELECT resource_name, current_utilization, max_utilization, initial_allocation, limit_value
+FROM v$resource_limit
+WHERE resource_name IN ('sessions','processes','transactions','enqueue_locks','dml_locks')
+ORDER BY resource_name;

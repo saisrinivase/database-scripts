@@ -1,22 +1,31 @@
 /*
-Purpose: Capture point-in-time database sizes for growth tracking.
+Oracle DBA Script: Capture Database Size Snapshot
+Purpose: Provide Oracle DBA diagnostics for capture database size snapshot.
 Area: Capacity Forecasting
-Usage: Schedule daily/hourly after repository creation.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-INSERT INTO dba_metrics.database_size_snapshots (captured_at, database_name, size_bytes)
-SELECT
-    now() AS captured_at,
-    datname AS database_name,
-    pg_database_size(datname) AS size_bytes
-FROM pg_database
-WHERE datallowconn;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Capture Database Size Snapshot
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
--- INSERT 0 7
--- SAMPLE_OUTPUT_END
+INSERT INTO dba_capacity_database_snap (database_name, allocated_bytes, segment_bytes, tempfile_bytes, redo_bytes)
+SELECT d.name,
+       (SELECT SUM(bytes) FROM dba_data_files),
+       (SELECT SUM(bytes) FROM dba_segments),
+       (SELECT SUM(bytes) FROM dba_temp_files),
+       (SELECT SUM(bytes) FROM v$log)
+FROM v$database d;
+COMMIT;

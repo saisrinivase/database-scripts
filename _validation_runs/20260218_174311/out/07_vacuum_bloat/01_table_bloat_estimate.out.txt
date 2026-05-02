@@ -1,4 +1,0 @@
- schema_name | table_name | total_bytes | total_pretty | n_live_tup | n_dead_tup | dead_tuple_pct | est_bloat_bytes | est_bloat_pretty 
--------------+------------+-------------+--------------+------------+------------+----------------+-----------------+------------------
-(0 rows)
-

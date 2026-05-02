@@ -1,85 +1,27 @@
 /*
-Purpose: Inventory functions/procedures with performance and safety attributes.
-Area: Object Inventory and Health
-Usage: Use to detect dynamic SQL, SECURITY DEFINER risk, and hot routines.
+Oracle DBA Script: Function Procedure Inventory
+Purpose: Provide Oracle DBA diagnostics for function procedure inventory.
+Area: Object Inventory Health
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-WITH routine_base AS (
-    SELECT
-        p.oid AS proc_oid,
-        n.nspname AS schema_name,
-        p.proname AS routine_name,
-        CASE p.prokind WHEN 'p' THEN 'PROCEDURE' ELSE 'FUNCTION' END AS routine_type,
-        pg_get_function_identity_arguments(p.oid) AS identity_args,
-        l.lanname AS language_name,
-        CASE p.provolatile
-            WHEN 'i' THEN 'IMMUTABLE'
-            WHEN 's' THEN 'STABLE'
-            WHEN 'v' THEN 'VOLATILE'
-            ELSE p.provolatile::text
-        END AS volatility,
-        CASE WHEN p.prosecdef THEN 'SECURITY_DEFINER' ELSE 'SECURITY_INVOKER' END AS security_mode,
-        CASE p.proparallel
-            WHEN 's' THEN 'SAFE'
-            WHEN 'r' THEN 'RESTRICTED'
-            WHEN 'u' THEN 'UNSAFE'
-            ELSE p.proparallel::text
-        END AS parallel_safety,
-        p.procost,
-        p.prorows,
-        pg_get_userbyid(p.proowner) AS owner_name,
-        CASE
-            WHEN l.lanname = 'plpgsql'
-             AND position('EXECUTE ' IN upper(pg_get_functiondef(p.oid))) > 0
-                THEN 'DYNAMIC_SQL_DETECTED'
-            ELSE 'NO_DYNAMIC_SQL_MARKER'
-        END AS dynamic_sql_flag
-    FROM pg_proc p
-    JOIN pg_namespace n ON n.oid = p.pronamespace
-    JOIN pg_language l ON l.oid = p.prolang
-    WHERE n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
-      AND p.prokind IN ('f', 'p')
-)
-SELECT
-    b.schema_name,
-    b.routine_name,
-    b.routine_type,
-    b.identity_args,
-    b.language_name,
-    b.volatility,
-    b.security_mode,
-    b.parallel_safety,
-    b.procost,
-    b.prorows,
-    b.owner_name,
-    coalesce(s.calls, 0) AS calls,
-    round(coalesce(s.total_time, 0)::numeric, 2) AS total_time_ms,
-    round(coalesce(s.self_time, 0)::numeric, 2) AS self_time_ms,
-    b.dynamic_sql_flag
-FROM routine_base b
-LEFT JOIN pg_stat_user_functions s
-  ON s.funcid = b.proc_oid
-ORDER BY
-    coalesce(s.total_time, 0) DESC,
-    b.schema_name,
-    b.routine_name,
-    b.routine_type;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Function Procedure Inventory
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---    schema_name    |       routine_name        | routine_type |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            identity_args                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | language_name | volatility |  security_mode   | parallel_safety | procost | prorows | owner_name | calls | total_time_ms | self_time_ms |   dynamic_sql_flag    
--- ------------------+---------------------------+--------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+------------+------------------+-----------------+---------+---------+------------+-------+---------------+--------------+-----------------------
---  migration_v2_lab | fn_calc_fee               | FUNCTION     | p_amount numeric                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | sql           | VOLATILE   | SECURITY_INVOKER | UNSAFE          |     100 |       0 | saiendla   |     0 |          0.00 |         0.00 | NO_DYNAMIC_SQL_MARKER
---  migration_v2_lab | fn_set_updated_at         | FUNCTION     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | plpgsql       | VOLATILE   | SECURITY_INVOKER | UNSAFE          |     100 |       0 | saiendla   |     0 |          0.00 |         0.00 | NO_DYNAMIC_SQL_MARKER
---  migration_v2_lab | prc_tag_high_value_orders | PROCEDURE    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | plpgsql       | VOLATILE   | SECURITY_INVOKER | UNSAFE          |     100 |       0 | saiendla   |     0 |          0.00 |         0.00 | NO_DYNAMIC_SQL_MARKER
---  public           | pg_stat_statements        | FUNCTION     | showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT shared_blk_read_time double precision, OUT shared_blk_write_time double precision, OUT local_blk_read_time double precision, OUT local_blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT wal_buffers_full bigint, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision, OUT jit_deform_count bigint, OUT jit_deform_time double precision, OUT parallel_workers_to_launch bigint, OUT parallel_workers_launched bigint, OUT stats_since timestamp with time zone, OUT minmax_stats_since timestamp with time zone | c             | VOLATILE   | SECURITY_INVOKER | SAFE            |       1 |    1000 | saiendla   |     0 |          0.00 |         0.00 | NO_DYNAMIC_SQL_MARKER
---  public           | pg_stat_statements_info   | FUNCTION     | OUT dealloc bigint, OUT stats_reset timestamp with time zone                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | c             | VOLATILE   | SECURITY_INVOKER | SAFE            |       1 |       0 | saiendla   |     0 |          0.00 |         0.00 | NO_DYNAMIC_SQL_MARKER
---  public           | pg_stat_statements_reset  | FUNCTION     | userid oid, dbid oid, queryid bigint, minmax_only boolean                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | c             | VOLATILE   | SECURITY_INVOKER | SAFE            |       1 |       0 | saiendla   |     0 |          0.00 |         0.00 | NO_DYNAMIC_SQL_MARKER
--- (6 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT owner, object_name, procedure_name, object_type, status, authid, last_ddl_time
+FROM dba_procedures
+WHERE owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+ORDER BY owner, object_name, procedure_name;

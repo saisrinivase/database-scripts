@@ -1,43 +1,27 @@
 /*
-Purpose: Show connection and timeout settings that influence application behavior and contention.
+Oracle DBA Script: Connection Timeout Settings
+Purpose: Provide Oracle DBA diagnostics for connection timeout settings.
 Area: Configuration Parameters
-Usage: Validate with connection pooling and app retry strategy.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    name,
-    setting,
-    unit,
-    source
-FROM pg_settings
-WHERE name IN (
-    'max_connections',
-    'superuser_reserved_connections',
-    'statement_timeout',
-    'lock_timeout',
-    'idle_in_transaction_session_timeout',
-    'tcp_keepalives_idle',
-    'tcp_keepalives_interval',
-    'tcp_keepalives_count'
-)
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
+
+PROMPT Connection Timeout Settings
+
+SELECT name AS parameter_name, value, isdefault, ismodified, issys_modifiable, description
+FROM v$parameter
+WHERE name IN ('processes','sessions','transactions','open_cursors','session_cached_cursors','resource_limit','distributed_lock_timeout','sqlnet.expire_time')
 ORDER BY name;
-
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---                 name                 | setting | unit |       source       
--- -------------------------------------+---------+------+--------------------
---  idle_in_transaction_session_timeout | 0       | ms   | default
---  lock_timeout                        | 0       | ms   | default
---  max_connections                     | 100     |      | configuration file
---  statement_timeout                   | 0       | ms   | default
---  superuser_reserved_connections      | 3       |      | default
---  tcp_keepalives_count                | 0       |      | default
---  tcp_keepalives_idle                 | 0       | s    | default
---  tcp_keepalives_interval             | 0       | s    | default
--- (8 rows)
--- 
--- SAMPLE_OUTPUT_END

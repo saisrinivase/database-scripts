@@ -1,44 +1,51 @@
-# Internals Coverage Matrix
+# Oracle Internals Coverage Matrix
 
-Purpose: Map administration topics to PostgreSQL internals sources and ready-to-run scripts.
+This document applies to the `oracle` branch.
 
-## Topic Coverage
+## Script Areas
 
-| Topic | Core Internals Sources | Primary Scripts |
-|---|---|---|
-| Instance baseline | `version()`, `pg_postmaster_start_time()`, `pg_settings` | `00_environment/01_server_instance_overview.sql` |
-| Extension baseline | `pg_extension`, `pg_namespace` | `00_environment/02_extensions_installed.sql` |
-| Catalog object footprint | `pg_class`, `pg_namespace` | `00_environment/03_database_catalog_overview.sql`, `16_internals_deep_dive/03_system_catalog_size_profile.sql` |
-| Database size | `pg_database`, `pg_database_size()` | `01_database_size/01_databases_size.sql` |
-| Tablespace size | `pg_tablespace`, `pg_tablespace_size()` | `01_database_size/03_tablespaces_size.sql` |
-| Table/index/TOAST composition | `pg_class`, `pg_relation_size()`, `pg_indexes_size()` | `02_table_storage/01_table_size_breakdown.sql`, `16_internals_deep_dive/05_fsm_vm_toast_size_breakdown.sql` |
-| Index usage/utilization | `pg_stat_user_indexes`, `pg_index` | `03_index_analysis/01_index_size_and_usage.sql`, `03_index_analysis/02_unused_indexes_candidates.sql` |
-| Duplicate index internals | `pg_index` metadata vectors | `03_index_analysis/03_duplicate_indexes.sql` |
-| TOAST internals | `pg_class.reltoastrelid` | `04_toast_lob_blob/01_tables_with_toast.sql`, `04_toast_lob_blob/02_toast_heavy_tables.sql` |
-| Large object (BLOB/LOB) footprint | `pg_largeobject` | `04_toast_lob_blob/03_large_objects_summary.sql`, `04_toast_lob_blob/04_top_large_objects.sql` |
-| Partition metadata | `pg_inherits`, `pg_get_partkeydef()` | `05_partitioning/01_partitioned_tables_overview.sql` |
-| Session/lock internals | `pg_stat_activity`, `pg_blocking_pids()` | `06_activity_locks/01_active_sessions.sql`, `06_activity_locks/02_blocking_and_blocked_sessions.sql` |
-| Vacuum/bloat internals | `pg_stat_user_tables`, `relfrozenxid`, `pg_stat_progress_vacuum` | `07_vacuum_bloat/01_table_bloat_estimate.sql`, `07_vacuum_bloat/03_freeze_age_risk.sql`, `07_vacuum_bloat/05_vacuum_progress.sql` |
-| Replication state | `pg_stat_replication`, `pg_is_in_recovery()` | `08_replication_ha/01_primary_replication_status.sql`, `08_replication_ha/02_standby_replay_status.sql` |
-| Replication slot retention | `pg_replication_slots`, LSN diff functions | `08_replication_ha/03_replication_slots_health.sql` |
-| WAL internals | `pg_stat_wal`, `pg_stat_archiver`, LSN functions | `08_replication_ha/04_wal_generation_rate.sql`, `13_io_wal_checkpoints/04_wal_archiver_health.sql` |
-| Security/privilege internals | `pg_roles`, `pg_auth_members`, `pg_default_acl`, `information_schema` | `09_security_roles/*.sql` |
-| Checkpoints and writer internals | `pg_stat_bgwriter` | `10_maintenance_monitoring/01_bgwriter_checkpoint_stats.sql`, `13_io_wal_checkpoints/05_checkpoint_pressure_indicators.sql` |
-| Query-level performance | `pg_stat_statements`, `pg_stat_user_functions` | `11_performance_tuning/*.sql` |
-| Planner stats health | `pg_stat_user_tables`, `pg_stats`, `pg_statistic_ext` | `12_planner_statistics/*.sql` |
-| I/O internals | `pg_stat_database`, `pg_statio_*`, `pg_stat_io` | `13_io_wal_checkpoints/*.sql` |
-| Connection behavior internals | `pg_stat_activity`, `pg_roles`, `pg_prepared_xacts` | `14_connection_workload/*.sql` |
-| Capacity trend internals | Snapshot tables + runtime stats views | `15_capacity_forecasting/*.sql` |
-| XID/multixact aging | `pg_database.datfrozenxid`, `datminmxid`, `pg_class.relfrozenxid` | `16_internals_deep_dive/01_database_xid_multixact_age.sql`, `16_internals_deep_dive/06_visibility_and_freeze_profile.sql` |
-| Storage file mapping | `pg_relation_filenode()`, `pg_relation_filepath()` | `16_internals_deep_dive/02_relation_filenode_mapping.sql` |
-| Dependency graph internals | `pg_depend` | `16_internals_deep_dive/04_dependency_fanout_objects.sql` |
-| Object type inventory | `pg_class`, `pg_proc`, `pg_type`, `pg_tablespace`, `pg_trigger`, `information_schema.*` | `29_object_inventory_health/01_object_type_inventory.sql` |
-| PK/FK and join-index health | `pg_constraint`, `pg_index`, `pg_stat_user_tables`, `pg_attribute` | `29_object_inventory_health/02_table_pk_fk_health.sql`, `29_object_inventory_health/04_missing_fk_supporting_indexes.sql`, `29_object_inventory_health/05_missing_join_column_indexes.sql` |
-| Identifier naming and migration mapping | `pg_class`, `pg_attribute`, `pg_proc`, `pg_namespace` | `29_object_inventory_health/06_identifier_casing_risks.sql`, `29_object_inventory_health/15_oracle_package_synonym_mapping.sql` |
-| Ingest/federation/object query diagnostics | `pg_stat_progress_copy`, `pg_foreign_*`, `pg_stat_statements` | `29_object_inventory_health/13_insert_copy_activity.sql`, `29_object_inventory_health/14_fdw_inventory.sql`, `29_object_inventory_health/18_object_query_hotspots_pgss.sql` |
+- `00_environment`: Oracle instance, database, option, and catalog inventory. (3 scripts)
+- `01_database_size`: Database, tablespace, datafile, temp file, and segment size diagnostics. (3 scripts)
+- `02_table_storage`: Table storage, segment allocation, row counts, and storage attributes. (4 scripts)
+- `03_index_analysis`: Index storage, visibility, duplication, selectivity, and maintenance candidates. (4 scripts)
+- `04_lob_blob_storage`: LOB/BLOB storage, SecureFiles, BasicFiles, compression, deduplication, and top LOB segments. (4 scripts)
+- `05_partitioning`: Partitioned table, partition segment, indexing, and recommendation checks. (7 scripts)
+- `06_activity_locks`: Active sessions, blockers, wait events, locks, and long-running transactions. (4 scripts)
+- `07_segment_space_reclaim`: Segment space reclaim, stale statistics, undo retention, and Segment Advisor signals. (5 scripts)
+- `08_replication_ha`: Data Guard, archivelog, redo generation, standby apply, and high availability posture. (4 scripts)
+- `09_security_roles`: Users, roles, system privileges, object grants, profiles, and exposure checks. (4 scripts)
+- `10_maintenance_monitoring`: DB writer, cache, checkpoint, top SQL, parameter drift, and capacity monitoring. (5 scripts)
+- `11_performance_tuning`: Top SQL, temp-heavy SQL, I/O-heavy SQL, parameter tuning, and PL/SQL hotspots. (6 scripts)
+- `12_planner_statistics`: Optimizer statistics quality, stale objects, histogram and extension inventory, and optimizer parameters. (6 scripts)
+- `13_io_redo_checkpoints`: Datafile I/O, object I/O, redo, archiver, checkpoint, and temp pressure. (7 scripts)
+- `14_connection_workload`: Session distribution, idle sessions, connection capacity, and distributed transaction status. (6 scripts)
+- `15_capacity_forecasting`: Capacity snapshot repository, capture scripts, and growth reports. (8 scripts)
+- `16_internals_deep_dive`: Undo, extents, segment internals, dependencies, LOB internals, and retention profiles. (6 scripts)
+- `17_execution_plans`: Plan capture, DBMS_XPLAN templates, and plan red-flag candidates. (4 scripts)
+- `18_long_queries_full_scans`: Long-running SQL and full scan workload diagnostics. (4 scripts)
+- `19_dml_optimization`: Write-heavy tables, row movement, index support for foreign keys, and DML pressure. (4 scripts)
+- `20_design_matters`: Schema design anti-patterns such as missing primary keys, wide tables, and high-null columns. (4 scripts)
+- `21_configuration_parameters`: Oracle initialization parameter baselines for performance, redo, stats, and connections. (4 scripts)
+- `22_application_orm_performance`: Application and ORM query patterns, select-star risk, chatty SQL, and idle transaction behavior. (4 scripts)
+- `23_functions_dynamic_sql`: PL/SQL procedure/function execution, dynamic SQL, security definer analogs, and triggers. (4 scripts)
+- `24_complex_filter_search`: LIKE, JSON, XML, Oracle Text, spatial, and domain index diagnostics. (4 scripts)
+- `25_oltp_olap_goals`: Workload classification and OLTP/OLAP pressure indicators. (4 scripts)
+- `26_physical_cloud_diagnostics`: Platform fingerprint, storage, wait, checkpoint, and managed-service signals. (4 scripts)
+- `27_high_speed_tuning`: Fast triage dashboards and action queues for bottleneck diagnosis. (6 scripts)
+- `27_oracle_health_validation`: Oracle health reports, sanity gates, and optional lab issue scripts. (9 scripts)
+- `28_sql_resource_attribution`: SQL resource attribution by SQL ID, service, parsing schema, and infrastructure tier. (4 scripts)
+- `29_object_inventory_health`: Deep object inventory and health checks for tables, indexes, constraints, PL/SQL, partitions, grants, DB links, and synonyms. (18 scripts)
+- `30_backup_restore_pitr_dr`: RMAN, archivelog, restore point, PITR, and Data Guard evidence. (5 scripts)
+- `31_logging_error_signatures`: ADR, alert log, trace, error signatures, slow SQL, lock waits, and deadlock indicators. (4 scripts)
+- `32_upgrade_patch_readiness`: Version, component, SQL patch, invalid object, NLS, and post-upgrade regression checks. (6 scripts)
+- `33_db_writer_memory_pressure`: DB writer, checkpoint, redo writer, stats jobs, parallel workers, SGA/PGA, and temp spill pressure. (5 scripts)
+- `34_consistency_integrity_checks`: Invalid objects, corruption views, LOB dictionary signals, and validate-structure commands. (5 scripts)
+- `35_pooler_proxy_diagnostics`: Connection saturation, session distribution, cursor cache, shared server, and proxy/client signals. (5 scripts)
+- `36_cloud_provider_signals`: Managed-service fingerprints, parameter drift, replica lag/failover, and incident-window evidence. (5 scripts)
+- `37_object_lifecycle_capacity`: Object lifecycle repository, DDL trigger, snapshots, advisory views, and capacity reports. (12 scripts)
 
-## Gaps to Expand Next
+## Notes
 
-- Backup/restore validation (`pg_backup_start`, archive restore checks, recovery verification).
-- DDL/event auditing baselines (event triggers and schema drift history).
-- Per-application service-level dashboards (latency/error budgets from SQL counters).
+- Designed around Oracle Database 19c+ catalog and dynamic performance views.
+- `DBA_HIST_*`, ASH, SQL Monitor, and similar history views may require Diagnostics Pack licensing.
+- Use SQL*Plus or SQLcl for substitution variables and `DBMS_XPLAN` output.

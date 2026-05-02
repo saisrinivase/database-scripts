@@ -1,39 +1,31 @@
 /*
-Purpose: List currently running long queries and wait signals.
-Area: Long Queries and Full Scans
-Usage: Run during incidents; adjust threshold interval as needed.
+Oracle DBA Script: Active Long Queries
+Purpose: Provide Oracle DBA diagnostics for active long queries.
+Area: Long Queries Full Scans
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    pid,
-    datname AS database_name,
-    usename AS user_name,
-    application_name,
-    client_addr,
-    now() - query_start AS query_age,
-    state,
-    wait_event_type,
-    wait_event,
-    left(query, 400) AS query_snippet
-FROM pg_stat_activity
-WHERE state = 'active'
-  AND query_start IS NOT NULL
-  AND now() - query_start >= interval '1 minute'
-ORDER BY query_age DESC;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Active Long Queries
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  pid | database_name | user_name | application_name | client_addr | query_age | state | wait_event_type | wait_event | query_snippet 
--- -----+---------------+-----------+------------------+-------------+-----------+-------+-----------------+------------+---------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No issue/candidate rows were found at capture time.
--- - This typically indicates healthy state for this check; rerun during peak load for validation.
--- SAMPLE_OUTPUT_END
-
+SELECT inst_id, sid, serial# AS serial_num, username, status, sql_id,
+       event, wait_class, last_call_et AS seconds_since_call,
+       ROUND(last_call_et/60,2) AS minutes_since_call, module, machine, program
+FROM gv$session
+WHERE username IS NOT NULL
+  AND status = 'ACTIVE'
+  AND last_call_et >= 300
+ORDER BY last_call_et DESC;

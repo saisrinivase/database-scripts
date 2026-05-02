@@ -1,34 +1,27 @@
 /*
-Purpose: Identify highly privileged roles (superuser, replication, bypass RLS).
-Area: Security and Roles
-Usage: Review regularly for least-privilege compliance.
+Oracle DBA Script: High Privilege Roles
+Purpose: Provide Oracle DBA diagnostics for high privilege roles.
+Area: Security Roles
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    rolname AS role_name,
-    rolsuper AS is_superuser,
-    rolreplication AS can_replicate,
-    rolbypassrls AS bypasses_row_level_security,
-    rolcreaterole AS can_create_roles,
-    rolcreatedb AS can_create_databases,
-    rolcanlogin AS can_login
-FROM pg_roles
-WHERE rolsuper
-   OR rolreplication
-   OR rolbypassrls
-   OR rolcreaterole
-ORDER BY role_name;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT High Privilege Roles
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  role_name | is_superuser | can_replicate | bypasses_row_level_security | can_create_roles | can_create_databases | can_login 
--- -----------+--------------+---------------+-----------------------------+------------------+----------------------+-----------
---  postgres  | t            | t             | f                           | t                | t                    | t
---  saiendla  | t            | t             | t                           | t                | t                    | t
--- (2 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT grantee, privilege, admin_option, common, inherited
+FROM dba_sys_privs
+WHERE privilege IN ('DBA','SYSDBA','SYSOPER','CREATE USER','ALTER USER','DROP USER','GRANT ANY PRIVILEGE','GRANT ANY ROLE','CREATE ANY TABLE','DROP ANY TABLE','ALTER SYSTEM')
+ORDER BY grantee, privilege;

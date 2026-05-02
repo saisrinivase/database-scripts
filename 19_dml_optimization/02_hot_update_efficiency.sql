@@ -1,36 +1,30 @@
 /*
-Purpose: Evaluate HOT update efficiency (lower ratio may indicate index churn and write amplification).
-Area: Optimizing Data Modification
-Usage: Focus on heavily updated tables.
+Oracle DBA Script: Hot Update Efficiency
+Purpose: Provide Oracle DBA diagnostics for hot update efficiency.
+Area: Dml Optimization
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    schemaname AS schema_name,
-    relname AS table_name,
-    n_tup_upd,
-    n_tup_hot_upd,
-    CASE
-        WHEN n_tup_upd = 0 THEN NULL
-        ELSE round(100.0 * n_tup_hot_upd / n_tup_upd, 2)
-    END AS hot_update_pct,
-    pg_size_pretty(pg_total_relation_size(relid)) AS total_size
-FROM pg_stat_user_tables
-WHERE n_tup_upd > 0
-ORDER BY hot_update_pct ASC NULLS LAST, n_tup_upd DESC;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Hot Update Efficiency
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---    schema_name    |       table_name        | n_tup_upd | n_tup_hot_upd | hot_update_pct | total_size 
--- ------------------+-------------------------+-----------+---------------+----------------+------------
---  migration_v2_lab | amount_mapping_risk     |    120000 |             0 |           0.00 | 19 MB
---  migration_v2_lab | customer_contact_compat |     51429 |           466 |           0.91 | 13 MB
---  public           | pgbench_accounts        |   5332823 |       2672081 |          50.11 | 30 GB
---  public           | pgbench_tellers         |   5332823 |       5288199 |          99.16 | 3712 kB
---  public           | pgbench_branches        |   5332823 |       5316334 |          99.69 | 7048 kB
--- (5 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT t.owner, t.table_name, t.row_movement, t.pct_free, t.ini_trans, t.num_rows, t.blocks,
+       m.inserts, m.updates, m.deletes,
+       CASE WHEN NVL(m.updates,0) > NVL(m.inserts,0) + NVL(m.deletes,0) THEN 'UPDATE_HEAVY_REVIEW_PCTFREE_INDEXES' ELSE 'NORMAL' END AS dml_profile
+FROM dba_tables t
+LEFT JOIN dba_tab_modifications m ON m.table_owner = t.owner AND m.table_name = t.table_name
+WHERE t.owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+ORDER BY NVL(m.updates,0) DESC NULLS LAST;

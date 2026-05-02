@@ -1,31 +1,35 @@
 /*
-Purpose: Show write-heavy tables with dead tuple pressure (bloat risk).
-Area: Optimizing Data Modification
-Usage: Candidate list for VACUUM tuning and batch rewrite strategies.
+Oracle DBA Script: Dml Bloat Pressure
+Purpose: Provide Oracle DBA diagnostics for dml bloat pressure.
+Area: Dml Optimization
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    schemaname AS schema_name,
-    relname AS table_name,
-    n_live_tup,
-    n_dead_tup,
-    round(100.0 * n_dead_tup / NULLIF(n_live_tup + n_dead_tup, 0), 2) AS dead_tuple_pct,
-    (n_tup_ins + n_tup_upd + n_tup_del) AS total_writes,
-    pg_size_pretty(pg_total_relation_size(relid)) AS total_size
-FROM pg_stat_user_tables
-WHERE n_dead_tup > 0
-ORDER BY dead_tuple_pct DESC NULLS LAST, total_writes DESC;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Dml Bloat Pressure
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name |    table_name    | n_live_tup | n_dead_tup | dead_tuple_pct | total_writes | total_size 
--- -------------+------------------+------------+------------+----------------+--------------+------------
---  public      | pgbench_branches |       2000 |         81 |           3.89 |      5334823 | 7048 kB
---  public      | pgbench_accounts |  200000029 |    4232485 |           2.07 |    205332823 | 30 GB
--- (2 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT t.owner, t.table_name, ROUND(NVL(s.bytes,0)/1024/1024,2) AS segment_mb,
+       t.num_rows, t.blocks, t.empty_blocks, t.avg_space, t.chain_cnt, t.last_analyzed,
+       CASE
+         WHEN t.last_analyzed IS NULL THEN 'GATHER_STATS'
+         WHEN t.chain_cnt > 0 THEN 'REVIEW_ROW_CHAINING'
+         WHEN NVL(s.bytes,0) > 1024*1024*1024 AND NVL(t.num_rows,0) = 0 THEN 'REVIEW_UNUSED_SEGMENT'
+         ELSE 'REVIEW_SEGMENT_ADVISOR'
+       END AS suggested_check
+FROM dba_tables t
+LEFT JOIN dba_segments s ON s.owner = t.owner AND s.segment_name = t.table_name
+WHERE t.owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+ORDER BY segment_mb DESC NULLS LAST;

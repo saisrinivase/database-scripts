@@ -1,61 +1,26 @@
 /*
-Purpose: Show checksum posture and checksum-failure evidence when available.
-Area: Consistency and Integrity Checks
-Usage: If checksums are off, rely on stronger backup/restore verification and storage diagnostics.
+Oracle DBA Script: Checksum Status And Failures
+Purpose: Provide Oracle DBA diagnostics for checksum status and failures.
+Area: Consistency Integrity Checks
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT EXISTS (
-           SELECT 1
-           FROM information_schema.columns
-           WHERE table_schema = 'pg_catalog'
-             AND table_name = 'pg_stat_database'
-             AND column_name = 'checksum_failures'
-       ) AS has_checksum_columns
-\gset
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
-\if :has_checksum_columns
-SELECT
-    current_database() AS database_name,
-    coalesce(current_setting('data_checksums', true), '(unknown)') AS data_checksums,
-    d.datname,
-    s.checksum_failures,
-    s.stats_reset,
-    CASE
-        WHEN coalesce(current_setting('data_checksums', true), 'off') IN ('on', '1') AND s.checksum_failures = 0 THEN 'CHECKSUMS_ENABLED_NO_FAILURES'
-        WHEN coalesce(current_setting('data_checksums', true), 'off') IN ('on', '1') AND s.checksum_failures > 0 THEN 'CHECKSUM_FAILURES_DETECTED'
-        ELSE 'CHECKSUMS_DISABLED_OR_UNKNOWN'
-    END AS integrity_signal,
-    CASE
-        WHEN s.checksum_failures > 0 THEN 'Escalate: run storage and integrity triage, validate replicas/backups immediately.'
-        WHEN coalesce(current_setting('data_checksums', true), 'off') NOT IN ('on', '1') THEN 'Plan checksum-enabled cluster for stronger corruption detection in future upgrades/migrations.'
-        ELSE 'No immediate checksum-driven action.'
-    END AS action_hint
-FROM pg_database d
-JOIN pg_stat_database s
-  ON s.datid = d.oid
-WHERE NOT d.datistemplate
-ORDER BY s.checksum_failures DESC, d.datname;
-\else
-SELECT
-    current_database() AS database_name,
-    coalesce(current_setting('data_checksums', true), '(unknown)') AS data_checksums,
-    'checksum_failures columns are not available in this PostgreSQL version.'::text AS note;
-\endif
+PROMPT Checksum Status And Failures
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_new_areas_20260219_refresh2
---
---  database_name | data_checksums |              datname              | checksum_failures | stats_reset |       integrity_signal        |             action_hint              
--- ---------------+----------------+-----------------------------------+-------------------+-------------+-------------------------------+--------------------------------------
---  pgbench_test  | on             | appdb                             |                 0 |             | CHECKSUMS_ENABLED_NO_FAILURES | No immediate checksum-driven action.
---  pgbench_test  | on             | hypopg_lab                        |                 0 |             | CHECKSUMS_ENABLED_NO_FAILURES | No immediate checksum-driven action.
---  pgbench_test  | on             | perf_test                         |                 0 |             | CHECKSUMS_ENABLED_NO_FAILURES | No immediate checksum-driven action.
---  pgbench_test  | on             | pgbench_test                      |                 0 |             | CHECKSUMS_ENABLED_NO_FAILURES | No immediate checksum-driven action.
---  pgbench_test  | on             | postgres                          |                 0 |             | CHECKSUMS_ENABLED_NO_FAILURES | No immediate checksum-driven action.
---  pgbench_test  | on             | script_validation_20260218_172749 |                 0 |             | CHECKSUMS_ENABLED_NO_FAILURES | No immediate checksum-driven action.
--- (6 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT 'DATABASE_BLOCK_CORRUPTION' AS source_view, COUNT(*) AS finding_count FROM v$database_block_corruption
+UNION ALL SELECT 'BACKUP_CORRUPTION', COUNT(*) FROM v$backup_corruption
+UNION ALL SELECT 'COPY_CORRUPTION', COUNT(*) FROM v$copy_corruption;

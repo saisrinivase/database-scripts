@@ -1,40 +1,32 @@
 /*
-Purpose: Break down current database storage into table, index, and TOAST components.
+Oracle DBA Script: Current Database Size Breakdown
+Purpose: Provide Oracle DBA diagnostics for current database size breakdown.
 Area: Database Size
-Usage: Run in the database you want to analyze.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-WITH base AS (
-    SELECT
-        c.oid,
-        c.reltoastrelid
-    FROM pg_class c
-    JOIN pg_namespace n
-        ON n.oid = c.relnamespace
-    WHERE c.relkind IN ('r', 'm')
-      AND n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
+
+PROMPT Current Database Size Breakdown
+
+SELECT component, ROUND(bytes / 1024 / 1024 / 1024, 2) AS gb
+FROM (
+    SELECT 'DATAFILES' component, SUM(bytes) bytes FROM dba_data_files
+    UNION ALL SELECT 'TEMPFILES', SUM(bytes) FROM dba_temp_files
+    UNION ALL SELECT 'ONLINE_REDO_LOGS', SUM(bytes) FROM v$log
+    UNION ALL SELECT 'CONTROL_FILES_ESTIMATE', COUNT(*) * 1024 * 1024 FROM v$controlfile
+    UNION ALL SELECT 'SEGMENTS_ALLOCATED', SUM(bytes) FROM dba_segments
 )
-SELECT
-    pg_database_size(current_database()) AS database_total_bytes,
-    pg_size_pretty(pg_database_size(current_database())) AS database_total_pretty,
-    sum(pg_relation_size(b.oid)) AS table_heap_bytes,
-    pg_size_pretty(sum(pg_relation_size(b.oid))) AS table_heap_pretty,
-    sum(pg_indexes_size(b.oid)) AS indexes_bytes,
-    pg_size_pretty(sum(pg_indexes_size(b.oid))) AS indexes_pretty,
-    sum(CASE WHEN b.reltoastrelid = 0 THEN 0 ELSE pg_total_relation_size(b.reltoastrelid) END) AS toast_bytes,
-    pg_size_pretty(sum(CASE WHEN b.reltoastrelid = 0 THEN 0 ELSE pg_total_relation_size(b.reltoastrelid) END)) AS toast_pretty
-FROM base b;
-
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  database_total_bytes | database_total_pretty | table_heap_bytes | table_heap_pretty | indexes_bytes | indexes_pretty | toast_bytes | toast_pretty 
--- ----------------------+-----------------------+------------------+-------------------+---------------+----------------+-------------+--------------
---           32236762815 | 30 GB                 |      27656060928 | 26 GB             |    4562763776 | 4351 MB        |      204800 | 200 kB
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
+ORDER BY gb DESC;

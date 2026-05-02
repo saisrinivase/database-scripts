@@ -1,48 +1,39 @@
 /*
-Purpose: Classify query mix into short/medium/long buckets for optimization strategy choice.
-Area: Long Queries and Full Scans
-Usage: Requires pg_stat_statements; thresholds are adjustable.
+Oracle DBA Script: Short Vs Long Query Distribution
+Purpose: Provide Oracle DBA diagnostics for short vs long query distribution.
+Area: Long Queries Full Scans
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-WITH classified AS (
-    SELECT
-        CASE
-            WHEN mean_exec_time < 10 THEN 'Short (<10ms)'
-            WHEN mean_exec_time < 100 THEN 'Medium (10-100ms)'
-            WHEN mean_exec_time < 1000 THEN 'Long (100ms-1s)'
-            ELSE 'Very long (>1s)'
-        END AS bucket,
-        calls,
-        total_exec_time
-    FROM pg_stat_statements
-)
-SELECT
-    bucket,
-    count(*) AS statement_count,
-    sum(calls) AS total_calls,
-    sum(total_exec_time) AS total_exec_time_ms
-FROM classified
-GROUP BY bucket
-ORDER BY
-    CASE bucket
-        WHEN 'Short (<10ms)' THEN 1
-        WHEN 'Medium (10-100ms)' THEN 2
-        WHEN 'Long (100ms-1s)' THEN 3
-        ELSE 4
-    END;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Short Vs Long Query Distribution
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---       bucket       | statement_count | total_calls | total_exec_time_ms 
--- -------------------+-----------------+-------------+--------------------
---  Short (<10ms)     |             688 |    39301614 | 21138847.442612693
---  Medium (10-100ms) |              68 |         226 |  6928.975448999999
---  Long (100ms-1s)   |              35 |         130 |       36590.310079
---  Very long (>1s)   |               3 |           9 | 10957.114957999998
--- (4 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT CASE
+         WHEN elapsed_time/NULLIF(executions,0)/1000000 < 1 THEN '<1s'
+         WHEN elapsed_time/NULLIF(executions,0)/1000000 < 10 THEN '1-10s'
+         WHEN elapsed_time/NULLIF(executions,0)/1000000 < 60 THEN '10-60s'
+         ELSE '>=60s'
+       END AS avg_elapsed_bucket,
+       COUNT(*) AS sql_count
+FROM gv$sqlarea
+WHERE executions > 0
+GROUP BY CASE
+         WHEN elapsed_time/NULLIF(executions,0)/1000000 < 1 THEN '<1s'
+         WHEN elapsed_time/NULLIF(executions,0)/1000000 < 10 THEN '1-10s'
+         WHEN elapsed_time/NULLIF(executions,0)/1000000 < 60 THEN '10-60s'
+         ELSE '>=60s'
+       END
+ORDER BY sql_count DESC;

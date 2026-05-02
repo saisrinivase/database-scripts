@@ -1,33 +1,30 @@
 /*
-Purpose: Summarize wait events across sessions to spot dominant bottlenecks.
-Area: Activity and Locks
-Usage: Run repeatedly to compare shifting wait profiles.
+Oracle DBA Script: Wait Events Summary
+Purpose: Provide Oracle DBA diagnostics for wait events summary.
+Area: Activity Locks
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    coalesce(wait_event_type, 'CPU/None') AS wait_event_type,
-    coalesce(wait_event, 'CPU/None') AS wait_event,
-    state,
-    count(*) AS session_count
-FROM pg_stat_activity
-GROUP BY coalesce(wait_event_type, 'CPU/None'), coalesce(wait_event, 'CPU/None'), state
-ORDER BY session_count DESC, wait_event_type, wait_event;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Wait Events Summary
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  wait_event_type |     wait_event      | state  | session_count 
--- -----------------+---------------------+--------+---------------
---  Activity        | IoWorkerMain        |        |             3
---  Activity        | AutovacuumMain      |        |             1
---  Activity        | BgwriterMain        |        |             1
---  Activity        | CheckpointerMain    |        |             1
---  Activity        | LogicalLauncherMain |        |             1
---  Activity        | WalWriterMain       |        |             1
---  CPU/None        | CPU/None            | active |             1
--- (7 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT wait_class, event, COUNT(*) AS sessions_waiting,
+       MAX(seconds_in_wait) AS max_seconds_in_wait
+FROM gv$session
+WHERE state = 'WAITING'
+  AND wait_class <> 'Idle'
+GROUP BY wait_class, event
+ORDER BY sessions_waiting DESC, max_seconds_in_wait DESC;

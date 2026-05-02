@@ -1,6 +1,0 @@
- tablespace_name | size_bytes  | size_pretty 
------------------+-------------+-------------
- pg_default      | 33023270904 | 31 GB
- pg_global       |      586116 | 572 kB
-(2 rows)
-

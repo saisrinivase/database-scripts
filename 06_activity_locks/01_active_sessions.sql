@@ -1,43 +1,28 @@
 /*
-Purpose: List active and idle sessions with query age and wait details.
-Area: Activity and Locks
-Usage: Useful for live triage of load or stuck sessions.
+Oracle DBA Script: Active Sessions
+Purpose: Provide Oracle DBA diagnostics for active sessions.
+Area: Activity Locks
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    a.pid,
-    a.usename AS user_name,
-    a.application_name,
-    a.client_addr,
-    a.backend_start,
-    a.xact_start,
-    a.query_start,
-    now() - a.query_start AS query_age,
-    a.state,
-    a.wait_event_type,
-    a.wait_event,
-    left(a.query, 400) AS query_snippet
-FROM pg_stat_activity a
-WHERE a.pid <> pg_backend_pid()
-ORDER BY query_age DESC NULLS LAST;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Active Sessions
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  pid | user_name | application_name | client_addr |         backend_start         | xact_start | query_start | query_age | state | wait_event_type |     wait_event      | query_snippet 
--- -----+-----------+------------------+-------------+-------------------------------+------------+-------------+-----------+-------+-----------------+---------------------+---------------
---  892 |           |                  |             | 2026-02-10 09:32:09.214793-05 |            |             |           |       | Activity        | AutovacuumMain      | 
---  893 | saiendla  |                  |             | 2026-02-10 09:32:09.216526-05 |            |             |           |       | Activity        | LogicalLauncherMain | 
---  885 |           |                  |             | 2026-02-10 09:32:09.197791-05 |            |             |           |       | Activity        | IoWorkerMain        | 
---  886 |           |                  |             | 2026-02-10 09:32:09.200077-05 |            |             |           |       | Activity        | IoWorkerMain        | 
---  887 |           |                  |             | 2026-02-10 09:32:09.201055-05 |            |             |           |       | Activity        | IoWorkerMain        | 
---  888 |           |                  |             | 2026-02-10 09:32:09.202493-05 |            |             |           |       | Activity        | CheckpointerMain    | 
---  889 |           |                  |             | 2026-02-10 09:32:09.20292-05  |            |             |           |       | Activity        | BgwriterMain        | 
---  891 |           |                  |             | 2026-02-10 09:32:09.21264-05  |            |             |           |       | Activity        | WalWriterMain       | 
--- (8 rows)
--- 
--- SAMPLE_OUTPUT_END
-
+SELECT inst_id, sid, serial# AS serial_num, username, status, state,
+       event, wait_class, seconds_in_wait, sql_id, module, machine, program, logon_time
+FROM gv$session
+WHERE username IS NOT NULL
+ORDER BY status, last_call_et DESC;

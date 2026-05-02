@@ -1,33 +1,26 @@
 /*
-Purpose: Inspect default privileges that apply to future objects.
-Area: Security and Roles
-Usage: Helps detect unexpected inherited access.
+Oracle DBA Script: Default Privileges
+Purpose: Provide Oracle DBA diagnostics for default privileges.
+Area: Security Roles
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    n.nspname AS schema_name,
-    r.rolname AS owner_role,
-    d.defaclobjtype AS object_type,
-    d.defaclacl AS default_acl
-FROM pg_default_acl d
-LEFT JOIN pg_namespace n
-    ON n.oid = d.defaclnamespace
-JOIN pg_roles r
-    ON r.oid = d.defaclrole
-ORDER BY schema_name NULLS FIRST, owner_role, object_type;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Default Privileges
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name | owner_role | object_type | default_acl 
--- -------------+------------+-------------+-------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No matching rows were returned at capture time.
--- - Rerun during peak workload or after seeding representative test cases for non-zero examples.
--- SAMPLE_OUTPUT_END
+SELECT owner, schema_name, grantee, privilege, type, grantable
+FROM dba_def_tab_privs
+ORDER BY owner, schema_name, grantee, privilege;

@@ -1,3 +1,0 @@
-psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/10_maintenance_monitoring/01_bgwriter_checkpoint_stats.sql:18: ERROR:  column "checkpoints_timed" does not exist
-LINE 7:     checkpoints_timed,
-            ^

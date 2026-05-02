@@ -1,4 +1,0 @@
- schema_name | table_name | seq_scan | idx_scan | seq_scan_pct | total_bytes | total_pretty | estimated_live_rows 
--------------+------------+----------+----------+--------------+-------------+--------------+---------------------
-(0 rows)
-

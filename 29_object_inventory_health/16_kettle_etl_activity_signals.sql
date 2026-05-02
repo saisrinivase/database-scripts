@@ -1,77 +1,30 @@
 /*
-Purpose: Detect ETL/KETTLE-like activity patterns from active sessions and role naming.
-Area: Object Inventory and Health
-Usage: Correlate ETL windows with locking, I/O pressure, and long-running statements.
+Oracle DBA Script: Kettle Etl Activity Signals
+Purpose: Provide Oracle DBA diagnostics for kettle etl activity signals.
+Area: Object Inventory Health
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-WITH etl_sessions AS (
-    SELECT
-        pid,
-        usename,
-        datname,
-        coalesce(application_name, '') AS application_name,
-        client_addr,
-        state,
-        wait_event_type,
-        wait_event,
-        now() - query_start AS query_age,
-        left(query, 240) AS query_snippet
-    FROM pg_stat_activity
-    WHERE backend_type = 'client backend'
-      AND (
-            application_name ~* '(kettle|pentaho|spoon|pan|kitchen|etl|batch)'
-         OR usename ~* '(etl|batch|kettle|pentaho)'
-      )
-),
-etl_roles AS (
-    SELECT
-        rolname,
-        rolsuper,
-        rolcreaterole,
-        rolcreatedb,
-        rolreplication
-    FROM pg_roles
-    WHERE rolname ~* '(etl|batch|kettle|pentaho)'
-)
-SELECT
-    'SESSION'::text AS signal_type,
-    pid::text AS signal_id,
-    usename AS principal,
-    datname AS database_name,
-    application_name,
-    state,
-    coalesce(wait_event_type, '') AS wait_event_type,
-    coalesce(wait_event, '') AS wait_event,
-    query_age::text AS duration,
-    query_snippet AS details
-FROM etl_sessions
-UNION ALL
-SELECT
-    'ROLE'::text,
-    rolname,
-    rolname,
-    '',
-    '',
-    CASE WHEN rolsuper THEN 'SUPERUSER' ELSE 'NON_SUPERUSER' END,
-    '',
-    '',
-    '',
-    format('create_role=%s create_db=%s replication=%s', rolcreaterole, rolcreatedb, rolreplication)
-FROM etl_roles
-ORDER BY signal_type, signal_id;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Kettle Etl Activity Signals
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  signal_type | signal_id | principal | database_name | application_name | state | wait_event_type | wait_event | duration | details 
--- -------------+-----------+-----------+---------------+------------------+-------+-----------------+------------+----------+---------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No KETTLE/ETL-like sessions or roles matched at capture time.
--- - This is expected outside ETL windows or when application_name/role naming differs.
--- SAMPLE_OUTPUT_END
+SELECT * FROM (
+    SELECT sql_id, parsing_schema_name, module, action, executions, rows_processed,
+           SUBSTR(sql_text,1,160) AS sql_text
+    FROM v$sqlarea
+    WHERE UPPER(module) LIKE '%KETTLE%' OR UPPER(module) LIKE '%PENTAHO%' OR UPPER(sql_text) LIKE '%KETTLE%'
+    ORDER BY last_active_time DESC NULLS LAST
+) WHERE ROWNUM <= 100;

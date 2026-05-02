@@ -1,50 +1,28 @@
 /*
-Purpose: Report planner cost parameters that strongly influence execution plan selection.
-Area: Planner and Statistics
-Usage: Baseline before/after performance tuning changes.
+Oracle DBA Script: Planner Cost Settings
+Purpose: Provide Oracle DBA diagnostics for planner cost settings.
+Area: Planner Statistics
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    name,
-    setting,
-    unit,
-    source,
-    reset_val
-FROM pg_settings
-WHERE name IN (
-    'default_statistics_target',
-    'random_page_cost',
-    'seq_page_cost',
-    'cpu_tuple_cost',
-    'cpu_index_tuple_cost',
-    'cpu_operator_cost',
-    'parallel_setup_cost',
-    'parallel_tuple_cost',
-    'min_parallel_table_scan_size',
-    'min_parallel_index_scan_size',
-    'effective_cache_size'
-)
-ORDER BY name;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Planner Cost Settings
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---              name             | setting | unit | source  | reset_val 
--- ------------------------------+---------+------+---------+-----------
---  cpu_index_tuple_cost         | 0.005   |      | default | 0.005
---  cpu_operator_cost            | 0.0025  |      | default | 0.0025
---  cpu_tuple_cost               | 0.01    |      | default | 0.01
---  default_statistics_target    | 100     |      | default | 100
---  effective_cache_size         | 524288  | 8kB  | default | 524288
---  min_parallel_index_scan_size | 64      | 8kB  | default | 64
---  min_parallel_table_scan_size | 1024    | 8kB  | default | 1024
---  parallel_setup_cost          | 1000    |      | default | 1000
---  parallel_tuple_cost          | 0.1     |      | default | 0.1
---  random_page_cost             | 4       |      | default | 4
---  seq_page_cost                | 1       |      | default | 1
--- (11 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT o.owner, o.target, o.target_type, o.operation, o.status, o.start_time, o.end_time,
+       o.job_name, o.notes
+FROM dba_optstat_operations o
+WHERE o.start_time >= SYSTIMESTAMP - INTERVAL '14' DAY
+ORDER BY o.start_time DESC;

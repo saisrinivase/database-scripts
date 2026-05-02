@@ -1,16 +1,17 @@
-# Pooler and Proxy Diagnostics
+# 35_pooler_proxy_diagnostics
 
-Purpose: Troubleshoot connection pool/proxy behavior (PgBouncer/PgPool/RDS Proxy style) from PostgreSQL-side evidence.
+Connection saturation, session distribution, cursor cache, shared server, and proxy/client signals.
 
-## Run Order
+Scripts in this area: `5`.
 
-1. `01_connection_saturation_queue_risk.sql`
-2. `02_connection_distribution_by_app_user.sql`
-3. `03_prepared_statement_pooling_risk.sql`
-4. `04_tx_pooling_incompatible_patterns_pgss.sql`
-5. `05_pooler_proxy_inventory_signals.sql`
+## Usage
 
-## Notes
+Run with SQL*Plus or SQLcl, for example: `sqlplus / as sysdba @35_pooler_proxy_diagnostics/<script>.sql`.
 
-- Pool queue depth often lives in the pooler layer; these scripts provide database-side indicators.
-- Pair this area with pooler admin metrics for complete diagnosis.
+## Scripts
+
+- `01_connection_saturation_queue_risk.sql`
+- `02_connection_distribution_by_app_user.sql`
+- `03_session_cursor_cache_risk.sql`
+- `04_shared_server_pooling_risk.sql`
+- `05_pooler_proxy_inventory_signals.sql`

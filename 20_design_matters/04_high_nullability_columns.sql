@@ -1,33 +1,31 @@
 /*
-Purpose: Identify columns with high null fraction that may indicate schema redesign opportunities.
+Oracle DBA Script: High Nullability Columns
+Purpose: Provide Oracle DBA diagnostics for high nullability columns.
 Area: Design Matters
-Usage: Review with domain model and query usage before schema changes.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    schemaname AS schema_name,
-    tablename AS table_name,
-    attname AS column_name,
-    null_frac,
-    n_distinct,
-    correlation
-FROM pg_stats
-WHERE schemaname !~ '^pg_'
-  AND schemaname <> 'information_schema'
-  AND null_frac >= 0.80
-ORDER BY null_frac DESC, schemaname, tablename, attname;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT High Nullability Columns
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name |    table_name    | column_name | null_frac | n_distinct | correlation 
--- -------------+------------------+-------------+-----------+------------+-------------
---  public      | pgbench_branches | filler      |         1 |          0 |            
---  public      | pgbench_history  | filler      |         1 |          0 |            
---  public      | pgbench_tellers  | filler      |         1 |          0 |            
--- (3 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT owner, table_name, COUNT(*) AS columns,
+       SUM(CASE WHEN nullable = 'Y' THEN 1 ELSE 0 END) AS nullable_columns,
+       ROUND(SUM(CASE WHEN nullable = 'Y' THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) AS nullable_pct
+FROM dba_tab_columns
+WHERE owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+GROUP BY owner, table_name
+HAVING SUM(CASE WHEN nullable = 'Y' THEN 1 ELSE 0 END) / COUNT(*) >= 0.75
+ORDER BY nullable_pct DESC, columns DESC;

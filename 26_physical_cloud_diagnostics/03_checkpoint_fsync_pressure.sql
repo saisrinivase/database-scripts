@@ -1,59 +1,27 @@
 /*
-Purpose: Detect checkpoint and fsync pressure indicative of storage or config issues.
-Area: Physical and Cloud Diagnostics
-Usage: Review with WAL/checkpoint settings and cloud disk metrics.
+Oracle DBA Script: Checkpoint Fsync Pressure
+Purpose: Provide Oracle DBA diagnostics for checkpoint fsync pressure.
+Area: Physical Cloud Diagnostics
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT (current_setting('server_version_num')::int >= 170000) AS has_pg_stat_checkpointer \gset
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
-\if :has_pg_stat_checkpointer
-SELECT
-    cp.num_timed AS checkpoints_timed,
-    cp.num_requested AS checkpoints_req,
-    cp.write_time AS checkpoint_write_time,
-    cp.sync_time AS checkpoint_sync_time,
-    cp.buffers_written AS buffers_checkpoint,
-    cp.slru_written,
-    bg.buffers_clean,
-    bg.maxwritten_clean,
-    bg.buffers_alloc,
-    CASE
-        WHEN cp.num_requested > cp.num_timed THEN 'Checkpoint pressure'
-        ELSE 'Normal checkpoint profile'
-    END AS recommendation,
-    cp.stats_reset AS checkpointer_stats_reset,
-    bg.stats_reset AS bgwriter_stats_reset
-FROM pg_stat_checkpointer cp
-CROSS JOIN pg_stat_bgwriter bg;
-\else
-SELECT
-    checkpoints_timed,
-    checkpoints_req,
-    checkpoint_write_time,
-    checkpoint_sync_time,
-    buffers_checkpoint,
-    NULL::bigint AS slru_written,
-    buffers_clean,
-    maxwritten_clean,
-    buffers_alloc,
-    CASE
-        WHEN checkpoints_req > checkpoints_timed THEN 'Checkpoint pressure'
-        ELSE 'Normal checkpoint profile'
-    END AS recommendation,
-    stats_reset AS checkpointer_stats_reset,
-    stats_reset AS bgwriter_stats_reset
-FROM pg_stat_bgwriter;
-\endif
+PROMPT Checkpoint Fsync Pressure
 
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  checkpoints_timed | checkpoints_req | checkpoint_write_time | checkpoint_sync_time | buffers_checkpoint | slru_written | buffers_clean | maxwritten_clean | buffers_alloc |      recommendation       |   checkpointer_stats_reset    |     bgwriter_stats_reset      
--- -------------------+-----------------+-----------------------+----------------------+--------------------+--------------+---------------+------------------+---------------+---------------------------+-------------------------------+-------------------------------
---                851 |              59 |               4142695 |                48708 |              68025 |          216 |        277435 |             2551 |      10942175 | Normal checkpoint profile | 2026-01-31 20:40:48.109778-05 | 2026-01-31 20:40:48.109778-05
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
+SELECT name, value
+FROM v$sysstat
+WHERE name IN ('background checkpoints started','background checkpoints completed','DBWR checkpoints','redo synch time','redo writes','physical writes')
+ORDER BY name;

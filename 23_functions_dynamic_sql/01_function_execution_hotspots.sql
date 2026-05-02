@@ -1,33 +1,27 @@
 /*
-Purpose: Rank user functions by execution cost.
-Area: Functions and Dynamic SQL
-Usage: Enable track_functions for complete timing data.
+Oracle DBA Script: Function Execution Hotspots
+Purpose: Provide Oracle DBA diagnostics for function execution hotspots.
+Area: Functions Dynamic Sql
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    schemaname AS schema_name,
-    funcname AS function_name,
-    calls,
-    total_time,
-    self_time,
-    CASE WHEN calls = 0 THEN NULL ELSE total_time / calls END AS mean_time
-FROM pg_stat_user_functions
-ORDER BY total_time DESC
-LIMIT 200;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Function Execution Hotspots
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name | function_name | calls | total_time | self_time | mean_time 
--- -------------+---------------+-------+------------+-----------+-----------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No matching rows were returned at capture time.
--- - Rerun during peak workload or after seeding representative test cases for non-zero examples.
--- SAMPLE_OUTPUT_END
-
+SELECT owner, object_name, procedure_name, object_type, status, authid, last_ddl_time
+FROM dba_procedures
+WHERE owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+ORDER BY owner, object_name, procedure_name;

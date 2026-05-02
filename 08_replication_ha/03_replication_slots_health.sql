@@ -1,35 +1,27 @@
 /*
-Purpose: Inspect replication slots and retained WAL volume.
-Area: Replication and HA
-Usage: Large retained bytes can cause WAL disk growth.
+Oracle DBA Script: Replication Slots Health
+Purpose: Provide Oracle DBA diagnostics for replication slots health.
+Area: Replication Ha
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    slot_name,
-    slot_type,
-    active,
-    temporary,
-    restart_lsn,
-    confirmed_flush_lsn,
-    pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn) AS retained_wal_bytes,
-    pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)::bigint) AS retained_wal_pretty,
-    wal_status,
-    safe_wal_size
-FROM pg_replication_slots
-ORDER BY retained_wal_bytes DESC NULLS LAST;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Replication Slots Health
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  slot_name | slot_type | active | temporary | restart_lsn | confirmed_flush_lsn | retained_wal_bytes | retained_wal_pretty | wal_status | safe_wal_size 
--- -----------+-----------+--------+-----------+-------------+---------------------+--------------------+---------------------+------------+---------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No replication rows were found in this capture.
--- - This is expected on standalone instances or when replication features are not configured.
--- SAMPLE_OUTPUT_END
+SELECT dest_id, status, type, database_mode, recovery_mode,
+       protection_mode, destination, archived_seq#, applied_seq#, error
+FROM v$archive_dest_status
+ORDER BY dest_id;

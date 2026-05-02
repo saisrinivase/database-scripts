@@ -1,34 +1,31 @@
 /*
-Purpose: Identify large tables where sequential scans dominate access pattern.
-Area: Long Queries and Full Scans
-Usage: Candidate list for indexing/query rewrite review.
+Oracle DBA Script: Full Scan Hotspot Tables
+Purpose: Provide Oracle DBA diagnostics for full scan hotspot tables.
+Area: Long Queries Full Scans
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    s.schemaname AS schema_name,
-    s.relname AS table_name,
-    s.seq_scan,
-    s.idx_scan,
-    CASE
-        WHEN s.seq_scan + s.idx_scan = 0 THEN NULL
-        ELSE round(100.0 * s.seq_scan / (s.seq_scan + s.idx_scan), 2)
-    END AS seq_scan_pct,
-    pg_total_relation_size(s.relid) AS total_bytes,
-    pg_size_pretty(pg_total_relation_size(s.relid)) AS total_pretty,
-    s.n_live_tup AS estimated_live_rows
-FROM pg_stat_user_tables s
-WHERE pg_total_relation_size(s.relid) >= 512::bigint * 1024 * 1024
-ORDER BY seq_scan_pct DESC NULLS LAST, total_bytes DESC;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Full Scan Hotspot Tables
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name |    table_name    | seq_scan | idx_scan | seq_scan_pct | total_bytes | total_pretty | estimated_live_rows 
--- -------------+------------------+----------+----------+--------------+-------------+--------------+---------------------
---  public      | pgbench_accounts |        2 | 10665646 |         0.00 | 31716564992 | 30 GB        |           200000029
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
+SELECT * FROM (
+    SELECT sql_id, plan_hash_value, object_owner, object_name, options, operation, COUNT(*) AS plan_occurrences
+    FROM dba_hist_sql_plan
+    WHERE operation = 'TABLE ACCESS'
+      AND options LIKE '%FULL%'
+    GROUP BY sql_id, plan_hash_value, object_owner, object_name, options, operation
+    ORDER BY plan_occurrences DESC
+) WHERE ROWNUM <= 100;

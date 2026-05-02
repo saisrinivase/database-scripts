@@ -1,49 +1,33 @@
 /*
-Purpose: Provide scheduling commands for periodic snapshot capture (pg_cron or external scheduler).
-Area: Object Lifecycle and Capacity Monitoring
-Usage: Run after procedures are created; choose one scheduling method.
+Oracle DBA Script: Scheduler Runbook
+Purpose: Provide Oracle DBA diagnostics for scheduler runbook.
+Area: Object Lifecycle Capacity
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    max(captured_at) AS last_capture_ts,
-    count(*) AS total_capture_runs
-FROM dba_metrics.capture_run;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
-SELECT
-    CASE
-        WHEN EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN 'PG_CRON_AVAILABLE'
-        ELSE 'PG_CRON_NOT_INSTALLED'
-    END AS scheduler_status,
-    'Use one of the recommended commands below.' AS note;
+PROMPT Scheduler Runbook
 
-SELECT
-    'SELECT cron.schedule(''dba_metrics_capture_15min'', ''*/15 * * * *'', $$CALL dba_metrics.sp_capture_operational_snapshot(''''pg_cron'''',''''scheduled 15m capture'''');$$);' AS recommended_pg_cron_command
-UNION ALL
-SELECT
-    'SELECT cron.schedule(''dba_metrics_purge_monthly'', ''5 1 1 * *'', $$CALL dba_metrics.sp_purge_history(18);$$);'
-UNION ALL
-SELECT
-    'External scheduler example: psql -d <db> -c "CALL dba_metrics.sp_capture_operational_snapshot(''''external'''',''''scheduled capture'''');"';
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_37_verify_20260220_safedrop_final
---
---         last_capture_ts        | total_capture_runs 
--- -------------------------------+--------------------
---  2026-02-20 15:16:10.729736-05 |                 39
--- (1 row)
--- 
---    scheduler_status    |                    note                    
--- -----------------------+--------------------------------------------
---  PG_CRON_NOT_INSTALLED | Use one of the recommended commands below.
--- (1 row)
--- 
---                                                                    recommended_pg_cron_command                                                                    
--- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
---  SELECT cron.schedule('dba_metrics_capture_15min', '*/15 * * * *', $$CALL dba_metrics.sp_capture_operational_snapshot(''pg_cron'',''scheduled 15m capture'');$$);
---  SELECT cron.schedule('dba_metrics_purge_monthly', '5 1 1 * *', $$CALL dba_metrics.sp_purge_history(18);$$);
---  External scheduler example: psql -d <db> -c "CALL dba_metrics.sp_capture_operational_snapshot(''external'',''scheduled capture'');"
--- (3 rows)
--- 
--- SAMPLE_OUTPUT_END
+BEGIN
+  DBMS_SCHEDULER.CREATE_JOB(
+    job_name        => 'DBA_LIFECYCLE_SNAPSHOT_JOB',
+    job_type        => 'STORED_PROCEDURE',
+    job_action      => 'CAPTURE_DBA_LIFECYCLE_SNAPSHOT',
+    repeat_interval => 'FREQ=DAILY;BYHOUR=1;BYMINUTE=0;BYSECOND=0',
+    enabled         => TRUE
+  );
+END;
+/

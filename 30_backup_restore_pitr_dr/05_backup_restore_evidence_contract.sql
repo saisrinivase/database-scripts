@@ -1,43 +1,26 @@
 /*
-Purpose: Check whether a backup/restore evidence table exists for trend reporting (duration, size, success).
-Area: Backup, Restore, PITR, and DR
-Usage: Optional control-table contract for operational audits.
+Oracle DBA Script: Backup Restore Evidence Contract
+Purpose: Provide Oracle DBA diagnostics for backup restore evidence contract.
+Area: Backup Restore Pitr Dr
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT (to_regclass('dba_metrics.backup_restore_history') IS NOT NULL) AS has_backup_history_contract \gset
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
-\if :has_backup_history_contract
-SELECT
-    run_id,
-    backup_type,
-    backup_tool,
-    backup_start_ts,
-    backup_end_ts,
-    round(extract(epoch FROM (backup_end_ts - backup_start_ts)) / 60.0, 2) AS duration_minutes,
-    backup_size_bytes,
-    round(backup_size_bytes / 1024.0 / 1024.0 / 1024.0, 2) AS backup_size_gb,
-    success,
-    restore_tested,
-    restore_target_ts,
-    restore_validation_ts,
-    notes
-FROM dba_metrics.backup_restore_history
-ORDER BY backup_end_ts DESC
-LIMIT 50;
-\else
-SELECT
-    'MISSING_BACKUP_RESTORE_EVIDENCE' AS status,
-    'Create dba_metrics.backup_restore_history to store last success, duration trend, size trend, and restore drill proof.' AS guidance,
-    'Expected columns: run_id, backup_type, backup_tool, backup_start_ts, backup_end_ts, backup_size_bytes, success, restore_tested, restore_target_ts, restore_validation_ts, notes.' AS suggested_contract;
-\endif
+PROMPT Backup Restore Evidence Contract
 
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_new_areas_20260219_refresh
---
---              status              |                                                       guidance                                                        |                                                                                suggested_contract                                                                                
--- ---------------------------------+-----------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
---  MISSING_BACKUP_RESTORE_EVIDENCE | Create dba_metrics.backup_restore_history to store last success, duration trend, size trend, and restore drill proof. | Expected columns: run_id, backup_type, backup_tool, backup_start_ts, backup_end_ts, backup_size_bytes, success, restore_tested, restore_target_ts, restore_validation_ts, notes.
--- (1 row)
--- 
--- SAMPLE_OUTPUT_END
+SELECT name, scn, time, database_incarnation#, guarantee_flashback_database, storage_size
+FROM v$restore_point
+ORDER BY time DESC;

@@ -1,3 +1,0 @@
-psql:/Users/saiendla/Documents/PostgreSQl SCripts /postgres_admin_scripts/27_high_speed_tuning/01_bottleneck_overview_dashboard.sql:82: ERROR:  column "checkpoints_timed" does not exist
-LINE 37:         checkpoints_timed,
-                 ^

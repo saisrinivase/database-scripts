@@ -1,69 +1,37 @@
 /*
-Purpose: Detect duplicate index definitions on the same table.
+Oracle DBA Script: Duplicate Indexes
+Purpose: Provide Oracle DBA diagnostics for duplicate indexes.
 Area: Index Analysis
-Usage: Validate access patterns before removing duplicates.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-WITH idx AS (
-    SELECT
-        n.nspname AS schema_name,
-        c.relname AS table_name,
-        i.indexrelid,
-        ci.relname AS index_name,
-        i.indrelid,
-        i.indkey,
-        i.indclass,
-        i.indcollation,
-        i.indoption,
-        i.indpred,
-        i.indexprs,
-        i.indisunique,
-        i.indisprimary,
-        pg_relation_size(i.indexrelid) AS index_bytes
-    FROM pg_index i
-    JOIN pg_class c
-        ON c.oid = i.indrelid
-    JOIN pg_class ci
-        ON ci.oid = i.indexrelid
-    JOIN pg_namespace n
-        ON n.oid = c.relnamespace
-    WHERE n.nspname !~ '^pg_'
-      AND n.nspname <> 'information_schema'
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
+
+PROMPT Duplicate Indexes
+
+WITH index_cols AS (
+    SELECT index_owner, table_owner, table_name, index_name,
+           LISTAGG(column_name, ',') WITHIN GROUP (ORDER BY column_position) AS columns_key
+    FROM dba_ind_columns
+    WHERE index_owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+    GROUP BY index_owner, table_owner, table_name, index_name
 )
-SELECT
-    schema_name,
-    table_name,
-    array_agg(index_name ORDER BY index_name) AS duplicate_indexes,
-    sum(index_bytes) AS total_duplicate_bytes,
-    pg_size_pretty(sum(index_bytes)) AS total_duplicate_pretty
-FROM idx
-GROUP BY
-    schema_name,
-    table_name,
-    indrelid,
-    indkey,
-    indclass,
-    indcollation,
-    indoption,
-    indpred,
-    indexprs,
-    indisunique,
-    indisprimary
-HAVING count(*) > 1
-ORDER BY total_duplicate_bytes DESC;
-
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  schema_name | table_name | duplicate_indexes | total_duplicate_bytes | total_duplicate_pretty 
--- -------------+------------+-------------------+-----------------------+------------------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No issue/candidate rows were found at capture time.
--- - This typically indicates healthy state for this check; rerun during peak load for validation.
--- SAMPLE_OUTPUT_END
+SELECT table_owner, table_name, columns_key,
+       COUNT(*) AS index_count,
+       LISTAGG(index_owner || '.' || index_name, '; ') WITHIN GROUP (ORDER BY index_owner, index_name) AS indexes
+FROM index_cols
+GROUP BY table_owner, table_name, columns_key
+HAVING COUNT(*) > 1
+ORDER BY index_count DESC, table_owner, table_name;

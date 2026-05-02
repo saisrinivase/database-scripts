@@ -1,33 +1,33 @@
 /*
-Purpose: Rank all databases by total size.
+Oracle DBA Script: Databases Size
+Purpose: Provide Oracle DBA diagnostics for databases size.
 Area: Database Size
-Usage: Connect to any database in the instance.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
+
+PROMPT Databases Size
+
 SELECT
-    d.datname AS database_name,
-    pg_database_size(d.datname) AS size_bytes,
-    pg_size_pretty(pg_database_size(d.datname)) AS size_pretty
-FROM pg_database d
-ORDER BY size_bytes DESC;
-
-
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---            database_name           | size_bytes  | size_pretty 
--- -----------------------------------+-------------+-------------
---  pgbench_test                      | 32236762815 | 30 GB
---  script_validation_20260218_172749 |   468563647 | 447 MB
---  perf_test                         |   436410047 | 416 MB
---  postgres                          |    40007359 | 38 MB
---  hypopg_lab                        |    36173503 | 34 MB
---  appdb                             |     8058559 | 7870 kB
---  template1                         |     8033983 | 7846 kB
---  template0                         |     7791119 | 7609 kB
--- (8 rows)
--- 
--- SAMPLE_OUTPUT_END
-
+    d.name AS database_name,
+    ROUND((datafiles.bytes + NVL(tempfiles.bytes,0) + NVL(redologs.bytes,0)) / 1024 / 1024 / 1024, 2) AS allocated_gb,
+    ROUND(datafiles.bytes / 1024 / 1024 / 1024, 2) AS datafile_gb,
+    ROUND(NVL(tempfiles.bytes,0) / 1024 / 1024 / 1024, 2) AS tempfile_gb,
+    ROUND(NVL(redologs.bytes,0) / 1024 / 1024 / 1024, 2) AS redo_gb
+FROM v$database d
+CROSS JOIN (SELECT SUM(bytes) bytes FROM dba_data_files) datafiles
+CROSS JOIN (SELECT SUM(bytes) bytes FROM dba_temp_files) tempfiles
+CROSS JOIN (SELECT SUM(bytes) bytes FROM v$log) redologs;

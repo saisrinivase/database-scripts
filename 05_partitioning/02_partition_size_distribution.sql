@@ -1,39 +1,33 @@
 /*
-Purpose: Show partition sizes under each parent table.
+Oracle DBA Script: Partition Size Distribution
+Purpose: Provide Oracle DBA diagnostics for partition size distribution.
 Area: Partitioning
-Usage: Helps rebalance uneven partition growth.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    pns.nspname AS parent_schema,
-    p.relname AS parent_table,
-    cns.nspname AS partition_schema,
-    c.relname AS partition_name,
-    pg_total_relation_size(c.oid) AS partition_bytes,
-    pg_size_pretty(pg_total_relation_size(c.oid)) AS partition_pretty
-FROM pg_inherits i
-JOIN pg_class p
-    ON p.oid = i.inhparent
-JOIN pg_namespace pns
-    ON pns.oid = p.relnamespace
-JOIN pg_class c
-    ON c.oid = i.inhrelid
-JOIN pg_namespace cns
-    ON cns.oid = c.relnamespace
-ORDER BY partition_bytes DESC;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Partition Size Distribution
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---   parent_schema   |      parent_table       | partition_schema |        partition_name        | partition_bytes | partition_pretty 
--- ------------------+-------------------------+------------------+------------------------------+-----------------+------------------
---  migration_v2_lab | partitioned_events      | migration_v2_lab | partitioned_events_2025      |         5693440 | 5560 kB
---  migration_v2_lab | partitioned_events      | migration_v2_lab | partitioned_events_2026      |         5226496 | 5104 kB
---  migration_v2_lab | partitioned_events_pkey | migration_v2_lab | partitioned_events_2025_pkey |         1654784 | 1616 kB
---  migration_v2_lab | partitioned_events_pkey | migration_v2_lab | partitioned_events_2026_pkey |         1523712 | 1488 kB
--- (4 rows)
--- 
--- SAMPLE_OUTPUT_END
+SELECT p.table_owner AS owner, p.table_name,
+       COUNT(*) AS partition_count,
+       ROUND(SUM(NVL(s.bytes,0))/1024/1024,2) AS total_partition_mb,
+       ROUND(MIN(NVL(s.bytes,0))/1024/1024,2) AS min_partition_mb,
+       ROUND(MAX(NVL(s.bytes,0))/1024/1024,2) AS max_partition_mb
+FROM dba_tab_partitions p
+LEFT JOIN dba_segments s ON s.owner = p.table_owner AND s.segment_name = p.table_name AND s.partition_name = p.partition_name
+WHERE p.table_owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS')
+GROUP BY p.table_owner, p.table_name
+ORDER BY total_partition_mb DESC;

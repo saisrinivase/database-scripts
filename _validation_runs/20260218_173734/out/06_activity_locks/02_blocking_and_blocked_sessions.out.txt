@@ -1,4 +1,0 @@
- blocked_pid | blocked_user | blocked_app | blocked_state | blocked_query_age | blocked_query | blocker_pid | blocker_user | blocker_app | blocker_state | blocker_query_age | blocker_query 
--------------+--------------+-------------+---------------+-------------------+---------------+-------------+--------------+-------------+---------------+-------------------+---------------
-(0 rows)
-

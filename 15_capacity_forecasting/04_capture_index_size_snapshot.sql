@@ -1,31 +1,29 @@
 /*
-Purpose: Capture index size and scan count for index growth/utility trends.
+Oracle DBA Script: Capture Index Size Snapshot
+Purpose: Provide Oracle DBA diagnostics for capture index size snapshot.
 Area: Capacity Forecasting
-Usage: Schedule periodically with table snapshot.
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-INSERT INTO dba_metrics.index_size_snapshots (
-    captured_at,
-    schema_name,
-    table_name,
-    index_name,
-    index_bytes,
-    idx_scan
-)
-SELECT
-    now() AS captured_at,
-    s.schemaname AS schema_name,
-    s.relname AS table_name,
-    s.indexrelname AS index_name,
-    pg_relation_size(s.indexrelid) AS index_bytes,
-    s.idx_scan
-FROM pg_stat_user_indexes s;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Capture Index Size Snapshot
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
--- INSERT 0 30
--- SAMPLE_OUTPUT_END
+INSERT INTO dba_capacity_segment_snap (owner, segment_name, segment_type, tablespace_name, bytes)
+SELECT owner, segment_name, segment_type, tablespace_name, bytes
+FROM dba_segments
+WHERE segment_type LIKE 'INDEX%'
+  AND owner NOT IN ('SYS','SYSTEM','XDB','CTXSYS','MDSYS','ORDSYS','OUTLN','WMSYS','DBSNMP','AUDSYS');
+COMMIT;

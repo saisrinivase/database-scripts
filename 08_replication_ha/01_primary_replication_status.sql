@@ -1,40 +1,26 @@
 /*
-Purpose: Show standby status and lag metrics from a primary node.
-Area: Replication and HA
-Usage: Run on primary. On standby this view is typically empty.
+Oracle DBA Script: Primary Replication Status
+Purpose: Provide Oracle DBA diagnostics for primary replication status.
+Area: Replication Ha
+Usage: Run with SQL*Plus or SQLcl as a user with SELECT_CATALOG_ROLE, DBA, or explicit access to the referenced DBA_/GV$/V$ views.
+Notes: Review findings before taking action. Some performance history views require the Oracle Diagnostics Pack license.
 */
-SELECT
-    pid,
-    usename AS user_name,
-    application_name,
-    client_addr,
-    state,
-    sync_state,
-    sent_lsn,
-    write_lsn,
-    flush_lsn,
-    replay_lsn,
-    pg_wal_lsn_diff(pg_current_wal_lsn(), replay_lsn) AS byte_lag,
-    write_lag,
-    flush_lag,
-    replay_lag
-FROM pg_stat_replication
-ORDER BY byte_lag DESC NULLS LAST;
+SET LINESIZE 220
+SET PAGESIZE 200
+SET TRIMSPOOL ON
+SET TAB OFF
+COLUMN owner FORMAT A28
+COLUMN object_name FORMAT A38
+COLUMN segment_name FORMAT A38
+COLUMN table_name FORMAT A38
+COLUMN index_name FORMAT A38
+COLUMN sql_id FORMAT A14
+COLUMN event FORMAT A48
+COLUMN parameter_name FORMAT A45
+COLUMN value FORMAT A45
 
+PROMPT Primary Replication Status
 
-
-
--- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  pid | user_name | application_name | client_addr | state | sync_state | sent_lsn | write_lsn | flush_lsn | replay_lsn | byte_lag | write_lag | flush_lag | replay_lag 
--- -----+-----------+------------------+-------------+-------+------------+----------+-----------+-----------+------------+----------+-----------+-----------+------------
--- (0 rows)
--- 
--- 
--- Interpretation:
--- - No replication rows were found in this capture.
--- - This is expected on standalone instances or when replication features are not configured.
--- SAMPLE_OUTPUT_END
-
+SELECT d.name, d.database_role, d.protection_mode, d.protection_level,
+       d.open_mode, d.log_mode, d.switchover_status, d.dataguard_broker, d.force_logging
+FROM v$database d;
