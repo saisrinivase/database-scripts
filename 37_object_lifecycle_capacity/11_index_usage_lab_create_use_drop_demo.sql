@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Index Usage Lab Create Use Drop Demo
 Purpose: Demo index lifecycle by creating indexes, forcing index scans, and dropping an unused index.
 Area: Object Lifecycle and Capacity Monitoring
 Usage: Run after scripts 01-08; this creates objects in schema dba_metrics_lab.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 CREATE SCHEMA IF NOT EXISTS dba_metrics_lab;
 

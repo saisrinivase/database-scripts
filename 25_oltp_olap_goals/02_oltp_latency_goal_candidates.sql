@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: OLTP Latency Goal Candidates
 Purpose: Find high-frequency statements violating common OLTP latency expectations.
 Area: Optimization Goals (OLTP vs OLAP)
 Usage: Tune thresholds to your SLA targets.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     queryid,

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Trigger Function Inventory
 Purpose: List trigger functions and their table bindings.
 Area: Functions and Dynamic SQL
 Usage: Heavy trigger paths can dominate DML latency.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     tn.nspname AS table_schema,

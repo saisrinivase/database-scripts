@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Instance Platform Fingerprint
 Purpose: Capture platform hints and runtime footprint for physical/cloud diagnosis.
 Area: Physical and Cloud Diagnostics
 Usage: Baseline script for environment-aware tuning.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     version() AS version_string,

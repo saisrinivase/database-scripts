@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Insert Copy Activity
 Purpose: Monitor INSERT/COPY pressure using active COPY progress and table write counters.
 Area: Object Inventory and Health
 Usage: Run during load windows or ETL batches to identify ingest hotspots.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     'copy_progress'::text AS section,

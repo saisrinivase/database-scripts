@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Select Star Candidates
 Purpose: Identify statements that use SELECT * and may fetch unnecessary columns.
 Area: Application Development and ORM Performance
 Usage: Requires pg_stat_statements; review ORM projections.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     queryid,

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Connection Distribution By App User
 Purpose: Show connection distribution by user/application/client for pool right-sizing and hotspot detection.
 Area: Pooler and Proxy Diagnostics
 Usage: Look for many idle sessions per app/user and bursty client patterns.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     usename,

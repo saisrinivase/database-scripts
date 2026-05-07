@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Toast Catalog Consistency Signals
 Purpose: Detect TOAST/catalog linkage anomalies that can indicate deeper metadata inconsistencies.
 Area: Consistency and Integrity Checks
 Usage: Any non-empty result should be reviewed immediately.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH toast_namespace AS (
     SELECT oid AS nspoid

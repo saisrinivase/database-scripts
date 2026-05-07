@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Capture Table Size Snapshot
 Purpose: Capture table-level size and tuple estimates for growth trending.
 Area: Capacity Forecasting
 Usage: Schedule periodically; can be heavy on very large catalogs.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 INSERT INTO dba_metrics.table_size_snapshots (
     captured_at,

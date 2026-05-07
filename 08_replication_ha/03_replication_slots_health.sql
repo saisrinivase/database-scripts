@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Replication Slots Health
 Purpose: Inspect replication slots and retained WAL volume.
 Area: Replication and HA
 Usage: Large retained bytes can cause WAL disk growth.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     slot_name,

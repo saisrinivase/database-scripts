@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Autovacuum Table Status
 Purpose: Review vacuum/analyze recency and dead tuples per table.
 Area: Vacuum and Bloat
 Usage: Focus on large tables with stale vacuum/analyze timestamps.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     schemaname AS schema_name,

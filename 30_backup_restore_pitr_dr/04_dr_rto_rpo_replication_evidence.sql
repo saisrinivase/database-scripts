@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: DR RTO RPO Replication Evidence
 Purpose: Produce DR evidence for RPO/RTO discussions from replication and replay state.
 Area: Backup, Restore, PITR, and DR
 Usage: Run on both primary and standby and compare outputs.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT (pg_is_in_recovery()) AS is_standby \gset
 

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Wide Tables Profile
 Purpose: Profile table width and column counts to detect design patterns that can degrade performance.
 Area: Design Matters
 Usage: Use with normalization and access pattern review.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH col AS (
     SELECT

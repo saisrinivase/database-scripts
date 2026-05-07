@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Restore To Timestamp Quick Test
 Purpose: Quick SQL-only feasibility check for "Can we restore to timestamp X right now?".
 Area: Backup, Restore, PITR, and DR
 Usage: Edit target_restore_ts in params CTE before running.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH params AS (
     SELECT

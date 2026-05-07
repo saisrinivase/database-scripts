@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: Oracle To Postgres 360 Health Report
 Purpose: Generate a single HTML health-check report for PostgreSQL after Oracle migration.
 Area: Migration Validation
 Usage:
@@ -9,6 +10,7 @@ Usage:
 Notes:
   - Runs read-only checks across objects, security, workload, vacuum, replication, and configuration.
   - Produces a simple PASS/WARN/FAIL report with suggested actions.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 */
 
 \set ON_ERROR_STOP on

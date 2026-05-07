@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Backup Restore Evidence Contract
 Purpose: Check whether a backup/restore evidence table exists for trend reporting (duration, size, success).
 Area: Backup, Restore, PITR, and DR
 Usage: Optional control-table contract for operational audits.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT (to_regclass('dba_metrics.backup_restore_history') IS NOT NULL) AS has_backup_history_contract \gset
 

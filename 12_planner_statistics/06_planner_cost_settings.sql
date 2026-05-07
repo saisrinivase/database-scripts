@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Planner Cost Settings
 Purpose: Report planner cost parameters that strongly influence execution plan selection.
 Area: Planner and Statistics
 Usage: Baseline before/after performance tuning changes.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     name,

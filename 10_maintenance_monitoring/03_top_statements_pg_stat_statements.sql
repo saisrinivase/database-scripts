@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Top Statements Pg Stat Statements
 Purpose: Rank expensive SQL statements by total execution time.
 Area: Maintenance and Monitoring
 Usage: Requires pg_stat_statements extension.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     queryid,

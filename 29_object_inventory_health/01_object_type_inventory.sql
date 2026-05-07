@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Object Type Inventory
 Purpose: Provide a one-shot inventory of core object types and migration-mapped object equivalents.
 Area: Object Inventory and Health
 Usage: Run first to understand object landscape and missing object classes.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH user_schemas AS (
     SELECT oid, nspname

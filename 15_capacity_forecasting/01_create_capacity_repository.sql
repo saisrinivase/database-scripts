@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Create Capacity Repository
 Purpose: Create local repository tables for periodic capacity snapshots.
 Area: Capacity Forecasting
 Usage: Run once in a DBA utility database before capture scripts.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 CREATE SCHEMA IF NOT EXISTS dba_metrics;
 

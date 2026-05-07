@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Backend Type Distribution
 Purpose: Show backend process distribution by backend_type.
 Area: Connection and Workload
 Usage: Distinguish client backends from maintenance/background workers.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     backend_type,

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Mixed Workload Pressure
 Purpose: Summarize mixed-workload pressure indicators by database.
 Area: Optimization Goals (OLTP vs OLAP)
 Usage: Useful for deciding workload isolation strategy.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     d.datname AS database_name,

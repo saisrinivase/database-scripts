@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Seq Scan Hotspots
 Purpose: Highlight tables dominated by sequential scans (possible index or query design issue).
 Area: Planner and Statistics
 Usage: Validate with query plans before adding indexes.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     schemaname AS schema_name,

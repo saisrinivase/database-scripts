@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Top Queries By Total Exec Time
 Purpose: Rank statements by cumulative execution time to identify biggest workload contributors.
 Area: Performance Tuning
 Usage: Requires pg_stat_statements extension.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     queryid,

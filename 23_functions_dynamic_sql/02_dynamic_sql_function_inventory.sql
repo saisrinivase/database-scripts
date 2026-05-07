@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Dynamic SQL Function Inventory
 Purpose: Inventory PL/pgSQL functions likely using dynamic SQL (EXECUTE keyword).
 Area: Functions and Dynamic SQL
 Usage: Review for SQL injection safety and plan stability.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     n.nspname AS schema_name,

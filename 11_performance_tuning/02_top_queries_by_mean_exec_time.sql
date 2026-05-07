@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Top Queries By Mean Exec Time
 Purpose: Find high-latency statements (average execution time) with meaningful call counts.
 Area: Performance Tuning
 Usage: Requires pg_stat_statements extension; adjust minimum calls threshold.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     queryid,

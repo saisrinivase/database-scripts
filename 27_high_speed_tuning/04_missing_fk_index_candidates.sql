@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Missing FK Index Candidates
 Purpose: Find foreign keys without supporting indexes on referencing columns.
 Area: High Speed Tuning
 Usage: Missing FK indexes often cause DELETE/UPDATE slowdown on parent tables.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH fk AS (
     SELECT

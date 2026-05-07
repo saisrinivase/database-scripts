@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Default Privileges
 Purpose: Inspect default privileges that apply to future objects.
 Area: Security and Roles
 Usage: Helps detect unexpected inherited access.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     n.nspname AS schema_name,

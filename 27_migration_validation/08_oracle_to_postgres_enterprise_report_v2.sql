@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: Oracle To Postgres Enterprise Report V2
 Purpose: Generate an enterprise-style HTML report with deep object coverage and issue diagnostics.
 Area: Migration Validation
 Usage:
@@ -9,6 +10,7 @@ Usage:
 Notes:
   - Designed to evaluate both migration_v2_lab seeded issues and broader environment checks.
   - Covers object inventory and issue checks with clear explanations and recommendations.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 */
 
 \set ON_ERROR_STOP on

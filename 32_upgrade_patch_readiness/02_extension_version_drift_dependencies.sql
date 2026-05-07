@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Extension Version Drift Dependencies
 Purpose: Detect extension version drift and quantify extension-owned dependency footprint.
 Area: Upgrade and Patch Readiness
 Usage: Run before upgrade to avoid extension-related downtime surprises.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH ext AS (
     SELECT

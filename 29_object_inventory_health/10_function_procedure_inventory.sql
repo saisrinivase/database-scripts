@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Function Procedure Inventory
 Purpose: Inventory functions/procedures with performance and safety attributes.
 Area: Object Inventory and Health
 Usage: Use to detect dynamic SQL, SECURITY DEFINER risk, and hot routines.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH routine_base AS (
     SELECT

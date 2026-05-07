@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Function Hotspots
 Purpose: Identify expensive user-defined functions by total execution time.
 Area: Performance Tuning
 Usage: Requires track_functions enabled for non-zero timing counters.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     schemaname AS schema_name,

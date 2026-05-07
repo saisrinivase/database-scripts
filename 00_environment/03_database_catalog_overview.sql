@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Database Catalog Overview
 Purpose: Show high-level object counts in the current database catalog.
 Area: Environment / Internals
 Usage: Run in any database.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH object_counts AS (
     SELECT 'schemas'::text AS object_type, count(*)::bigint AS object_count

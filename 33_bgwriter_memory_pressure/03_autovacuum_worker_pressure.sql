@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Autovacuum Worker Pressure
 Purpose: Measure autovacuum worker saturation and table backlog pressure.
 Area: Background Processes and Memory Pressure
 Usage: Investigate when bloat/dead tuples rise or CPU stays high.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH worker AS (
     SELECT

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Write Heavy Tables
 Purpose: Rank tables by write volume to target DML optimization and maintenance.
 Area: Optimizing Data Modification
 Usage: Run before tuning autovacuum, indexing, and partition strategy.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     schemaname AS schema_name,

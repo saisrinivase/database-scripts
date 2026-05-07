@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: High Nullability Columns
 Purpose: Identify columns with high null fraction that may indicate schema redesign opportunities.
 Area: Design Matters
 Usage: Review with domain model and query usage before schema changes.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     schemaname AS schema_name,

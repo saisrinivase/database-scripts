@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Database Growth Report
 Purpose: Report database growth between first and latest snapshots in repository.
 Area: Capacity Forecasting
 Usage: Requires captured data in dba_metrics.database_size_snapshots.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH ranked AS (
     SELECT

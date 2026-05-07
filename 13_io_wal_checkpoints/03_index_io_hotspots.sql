@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Index IO Hotspots
 Purpose: Show indexes with the most block reads/hits to target tuning/rebuild reviews.
 Area: I/O, WAL, and Checkpoints
 Usage: High-read indexes may need design or maintenance review.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     schemaname AS schema_name,

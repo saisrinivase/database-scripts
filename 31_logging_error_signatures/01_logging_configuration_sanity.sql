@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Logging Configuration Sanity
 Purpose: Validate key logging parameters for performance troubleshooting and incident diagnostics.
 Area: Logging and Error Signatures
 Usage: Review parameters marked GAP or WARN and align with environment standards.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH expected(name, recommendation, rationale) AS (
     VALUES

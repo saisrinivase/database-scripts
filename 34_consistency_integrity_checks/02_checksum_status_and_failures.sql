@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Checksum Status And Failures
 Purpose: Show checksum posture and checksum-failure evidence when available.
 Area: Consistency and Integrity Checks
 Usage: If checksums are off, rely on stronger backup/restore verification and storage diagnostics.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT EXISTS (
            SELECT 1

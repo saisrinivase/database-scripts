@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: WAL Generation Rate
 Purpose: Estimate WAL generation rate based on pg_stat_wal counters.
 Area: Replication and HA
 Usage: PostgreSQL 14+ (pg_stat_wal).
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     wal_records,

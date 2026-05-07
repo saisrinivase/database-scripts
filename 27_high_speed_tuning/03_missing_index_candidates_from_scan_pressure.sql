@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Missing Index Candidates From Scan Pressure
 Purpose: Detect large tables with heavy sequential scan pressure as index candidate hotspots.
 Area: High Speed Tuning
 Usage: Review query predicates before creating indexes; this script finds tables, not exact columns.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH io AS (
     SELECT

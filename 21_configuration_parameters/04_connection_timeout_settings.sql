@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Connection Timeout Settings
 Purpose: Show connection and timeout settings that influence application behavior and contention.
 Area: Configuration Parameters
 Usage: Validate with connection pooling and app retry strategy.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     name,

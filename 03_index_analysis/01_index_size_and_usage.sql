@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Index Size And Usage
 Purpose: Correlate index size with usage counters to find expensive or cold indexes.
 Area: Index Analysis
 Usage: Reset stats only when intentional; counters are cumulative since reset/restart.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     s.schemaname AS schema_name,

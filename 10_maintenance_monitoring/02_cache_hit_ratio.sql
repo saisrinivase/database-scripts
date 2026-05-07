@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Cache Hit Ratio
 Purpose: Calculate cache hit ratios for tables and indexes.
 Area: Maintenance and Monitoring
 Usage: Very low hit ratios may indicate memory or query pattern issues.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH table_io AS (
     SELECT

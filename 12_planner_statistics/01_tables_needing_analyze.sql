@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Tables Needing Analyze
 Purpose: Identify tables where modifications have outpaced analyze activity.
 Area: Planner and Statistics
 Usage: Use thresholds to prioritize manual ANALYZE or autovacuum tuning.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     schemaname AS schema_name,

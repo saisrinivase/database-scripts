@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Explain Analyze Template
 Purpose: Template to read and understand execution plans for problematic queries.
 Area: Execution Plans
 Usage: Replace `SELECT 1` with target SQL and run in a lower environment first.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 EXPLAIN (ANALYZE, BUFFERS, VERBOSE, WAL, SETTINGS, FORMAT TEXT)
 SELECT 1;

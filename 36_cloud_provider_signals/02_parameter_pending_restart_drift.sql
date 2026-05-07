@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Parameter Pending Restart Drift
 Purpose: Detect pending-restart parameters and configuration drift from defaults.
 Area: Cloud Provider Signals
 Usage: Useful after parameter-group or flag changes in managed services.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     name,

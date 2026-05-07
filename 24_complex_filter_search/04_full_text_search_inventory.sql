@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Full Text Search Inventory
 Purpose: Inventory full-text search building blocks (tsvector/tsquery related columns and indexes).
 Area: Complex Filtering and Search
 Usage: Use when evaluating search architecture.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     n.nspname AS schema_name,

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Invalid Indexes And Constraints
 Purpose: Detect invalid indexes and unvalidated constraints that indicate integrity or migration risk.
 Area: Consistency and Integrity Checks
 Usage: Investigate all rows; invalid metadata can break optimizer behavior and DDL safety.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH invalid_indexes AS (
     SELECT

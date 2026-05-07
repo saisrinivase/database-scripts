@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Error Signature Indicators
 Purpose: Surface recurring error-like signatures from PostgreSQL statistics (deadlocks, conflicts, rollback spikes, temp storms).
 Area: Logging and Error Signatures
 Usage: Run during or after incidents to prioritize likely failure modes.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH db AS (
     SELECT

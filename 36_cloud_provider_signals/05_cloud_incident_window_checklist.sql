@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Cloud Incident Window Checklist
 Purpose: Provide cloud incident-window checklist prompts mapped to likely provider consoles.
 Area: Cloud Provider Signals
 Usage: Run during incidents to align DB evidence with cloud control-plane events.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH provider AS (
     SELECT

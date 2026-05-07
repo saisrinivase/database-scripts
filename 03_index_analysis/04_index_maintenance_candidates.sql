@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Index Maintenance Candidates
 Purpose: Highlight large indexes with low scan counts as maintenance/drop review candidates.
 Area: Index Analysis
 Usage: This is heuristic guidance, not an automatic drop list.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     s.schemaname AS schema_name,

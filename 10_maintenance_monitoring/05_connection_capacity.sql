@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Connection Capacity
 Purpose: Show connection utilization against max_connections.
 Area: Maintenance and Monitoring
 Usage: Useful for capacity planning and pool sizing.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH cfg AS (
     SELECT current_setting('max_connections')::int AS max_connections

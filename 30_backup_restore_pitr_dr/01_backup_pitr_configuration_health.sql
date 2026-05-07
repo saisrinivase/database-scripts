@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Backup Pitr Configuration Health
 Purpose: Validate backup/PITR configuration prerequisites and highlight gaps for recoverability.
 Area: Backup, Restore, PITR, and DR
 Usage: Run on primary and standby nodes; review STATUS and remediation.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH expected(name, recommended, details) AS (
     VALUES

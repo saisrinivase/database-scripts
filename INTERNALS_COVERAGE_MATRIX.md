@@ -18,6 +18,8 @@ Purpose: Map administration topics to PostgreSQL internals sources and ready-to-
 | Large object (BLOB/LOB) footprint | `pg_largeobject` | `04_toast_lob_blob/03_large_objects_summary.sql`, `04_toast_lob_blob/04_top_large_objects.sql` |
 | Partition metadata | `pg_inherits`, `pg_get_partkeydef()` | `05_partitioning/01_partitioned_tables_overview.sql` |
 | Session/lock internals | `pg_stat_activity`, `pg_blocking_pids()` | `06_activity_locks/01_active_sessions.sql`, `06_activity_locks/02_blocking_and_blocked_sessions.sql` |
+| 360 observability dashboard | `pg_stat_activity`, `pg_locks`, `pg_stat_database`, `pg_stat_wal`, `pg_stat_bgwriter`, `pg_stat_checkpointer`, `pg_stat_replication` | `38_observability_360/01_instance_health_360_dashboard.sql` |
+| CloudWatch metric equivalents | SQL-visible stats plus provider/OS-only gap classification | `38_observability_360/02_cloudwatch_metric_equivalents.sql` |
 | Vacuum/bloat internals | `pg_stat_user_tables`, `relfrozenxid`, `pg_stat_progress_vacuum` | `07_vacuum_bloat/01_table_bloat_estimate.sql`, `07_vacuum_bloat/03_freeze_age_risk.sql`, `07_vacuum_bloat/05_vacuum_progress.sql` |
 | Replication state | `pg_stat_replication`, `pg_is_in_recovery()` | `08_replication_ha/01_primary_replication_status.sql`, `08_replication_ha/02_standby_replay_status.sql` |
 | Replication slot retention | `pg_replication_slots`, LSN diff functions | `08_replication_ha/03_replication_slots_health.sql` |
@@ -39,6 +41,5 @@ Purpose: Map administration topics to PostgreSQL internals sources and ready-to-
 
 ## Gaps to Expand Next
 
-- Backup/restore validation (`pg_backup_start`, archive restore checks, recovery verification).
-- DDL/event auditing baselines (event triggers and schema drift history).
-- Per-application service-level dashboards (latency/error budgets from SQL counters).
+- Host/cloud-only metrics still need CloudWatch, OS tools, managed-service APIs, or monitoring agents for CPU, free memory, disk queue depth, network throughput, and free filesystem space.
+- Per-application service-level dashboards can be expanded further when application naming conventions and latency/error budgets are known.

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Generate Explain For Top Queries
 Purpose: Generate EXPLAIN command text for top queries from pg_stat_statements.
 Area: Execution Plans
 Usage: Requires pg_stat_statements; execute generated commands one-by-one with care.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     queryid,

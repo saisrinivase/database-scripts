@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Table PK FK Health
 Purpose: Show table-level PK/FK/index health for user schemas.
 Area: Object Inventory and Health
 Usage: Use as a broad relational integrity baseline before tuning and migrations.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH user_tables AS (
     SELECT

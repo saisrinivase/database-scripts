@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Extensions Installed
 Purpose: List installed extensions and their schema/version.
 Area: Environment / Internals
 Usage: Run in any database.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     e.extname AS extension_name,

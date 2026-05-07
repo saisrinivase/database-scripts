@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Standby Replay Status
 Purpose: Report recovery/replay state when connected to a standby node.
 Area: Replication and HA
 Usage: Run on standby for replay delay checks.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     pg_is_in_recovery() AS is_standby,

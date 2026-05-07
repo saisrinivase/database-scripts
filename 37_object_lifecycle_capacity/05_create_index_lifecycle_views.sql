@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Create Index Lifecycle Views
 Purpose: Create index lifecycle views with inferred last-use timestamp and create/drop event tracking.
 Area: Object Lifecycle and Capacity Monitoring
 Usage: Requires prior snapshots from dba_metrics.sp_capture_operational_snapshot.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 CREATE SCHEMA IF NOT EXISTS dba_metrics;
 

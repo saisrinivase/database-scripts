@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Object Query Hotspots Pg Stat Statements
 Purpose: Show top query hotspots with coarse object token extraction from SQL text.
 Area: Object Inventory and Health
 Usage: Requires pg_stat_statements. Use together with EXPLAIN for final tuning decisions.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT CASE
            WHEN EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements')

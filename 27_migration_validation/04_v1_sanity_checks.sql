@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: V1 Sanity Checks
 Purpose: Sanity assertions for V1 migration validation workflow.
 Area: Migration Validation
 Usage:
@@ -8,6 +9,7 @@ Usage:
 Notes:
   - Targets migration_v1_lab objects only.
   - PASS/FAIL summary can be archived with release artifacts.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 */
 
 \set ON_ERROR_STOP on

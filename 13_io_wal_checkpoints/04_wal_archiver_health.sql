@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: WAL Archiver Health
 Purpose: Check WAL archiver success/failure and recency.
 Area: I/O, WAL, and Checkpoints
 Usage: Run on primary where archiving is configured.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     archived_count,

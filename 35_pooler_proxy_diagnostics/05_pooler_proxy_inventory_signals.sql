@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Pooler Proxy Inventory Signals
 Purpose: Inventory pooler/proxy related extensions, FDWs, and operational signals.
 Area: Pooler and Proxy Diagnostics
 Usage: Use as a bridge between PostgreSQL evidence and external pooler dashboards.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH ext AS (
     SELECT

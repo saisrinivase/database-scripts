@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Partitions Without Indexes
 Purpose: Identify partitions that have zero indexes defined.
 Area: Partitioning
 Usage: Review query plans before adding indexes to every partition.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH child_index_count AS (
     SELECT

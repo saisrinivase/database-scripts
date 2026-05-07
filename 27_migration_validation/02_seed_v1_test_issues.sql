@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: Seed V1 Test Issues
 Purpose: Seed deterministic Oracle->PostgreSQL migration issues for V1 report validation.
 Area: Migration Validation
 Usage:
@@ -8,6 +9,7 @@ Usage:
 Notes:
   - Creates schema migration_v1_lab and inserts test-only data.
   - Safe to rerun: drops and recreates migration_v1_lab.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 */
 
 \set ON_ERROR_STOP on

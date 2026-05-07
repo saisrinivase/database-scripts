@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Temp Spill Work Mem Pressure
 Purpose: Identify memory-pressure symptoms from temp spill volume and work_mem-sensitive query behavior.
 Area: Background Processes and Memory Pressure
 Usage: Use alongside EXPLAIN to tune work_mem and query plans safely.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT CASE
            WHEN EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements') THEN 1

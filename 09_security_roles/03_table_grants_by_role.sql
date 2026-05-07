@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Table Grants By Role
 Purpose: Show table-level grants for non-system schemas.
 Area: Security and Roles
 Usage: Use to audit object privileges by grantee.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     table_schema,

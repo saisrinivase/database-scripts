@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: User Defined Type Inventory
 Purpose: Inventory custom types and show where they are used in table columns.
 Area: Object Inventory and Health
 Usage: Useful for migration audits and schema refactoring impact analysis.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH user_types AS (
     SELECT

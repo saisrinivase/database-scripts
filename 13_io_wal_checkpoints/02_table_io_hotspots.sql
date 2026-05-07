@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Table IO Hotspots
 Purpose: Identify tables with highest physical I/O pressure.
 Area: I/O, WAL, and Checkpoints
 Usage: Correlate with query plans and index strategy.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     schemaname AS schema_name,

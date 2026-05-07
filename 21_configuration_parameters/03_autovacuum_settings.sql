@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Autovacuum Settings
 Purpose: Report autovacuum and freeze-related settings.
 Area: Configuration Parameters
 Usage: Review when dead tuples, bloat, or xid age rise.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     name,

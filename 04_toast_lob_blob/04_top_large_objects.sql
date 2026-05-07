@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Top Large Objects
 Purpose: Rank largest individual large objects (BLOBs) by size.
 Area: TOAST / LOB / BLOB
 Usage: Use with caution on very large catalogs.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     loid,

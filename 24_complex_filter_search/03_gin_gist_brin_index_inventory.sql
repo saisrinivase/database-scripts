@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: GIN GiST BRIN Index Inventory
 Purpose: List advanced index access methods used for complex filtering/search patterns.
 Area: Complex Filtering and Search
 Usage: Validate index-method alignment with workload.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     n.nspname AS schema_name,

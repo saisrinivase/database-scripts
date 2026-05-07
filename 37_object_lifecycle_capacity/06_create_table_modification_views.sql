@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Create Table Modification Views
 Purpose: Create table modification delta views (insert/update/delete/HOT) and monthly rollups.
 Area: Object Lifecycle and Capacity Monitoring
 Usage: PostgreSQL approximation for Oracle DBA_TAB_MODIFICATIONS style monitoring.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 CREATE SCHEMA IF NOT EXISTS dba_metrics;
 

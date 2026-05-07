@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Waits And Blocking Details
 Purpose: Show wait profile and blocker/blocked chains for immediate bottleneck diagnosis.
 Area: High Speed Tuning
 Usage: Run during slowdowns; focus first on blockers with oldest blocked age.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH blocked AS (
     SELECT

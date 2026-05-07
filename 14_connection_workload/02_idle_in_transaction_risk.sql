@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Idle In Transaction Risk
 Purpose: List idle-in-transaction sessions that can cause bloat and lock retention.
 Area: Connection and Workload
 Usage: Investigate application transaction handling for recurring offenders.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     pid,

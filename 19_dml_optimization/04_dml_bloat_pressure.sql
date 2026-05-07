@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Dml Bloat Pressure
 Purpose: Show write-heavy tables with dead tuple pressure (bloat risk).
 Area: Optimizing Data Modification
 Usage: Candidate list for VACUUM tuning and batch rewrite strategies.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     schemaname AS schema_name,

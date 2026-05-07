@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Parallel Worker Pressure
 Purpose: Inspect parallel worker utilization and leader/worker activity pressure.
 Area: Background Processes and Memory Pressure
 Usage: High sustained utilization can indicate parallelism bottlenecks or mis-sizing.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH cfg AS (
     SELECT

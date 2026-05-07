@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Capture WAL Snapshot
 Purpose: Capture WAL counter snapshots for WAL rate trend analysis.
 Area: Capacity Forecasting
 Usage: PostgreSQL 14+; schedule at fixed intervals.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 INSERT INTO dba_metrics.wal_snapshots (
     captured_at,

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Extended Stats Candidates
 Purpose: Heuristically flag wide, high-write tables lacking extended statistics objects.
 Area: Planner and Statistics
 Usage: Candidate list for CREATE STATISTICS (dependencies, ndistinct, mcv).
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH table_profile AS (
     SELECT

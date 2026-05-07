@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Create Lifecycle Repository
 Purpose: Create repository tables for lifecycle events, usage snapshots, and growth tracking.
 Area: Object Lifecycle and Capacity Monitoring
 Usage: Run once per database before enabling scheduled captures.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 CREATE SCHEMA IF NOT EXISTS dba_metrics;
 

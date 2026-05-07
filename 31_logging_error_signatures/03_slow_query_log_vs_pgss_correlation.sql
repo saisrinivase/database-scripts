@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Slow Query Log Vs Pg Stat Statements Correlation
 Purpose: Correlate slow-query logging threshold with pg_stat_statements hotspots.
 Area: Logging and Error Signatures
 Usage: Requires pg_stat_statements. Helps decide whether logging threshold is missing key queries.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT CASE
            WHEN EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements') THEN 1

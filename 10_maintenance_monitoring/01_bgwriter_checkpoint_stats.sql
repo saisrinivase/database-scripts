@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Bgwriter Checkpoint Stats
 Purpose: Review checkpointer and background writer behavior.
 Area: Maintenance and Monitoring
 Usage: Reset stats only during controlled measurement windows.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT (current_setting('server_version_num')::int >= 170000) AS has_pg_stat_checkpointer \gset
 

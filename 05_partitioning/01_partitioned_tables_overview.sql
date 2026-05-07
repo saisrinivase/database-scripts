@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Partitioned Tables Overview
 Purpose: Show partitioned tables, partition key definition, and child count.
 Area: Partitioning
 Usage: Run in target database.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     pn.nspname AS parent_schema,

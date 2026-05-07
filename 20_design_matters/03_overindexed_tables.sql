@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Overindexed Tables
 Purpose: Find tables with potentially excessive index count relative to write activity.
 Area: Design Matters
 Usage: Over-indexing can slow INSERT/UPDATE/DELETE workloads.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH idx_count AS (
     SELECT

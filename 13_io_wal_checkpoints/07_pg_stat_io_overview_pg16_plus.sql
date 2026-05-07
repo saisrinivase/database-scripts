@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Pg Stat IO Overview Pg16 Plus
 Purpose: Provide consolidated I/O stats from pg_stat_io view.
 Area: I/O, WAL, and Checkpoints
 Usage: PostgreSQL 16+ only.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT (current_setting('server_version_num')::int >= 160000) AS has_pg_stat_io \gset
 

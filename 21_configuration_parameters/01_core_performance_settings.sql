@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Core Performance Settings
 Purpose: Report core performance-related instance settings for baseline tuning.
 Area: Configuration Parameters
 Usage: Compare across environments to catch drift.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     name,

@@ -1,9 +1,12 @@
 /*
+PostgreSQL DBA Script: V2 Sanity Checks
 Purpose: PASS/FAIL assertions for V2 migration/performance issue scenarios.
 Area: Migration Validation
 Usage:
   psql "host=<host> port=<port> dbname=<db> user=<user>" \
     -f 27_migration_validation/07_v2_sanity_checks.sql
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 
 \set ON_ERROR_STOP on

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Query Tuning Action Queue
 Purpose: Build an actionable queue of expensive queries with root-cause hints and next actions.
 Area: High Speed Tuning
 Usage: Requires pg_stat_statements; start with top 20 rows.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     queryid,

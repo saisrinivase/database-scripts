@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Database IO Profile
 Purpose: Profile read/write, temp, and transaction behavior by database.
 Area: I/O, WAL, and Checkpoints
 Usage: Compare across databases to identify noisy tenants.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     datname AS database_name,

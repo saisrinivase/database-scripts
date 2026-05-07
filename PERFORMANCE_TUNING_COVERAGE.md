@@ -4,6 +4,12 @@ Purpose: Map performance topics to script areas so teams can quickly diagnose ro
 
 ## Topic to Area Mapping
 
+- `CloudWatch-style first look and command-line 360 observability`
+  - `38_observability_360/01_instance_health_360_dashboard.sql`
+  - `38_observability_360/02_cloudwatch_metric_equivalents.sql`
+  - `38_observability_360/03_stat_view_coverage_check.sql`
+  - `38_observability_360/12_sme_triage_command_router.sql`
+
 - `Optimize PostgreSQL for high speed and tune database parameters`
   - `27_high_speed_tuning/01_bottleneck_overview_dashboard.sql`
   - `27_high_speed_tuning/05_parameter_tuning_advisor.sql`
@@ -97,6 +103,6 @@ Purpose: Map performance topics to script areas so teams can quickly diagnose ro
 - `SQL/query shape`: long query, full scan, ORM chatty query, complex filter scripts.
 - `Schema/index design`: design matters, missing FK index, index and planner sections.
 - `Runtime behavior`: activity/locks, wait events, function hotspots.
-- `Storage and I/O`: database/table/index size, WAL/checkpoint, I/O latency scripts.
-- `Infrastructure (physical/cloud)`: platform fingerprint, fsync/checkpoint pressure, replication slot WAL retention.
+- `Storage and I/O`: database/table/index size, WAL/checkpoint, I/O latency scripts, CloudWatch-style metric equivalents.
+- `Infrastructure (physical/cloud)`: platform fingerprint, fsync/checkpoint pressure, replication slot WAL retention, provider-console-only gap checks.
 - `Workload goal alignment`: OLTP vs OLAP classification and mixed workload pressure.

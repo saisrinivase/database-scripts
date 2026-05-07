@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Version Upgrade Path Overview
 Purpose: Show current PostgreSQL version posture and supported target path across PG15-PG18.
 Area: Upgrade and Patch Readiness
 Usage: Use before planning major version upgrade windows.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH version_info AS (
     SELECT

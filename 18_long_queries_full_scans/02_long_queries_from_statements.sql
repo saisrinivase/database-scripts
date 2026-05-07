@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Long Queries From Statements
 Purpose: Rank historically slow queries using mean and total execution times.
 Area: Long Queries and Full Scans
 Usage: Requires pg_stat_statements.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     queryid,

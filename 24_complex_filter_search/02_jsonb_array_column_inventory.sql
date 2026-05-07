@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: JSONB Array Column Inventory
 Purpose: Inventory JSON/JSONB/array columns that often need specialized indexing.
 Area: Complex Filtering and Search
 Usage: Review with query patterns before index design.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     n.nspname AS schema_name,

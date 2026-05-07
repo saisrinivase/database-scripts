@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Amcheck Readiness And Candidate Commands
 Purpose: Assess amcheck readiness and generate candidate bt_index_check commands for large indexes.
 Area: Consistency and Integrity Checks
 Usage: Run generated commands in a controlled window; prefer replicas for first pass.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT CASE
            WHEN EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'amcheck') THEN 1

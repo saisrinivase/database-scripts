@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Database XID Multixact Age
 Purpose: Show XID and multixact age by database to assess wraparound risk.
 Area: Internals Deep Dive
 Usage: Monitor regularly on high-write systems.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     datname AS database_name,

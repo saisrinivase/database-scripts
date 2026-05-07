@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Capture Index Size Snapshot
 Purpose: Capture index size and scan count for index growth/utility trends.
 Area: Capacity Forecasting
 Usage: Schedule periodically with table snapshot.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 INSERT INTO dba_metrics.index_size_snapshots (
     captured_at,

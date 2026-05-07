@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Large Objects Summary
 Purpose: Summarize large object (BLOB) footprint from pg_largeobject.
 Area: TOAST / LOB / BLOB
 Usage: Requires permissions to read pg_largeobject.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     count(DISTINCT loid) AS large_object_count,

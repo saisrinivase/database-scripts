@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Bottleneck Overview Dashboard
 Purpose: Provide a single-row bottleneck overview across concurrency, I/O, temp usage, locks, and checkpoints.
 Area: High Speed Tuning
 Usage: Run first during performance triage to identify top pressure domains.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT (current_setting('server_version_num')::int >= 170000) AS has_pg_stat_checkpointer \gset
 

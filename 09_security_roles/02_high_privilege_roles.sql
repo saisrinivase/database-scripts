@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: High Privilege Roles
 Purpose: Identify highly privileged roles (superuser, replication, bypass RLS).
 Area: Security and Roles
 Usage: Review regularly for least-privilege compliance.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     rolname AS role_name,

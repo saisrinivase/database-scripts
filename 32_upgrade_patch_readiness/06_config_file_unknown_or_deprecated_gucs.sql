@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Config File Unknown Or Deprecated Gucs
 Purpose: Identify configuration-file errors and unapplied parameters that can appear after upgrade/patch changes.
 Area: Upgrade and Patch Readiness
 Usage: Resolve rows with non-null error before restart/cutover.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     sourcefile,

@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: Enterprise Takeover Gate V3
 Purpose: Enterprise Day-1 takeover gate for Oracle -> PostgreSQL migration.
 Area: Migration Validation
 Usage:
@@ -16,6 +17,8 @@ Decision model:
   - NO_GO: one or more blocker checks in FAIL status.
   - CONDITIONAL_GO: no blocker FAIL, but warnings exist.
   - GO: no blocker FAIL and no warnings.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 
 \set ON_ERROR_STOP on

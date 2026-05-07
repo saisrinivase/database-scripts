@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Create Action Advisory Views
 Purpose: Create advisory views for unused indexes, high-growth objects, and high-DML pressure tables.
 Area: Object Lifecycle and Capacity Monitoring
 Usage: Use this as a triage queue before tuning/drop/partition decisions.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 CREATE SCHEMA IF NOT EXISTS dba_metrics;
 

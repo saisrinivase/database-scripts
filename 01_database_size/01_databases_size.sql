@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Databases Size
 Purpose: Rank all databases by total size.
 Area: Database Size
 Usage: Connect to any database in the instance.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     d.datname AS database_name,

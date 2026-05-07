@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Performance Related Settings
 Purpose: Show key performance tuning settings in one result set.
 Area: Performance Tuning
 Usage: Compare across environments for drift and baseline tuning.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     name,

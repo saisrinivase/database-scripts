@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Roles And Membership
 Purpose: List roles and inherited role memberships.
 Area: Security and Roles
 Usage: Run as privileged role to see complete membership.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     r.rolname AS role_name,

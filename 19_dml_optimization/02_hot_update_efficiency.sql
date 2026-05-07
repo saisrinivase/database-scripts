@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Hot Update Efficiency
 Purpose: Evaluate HOT update efficiency (lower ratio may indicate index churn and write amplification).
 Area: Optimizing Data Modification
 Usage: Focus on heavily updated tables.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     schemaname AS schema_name,

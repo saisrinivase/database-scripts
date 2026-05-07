@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Prepared Statement Pooling Risk
 Purpose: Detect prepared-statement patterns that can break or degrade transaction pooling modes.
 Area: Pooler and Proxy Diagnostics
 Usage: Review when using PgBouncer transaction pooling or proxies with statement lifecycle constraints.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH summary AS (
     SELECT

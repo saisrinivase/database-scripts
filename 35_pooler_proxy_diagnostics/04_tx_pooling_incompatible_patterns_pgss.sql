@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Tx Pooling Incompatible Patterns Pg Stat Statements
 Purpose: Identify query patterns that are problematic in transaction pooling modes.
 Area: Pooler and Proxy Diagnostics
 Usage: Requires pg_stat_statements. Use to detect LISTEN/temp-table/session-state dependencies.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT CASE
            WHEN EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements') THEN 1

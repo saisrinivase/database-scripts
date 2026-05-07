@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: WAL Archiving Gap And Lag
 Purpose: Detect WAL archiving failure trends, archive recency gaps, and slot-retention pressure.
 Area: Backup, Restore, PITR, and DR
 Usage: Run on primary. Gaps/failures indicate PITR exposure.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH arch AS (
     SELECT

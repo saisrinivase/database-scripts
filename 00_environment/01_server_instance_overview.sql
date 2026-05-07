@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Server Instance Overview
 Purpose: Provide a quick PostgreSQL instance fingerprint for troubleshooting.
 Area: Environment / Internals
 Usage: Run in any database.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     current_database() AS database_name,

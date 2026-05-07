@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Autovacuum Analyze Settings By Table
 Purpose: Show table-level reloptions that override analyze/autovacuum behavior.
 Area: Planner and Statistics
 Usage: Review inconsistent per-table settings across critical schemas.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     n.nspname AS schema_name,

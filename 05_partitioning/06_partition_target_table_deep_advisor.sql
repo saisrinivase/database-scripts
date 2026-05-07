@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: Partition Target Table Deep Advisor
 Purpose: Deep-dive partition advisor for a specific table and time column, with SME decision score and developer action steps.
 Area: Partitioning
 Usage:
@@ -8,6 +9,8 @@ Usage:
     -v target_time_column='event_date' \
     -v hot_window_months='6' \
     -f 05_partitioning/06_partition_target_table_deep_advisor.sql
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 \set ON_ERROR_STOP on
 

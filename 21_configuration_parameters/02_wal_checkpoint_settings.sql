@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: WAL Checkpoint Settings
 Purpose: Show WAL and checkpoint settings that affect write latency and recovery behavior.
 Area: Configuration Parameters
 Usage: Review together with checkpoint and WAL pressure scripts.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     name,

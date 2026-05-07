@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Current Database Size Breakdown
 Purpose: Break down current database storage into table, index, and TOAST components.
 Area: Database Size
 Usage: Run in the database you want to analyze.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH base AS (
     SELECT

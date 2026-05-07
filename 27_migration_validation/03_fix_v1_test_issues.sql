@@ -1,9 +1,12 @@
 /*
+PostgreSQL DBA Script: Fix V1 Test Issues
 Purpose: Resolve seeded V1 migration issues created by 02_seed_v1_test_issues.sql.
 Area: Migration Validation
 Usage:
   psql "host=<host> port=<port> dbname=<db> user=<user>" \
     -f 27_migration_validation/03_fix_v1_test_issues.sql
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 
 \set ON_ERROR_STOP on

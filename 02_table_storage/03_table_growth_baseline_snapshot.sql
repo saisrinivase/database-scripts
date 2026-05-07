@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Table Growth Baseline Snapshot
 Purpose: Capture current table size and row estimate as a growth baseline snapshot.
 Area: Table Storage
 Usage: Export results periodically and compare snapshots externally.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     now() AS captured_at,

@@ -20,6 +20,8 @@ Purpose: Map object-centric administration topics to ready SQL scripts.
 | INSERT or COPY ingest visibility | `29_object_inventory_health/13_insert_copy_activity.sql` | COPY progress + table write counters. |
 | FDW inventory and federation | `29_object_inventory_health/14_fdw_inventory.sql` | Wrapper/server/mapping/foreign table inventory. |
 | QUERY hotspots (object-oriented lens) | `11_performance_tuning/*.sql`, `18_long_queries_full_scans/*.sql`, `28_pgss_resource_attribution/*.sql`, `29_object_inventory_health/18_object_query_hotspots_pgss.sql` | Includes pg_stat_statements-based resource and object token extraction. |
+| TABLE/INDEX activity heatmap | `38_observability_360/06_table_index_activity_heatmap.sql` | Fast table/index pressure summary across size, scans, writes, dead tuples, and HOT update ratio. |
+| CAPACITY snapshot now | `38_observability_360/11_growth_and_capacity_snapshot_now.sql`, `37_object_lifecycle_capacity/*.sql` | One-shot capacity snapshot plus scheduled lifecycle/growth history. |
 | PK missing | `20_design_matters/01_tables_without_primary_keys.sql`, `29_object_inventory_health/03_tables_missing_primary_key.sql` | Dedicated missing-PK script with starter DDL. |
 | FK missing index | `19_dml_optimization/03_missing_fk_supporting_indexes.sql`, `27_high_speed_tuning/04_missing_fk_index_candidates.sql`, `29_object_inventory_health/04_missing_fk_supporting_indexes.sql` | Same problem covered in multiple operational runbooks. |
 | Casing risk (quoted identifiers) | `29_object_inventory_health/06_identifier_casing_risks.sql` | Finds mixed/uppercase identifiers. |
@@ -32,4 +34,5 @@ Purpose: Map object-centric administration topics to ready SQL scripts.
 
 - Oracle `PACKAGE` and `SYNONYM` are intentionally treated as migration mapping topics because PostgreSQL does not implement them as native object types.
 - `29_object_inventory_health/18_object_query_hotspots_pgss.sql` requires `pg_stat_statements`.
+- `38_observability_360` provides first-look object pressure routing before deep object analysis.
 - Coverage target is PostgreSQL `15-18`.

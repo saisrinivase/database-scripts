@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Fsm Vm Toast Size Breakdown
 Purpose: Break down main/FSM/VM/TOAST forks to inspect internal storage overhead.
 Area: Internals Deep Dive
 Usage: Helps explain relation size composition beyond heap/index totals.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     n.nspname AS schema_name,

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Missing FK Supporting Indexes
 Purpose: Find foreign keys where referencing columns are not backed by a suitable index prefix.
 Area: Object Inventory and Health
 Usage: Create suggested indexes after validating workload and existing composite index strategy.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH fk AS (
     SELECT

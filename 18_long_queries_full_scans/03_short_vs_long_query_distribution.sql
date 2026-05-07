@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Short Vs Long Query Distribution
 Purpose: Classify query mix into short/medium/long buckets for optimization strategy choice.
 Area: Long Queries and Full Scans
 Usage: Requires pg_stat_statements; thresholds are adjustable.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH classified AS (
     SELECT

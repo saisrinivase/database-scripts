@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Dependency Fanout Objects
 Purpose: Identify objects with high dependency fanout in catalog metadata.
 Area: Internals Deep Dive
 Usage: High fanout objects need careful change planning.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     c.oid AS object_oid,

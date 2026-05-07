@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Identifier Casing Risks
 Purpose: Find mixed/upper-case identifiers that require quoted SQL and increase migration risk.
 Area: Object Inventory and Health
 Usage: Standardize to lower_snake_case where possible for operational consistency.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH rel_risks AS (
     SELECT

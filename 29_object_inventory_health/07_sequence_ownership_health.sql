@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Sequence Ownership Health
 Purpose: Audit sequence ownership and attachment to table columns.
 Area: Object Inventory and Health
 Usage: Unowned sequences can become orphaned during refactors or migrations.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH sequences AS (
     SELECT

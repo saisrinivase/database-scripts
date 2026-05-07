@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Tables Missing Primary Key
 Purpose: Identify tables missing primary keys and generate starter DDL suggestions.
 Area: Object Inventory and Health
 Usage: Review result before adding PKs on production tables with existing duplicate/null values.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH candidates AS (
     SELECT

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Tables Without Primary Keys
 Purpose: Identify user tables without primary keys.
 Area: Design Matters
 Usage: Missing PKs often hurt data integrity and query/index design.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     n.nspname AS schema_name,

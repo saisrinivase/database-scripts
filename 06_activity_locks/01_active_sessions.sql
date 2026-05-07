@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Active Sessions
 Purpose: List active and idle sessions with query age and wait details.
 Area: Activity and Locks
 Usage: Useful for live triage of load or stuck sessions.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     a.pid,

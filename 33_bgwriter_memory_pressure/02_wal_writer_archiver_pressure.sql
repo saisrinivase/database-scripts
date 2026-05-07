@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: WAL Writer Archiver Pressure
 Purpose: Diagnose WAL writer and archiver pressure that can manifest as high IO/CPU latency.
 Area: Background Processes and Memory Pressure
 Usage: Run on primary. Review wal_buffers_full and archive failures.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT EXISTS (
            SELECT 1

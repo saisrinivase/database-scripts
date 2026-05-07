@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Unused Indexes Candidates
 Purpose: Identify non-unique/non-primary indexes that have never been scanned.
 Area: Index Analysis
 Usage: Review manually before dropping; low-traffic windows may hide infrequent use.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     s.schemaname AS schema_name,

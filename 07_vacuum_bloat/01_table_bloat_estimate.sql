@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Table Bloat Estimate
 Purpose: Approximate per-table bloat impact using dead tuple density.
 Area: Vacuum and Bloat
 Usage: Heuristic estimate; validate with deeper tooling for exact bloat.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH stats AS (
     SELECT

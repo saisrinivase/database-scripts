@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: Partition Lab Generate 5Gb Timeseries
 Purpose: Create an unpartitioned lab table with 5GB+ time-series data (5/10-year span) to test partition decisions.
 Area: Partitioning
 Usage:
@@ -10,6 +11,8 @@ Usage:
     -v payload_bytes='1024' \
     -v batch_rows='250000' \
     -f 05_partitioning/07_partition_lab_generate_5gb_timeseries.sql
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 \set ON_ERROR_STOP on
 

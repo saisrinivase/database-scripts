@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Relation Storage Parameters
 Purpose: Inspect per-table storage settings (fillfactor, autovacuum overrides, etc.).
 Area: Table Storage
 Usage: Useful when tuning table-level storage behavior.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     n.nspname AS schema_name,

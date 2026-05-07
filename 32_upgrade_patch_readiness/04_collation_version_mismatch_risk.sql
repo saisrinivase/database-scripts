@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Collation Version Mismatch Risk
 Purpose: Detect collation version mismatches that can cause index/order behavior drift after OS/DB upgrades.
 Area: Upgrade and Patch Readiness
 Usage: Rebuild affected indexes after controlled validation when mismatches are found.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH collation_check AS (
     SELECT

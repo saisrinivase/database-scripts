@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Connection Saturation Queue Risk
 Purpose: Measure connection saturation and queue-risk proxy metrics from PostgreSQL side.
 Area: Pooler and Proxy Diagnostics
 Usage: High client-backend saturation often indicates pool sizing or connection churn issues.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH cfg AS (
     SELECT

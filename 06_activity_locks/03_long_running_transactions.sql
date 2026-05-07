@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Long Running Transactions
 Purpose: Detect long-running transactions that can block VACUUM and generate bloat.
 Area: Activity and Locks
 Usage: Adjust interval threshold as needed.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     pid,

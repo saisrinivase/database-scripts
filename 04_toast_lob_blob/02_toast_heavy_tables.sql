@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Toast Heavy Tables
 Purpose: Find tables where TOAST occupies a large share of total table size.
 Area: TOAST / LOB / BLOB
 Usage: Useful for column-level compression/archive strategy reviews.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH toast_stats AS (
     SELECT

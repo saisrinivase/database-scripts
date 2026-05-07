@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Temp File Usage By Database
 Purpose: Rank databases by temp file usage (spill pressure indicator).
 Area: I/O, WAL, and Checkpoints
 Usage: Tune query patterns and memory settings for top consumers.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     datname AS database_name,

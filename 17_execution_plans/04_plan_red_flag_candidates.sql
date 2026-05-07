@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Plan Red Flag Candidates
 Purpose: Flag statements likely to have plan-level issues (spills, I/O-heavy, high variance).
 Area: Execution Plans
 Usage: Requires pg_stat_statements; candidate list for deeper EXPLAIN ANALYZE.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     queryid,

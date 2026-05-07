@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Partition Health
 Purpose: Assess partitioned table coverage, size distribution, and index gaps on leaf partitions.
 Area: Object Inventory and Health
 Usage: Run after partition changes or when large scans appear on partitioned workloads.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH parents AS (
     SELECT

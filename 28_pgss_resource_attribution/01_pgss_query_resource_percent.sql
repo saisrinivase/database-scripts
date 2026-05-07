@@ -1,8 +1,11 @@
 /*
+PostgreSQL DBA Script: Pg Stat Statements Query Resource Percent
 Purpose: Attribute query resource usage using pg_stat_statements with CPU/IO/memory-spill percentages.
 Area: PGSS Resource Attribution
 Usage: Requires pg_stat_statements and track_io_timing for better IO-to-CPU split.
 Note: CPU is a proxy: total_exec_time minus shared/local/temp block read/write time.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH base AS (
     SELECT

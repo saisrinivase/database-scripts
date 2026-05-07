@@ -7,13 +7,14 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 1. Pick an area folder based on your issue (size, locks, performance, migration, internals, etc.).
 2. Run a script with `psql -d <database> -f <area>/<script>.sql`.
 3. Compare your result with the embedded sample output at the bottom of the same script.
-4. Use coverage maps (`PERFORMANCE_TUNING_COVERAGE.md`, `OBJECT_COVERAGE_MATRIX.md`, `INTERNALS_COVERAGE_MATRIX.md`) for cross-area troubleshooting.
+4. Use `SCRIPT_CATALOG.md` to search by purpose, or start with `38_observability_360/01_instance_health_360_dashboard.sql` for a CloudWatch-style first look.
+5. Use coverage maps (`PERFORMANCE_TUNING_COVERAGE.md`, `OBJECT_COVERAGE_MATRIX.md`, `INTERNALS_COVERAGE_MATRIX.md`) for cross-area troubleshooting.
 
 ## Scope
 
-- Coverage: `38` operational areas.
-- Current SQL scripts: `198`.
-- Script style: every SQL file includes `Purpose`, `Area`, and `Usage` headers.
+- Coverage: `40` operational folders, including two legacy `27_*` folders retained for compatibility.
+- Current SQL scripts: `222`.
+- Script style: every SQL file includes `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes` headers.
 - Goal: any DBA/engineer can open an area and run purpose-specific scripts quickly.
 
 ## Area Index
@@ -56,6 +57,8 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `34_consistency_integrity_checks`: invalid object checks, checksum posture, TOAST/catalog anomaly signals, amcheck readiness.
 - `35_pooler_proxy_diagnostics`: saturation/churn indicators, prepared statement risk, transaction pooling incompatibility, proxy inventory.
 - `36_cloud_provider_signals`: optional managed-service fingerprint, parameter drift, replica lag/failover, cloud incident checklist.
+- `37_object_lifecycle_capacity`: lifecycle repository, DDL event tracking, object growth, monthly capacity reports, and advisory views.
+- `38_observability_360`: CloudWatch-style command-line dashboards, metric equivalents, stat coverage checks, waits, WAL/checkpoint/archive, vacuum/analyze, replication, pg_stat_statements capture quality, and SME triage routing.
 
 Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionally retained for backward compatibility.
 
@@ -64,6 +67,8 @@ Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionall
 - Performance topic map: `PERFORMANCE_TUNING_COVERAGE.md`
 - Object topic map: `OBJECT_COVERAGE_MATRIX.md`
 - Internals topic map: `INTERNALS_COVERAGE_MATRIX.md`
+- Script catalog: `SCRIPT_CATALOG.md`
+- 360 coverage audit: `POSTGRES_360_COVERAGE_AUDIT.md`
 - Fast triage order: `27_high_speed_tuning/README.md`
 - Version compatibility details: `VERSION_COMPATIBILITY.md`
 
@@ -78,9 +83,11 @@ Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionall
 
 - Candidate scripts (index drop, partitioning, extended statistics, etc.) are advisory; review plans and workload before changes.
 - Target support: PostgreSQL `15` through `18`.
-- Current validated execution in this workspace: PostgreSQL `18.0`.
+- Current validated execution in this workspace: PostgreSQL `18.3` for the new observability pack; historical full-run artifact used PostgreSQL `18.0`.
 - Some scripts use `psql` guards (`\\if`, `\\gset`) to support differences between `15/16` and `17/18` views/columns.
-Extension/feature dependencies:
+
+## Extension/Feature Dependencies
+
 - `pg_stat_statements` for statement-level tuning scripts.
 - `pg_stat_wal` (PostgreSQL 14+) for WAL counter scripts.
 - `pg_stat_io` (PostgreSQL 16+) for detailed I/O scripts.

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Managed Service Fingerprint
 Purpose: Infer managed-service footprint and enumerate provider-specific settings exposed in PostgreSQL.
 Area: Cloud Provider Signals
 Usage: Helps route troubleshooting toward provider console events when applicable.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH v AS (
     SELECT version() AS version_text

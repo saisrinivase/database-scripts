@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Connections By User App Db
 Purpose: Break down active connections by database, user, and application.
 Area: Connection and Workload
 Usage: Useful for pool sizing and workload attribution.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     datname AS database_name,

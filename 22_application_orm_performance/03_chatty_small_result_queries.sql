@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Chatty Small Result Queries
 Purpose: Detect chatty query patterns with many calls and tiny average row returns.
 Area: Application Development and ORM Performance
 Usage: Useful for API batching and data loader strategy tuning.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     queryid,

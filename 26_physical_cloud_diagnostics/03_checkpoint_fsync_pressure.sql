@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Checkpoint Fsync Pressure
 Purpose: Detect checkpoint and fsync pressure indicative of storage or config issues.
 Area: Physical and Cloud Diagnostics
 Usage: Review with WAL/checkpoint settings and cloud disk metrics.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT (current_setting('server_version_num')::int >= 170000) AS has_pg_stat_checkpointer \gset
 

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Preupgrade Invalid Objects Gate
 Purpose: Identify invalid indexes and NOT VALID constraints that can break upgrade confidence.
 Area: Upgrade and Patch Readiness
 Usage: Resolve all CRITICAL rows before major version upgrades.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH invalid_indexes AS (
     SELECT

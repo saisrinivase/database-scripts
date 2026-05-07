@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Dead Tuples Hotspots
 Purpose: Rank tables by dead tuple count and dead tuple percentage.
 Area: Vacuum and Bloat
 Usage: Supports targeting manual VACUUM or autovacuum tuning.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     schemaname AS schema_name,

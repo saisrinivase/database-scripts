@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: Seed V2 Test Issues
 Purpose: Seed practical, deterministic migration/performance issues using a dedicated lab schema.
 Area: Migration Validation
 Usage:
@@ -9,6 +10,7 @@ Notes:
   - Creates schema migration_v2_lab and test-only objects.
   - Designed to be practical for pgbench-like workloads.
   - Safe to rerun: drops and recreates migration_v2_lab.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 */
 
 \set ON_ERROR_STOP on

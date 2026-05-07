@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Plan Capture Prerequisites
 Purpose: Verify settings required for reliable plan analysis and plan-related diagnostics.
 Area: Execution Plans
 Usage: Run before plan troubleshooting; check values against standards.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     name,

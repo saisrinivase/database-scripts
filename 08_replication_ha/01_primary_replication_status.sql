@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Primary Replication Status
 Purpose: Show standby status and lag metrics from a primary node.
 Area: Replication and HA
 Usage: Run on primary. On standby this view is typically empty.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     pid,

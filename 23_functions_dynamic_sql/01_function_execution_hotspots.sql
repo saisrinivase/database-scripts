@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Function Execution Hotspots
 Purpose: Rank user functions by execution cost.
 Area: Functions and Dynamic SQL
 Usage: Enable track_functions for complete timing data.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     schemaname AS schema_name,

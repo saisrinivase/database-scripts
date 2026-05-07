@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Visibility And Freeze Profile
 Purpose: Correlate visibility/freeze internals for table aging and maintenance planning.
 Area: Internals Deep Dive
 Usage: Compare with autovacuum settings and freeze thresholds.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     n.nspname AS schema_name,

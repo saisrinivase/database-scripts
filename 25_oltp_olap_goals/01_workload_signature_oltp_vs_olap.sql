@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Workload Signature OLTP Vs OLAP
 Purpose: Classify statement patterns as OLTP-like or OLAP-like based on latency, volume, and rows/call.
 Area: Optimization Goals (OLTP vs OLAP)
 Usage: Requires pg_stat_statements; heuristic classification.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH base AS (
     SELECT

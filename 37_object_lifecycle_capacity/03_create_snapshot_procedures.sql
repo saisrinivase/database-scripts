@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Create Snapshot Procedures
 Purpose: Create procedures to capture periodic lifecycle/capacity snapshots and purge old history.
 Area: Object Lifecycle and Capacity Monitoring
 Usage: Run after repository tables are created; then schedule CALL dba_metrics.sp_capture_operational_snapshot(...).
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 CREATE SCHEMA IF NOT EXISTS dba_metrics;
 

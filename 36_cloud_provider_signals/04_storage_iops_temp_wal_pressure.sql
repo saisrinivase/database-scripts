@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Storage Iops Temp WAL Pressure
 Purpose: Summarize storage/IO pressure signals often correlated with cloud IOPS or burst-balance incidents.
 Area: Cloud Provider Signals
 Usage: Use during incident windows to correlate spikes in read/write/temp/WAL activity.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT EXISTS (
            SELECT 1

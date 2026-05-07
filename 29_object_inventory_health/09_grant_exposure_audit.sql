@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Grant Exposure Audit
 Purpose: Audit privilege exposure, with focus on PUBLIC grants and grant-option chains.
 Area: Object Inventory and Health
 Usage: Review regularly for least-privilege posture and migration cutover hardening.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH table_grants AS (
     SELECT

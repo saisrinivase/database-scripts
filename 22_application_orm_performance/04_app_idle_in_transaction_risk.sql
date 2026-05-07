@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: App Idle In Transaction Risk
 Purpose: Identify applications holding idle transactions that can block cleanup and increase latency.
 Area: Application Development and ORM Performance
 Usage: Coordinate fixes with transaction scope in application code.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     application_name,

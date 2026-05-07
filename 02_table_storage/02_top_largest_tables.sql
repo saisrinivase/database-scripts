@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Top Largest Tables
 Purpose: Quickly list the largest tables in the current database.
 Area: Table Storage
 Usage: Change LIMIT value based on reporting need.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     n.nspname AS schema_name,

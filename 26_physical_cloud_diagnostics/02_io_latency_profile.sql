@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: IO Latency Profile
 Purpose: Profile I/O latency per database to detect storage-level bottlenecks.
 Area: Physical and Cloud Diagnostics
 Usage: Compare with historical baselines and provider metrics.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     datname AS database_name,

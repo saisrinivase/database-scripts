@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Prepared Transactions Status
 Purpose: List prepared transactions (2PC) and their age.
 Area: Connection and Workload
 Usage: Stale prepared transactions can block cleanup and hold locks.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     transaction,

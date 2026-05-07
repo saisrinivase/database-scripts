@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Postupgrade Query Regression Watchlist Pg Stat Statements
 Purpose: Build a post-upgrade query watchlist for plan/latency regressions using pg_stat_statements.
 Area: Upgrade and Patch Readiness
 Usage: Requires pg_stat_statements. Run before and after upgrade and compare top entries.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT CASE
            WHEN EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements') THEN 1

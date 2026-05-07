@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Missing FK Supporting Indexes
 Purpose: Detect foreign keys lacking a matching index on referencing columns.
 Area: Optimizing Data Modification
 Usage: Missing FK indexes can hurt UPDATE/DELETE performance on parent tables.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH fk AS (
     SELECT

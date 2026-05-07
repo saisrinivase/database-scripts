@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Create Ddl Event Triggers
 Purpose: Create DDL event triggers to capture object create/alter/drop timestamps for lifecycle monitoring.
 Area: Object Lifecycle and Capacity Monitoring
 Usage: Requires superuser. If not superuser, script returns guidance and skips trigger creation.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT (current_setting('is_superuser') = 'on') AS is_superuser \gset
 

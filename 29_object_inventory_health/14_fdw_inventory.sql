@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: FDW Inventory
 Purpose: Inventory FDW objects (wrapper, servers, mappings, and foreign tables).
 Area: Object Inventory and Health
 Usage: Use for federated query troubleshooting and migration readiness checks.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH wrappers AS (
     SELECT

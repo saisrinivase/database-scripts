@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Table Modification Tracking Demo
 Purpose: Demonstrate INSERT/UPDATE/DELETE delta monitoring similar to Oracle DBA_TAB_MODIFICATIONS.
 Area: Object Lifecycle and Capacity Monitoring
 Usage: Run after scripts 01-08. This uses dba_metrics_lab.index_demo_orders from script 11.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 CREATE SCHEMA IF NOT EXISTS dba_metrics_lab;
 

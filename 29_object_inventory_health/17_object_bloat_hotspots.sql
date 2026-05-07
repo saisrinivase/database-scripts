@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Object Bloat Hotspots
 Purpose: Highlight table bloat pressure using dead tuple and scan behavior proxies.
 Area: Object Inventory and Health
 Usage: Prioritize VACUUM/rewrite/index strategy on high dead-tuple large relations.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH table_stats AS (
     SELECT

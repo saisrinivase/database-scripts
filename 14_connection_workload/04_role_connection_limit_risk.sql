@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Role Connection Limit Risk
 Purpose: Compare current connections against role-level connection limits.
 Area: Connection and Workload
 Usage: Roles with low limits and high utilization are outage risks.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH role_conn AS (
     SELECT

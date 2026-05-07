@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Relation Filenode Mapping
 Purpose: Map logical relation names to relfilenode and tablespace internals.
 Area: Internals Deep Dive
 Usage: Useful for low-level storage troubleshooting.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     n.nspname AS schema_name,

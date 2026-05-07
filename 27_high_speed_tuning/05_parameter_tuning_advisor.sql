@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Parameter Tuning Advisor
 Purpose: Evaluate key performance parameters and output tuning recommendations with severity.
 Area: High Speed Tuning
 Usage: Advisory output; validate recommendations with workload tests before applying.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH vals AS (
     SELECT

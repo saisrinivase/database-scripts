@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Partition Sme Decision Scorecard
 Purpose: Provide an SME-style partitioning scorecard using size, data-span, write pressure, and scan behavior.
 Area: Partitioning
 Usage: Run after ANALYZE; use output to decide if partitioning is required, recommended, or low priority.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH base AS (
     SELECT

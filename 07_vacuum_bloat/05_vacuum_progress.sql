@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Vacuum Progress
 Purpose: Monitor currently running VACUUM operations.
 Area: Vacuum and Bloat
 Usage: Requires PostgreSQL with pg_stat_progress_vacuum view.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT (current_setting('server_version_num')::int >= 170000) AS has_vacuum_bytes \gset
 

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Replication Slot WAL Retention Risk
 Purpose: Identify WAL retention risk from replication slots that can cause disk pressure.
 Area: Physical and Cloud Diagnostics
 Usage: Run on primary; large retained WAL indicates downstream lag or inactive slot.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     slot_name,

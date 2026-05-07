@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Blocking And Blocked Sessions
 Purpose: Show blocked sessions and the blocker session details.
 Area: Activity and Locks
 Usage: Run during lock contention incidents.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     blocked.pid AS blocked_pid,

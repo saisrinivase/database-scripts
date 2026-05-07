@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Capture Connection Snapshot
 Purpose: Capture connection distribution snapshot for pool/capacity trending.
 Area: Capacity Forecasting
 Usage: Schedule at higher frequency (for example every 5 minutes).
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 INSERT INTO dba_metrics.connection_snapshots (
     captured_at,

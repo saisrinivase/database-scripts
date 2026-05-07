@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Pg Stat Statements Resource Percent By User
 Purpose: Show resource percentage attribution by login role from pg_stat_statements.
 Area: PGSS Resource Attribution
 Usage: Requires pg_stat_statements.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH base AS (
     SELECT

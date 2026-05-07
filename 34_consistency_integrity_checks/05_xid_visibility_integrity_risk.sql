@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: XID Visibility Integrity Risk
 Purpose: Surface XID/multixact age and vacuum staleness risks that can lead to integrity incidents.
 Area: Consistency and Integrity Checks
 Usage: Treat high-age/high-dead-tuple rows as urgent maintenance candidates.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 WITH risk AS (
     SELECT

@@ -1,7 +1,10 @@
 /*
+PostgreSQL DBA Script: Scheduler Runbook
 Purpose: Provide scheduling commands for periodic snapshot capture (pg_cron or external scheduler).
 Area: Object Lifecycle and Capacity Monitoring
 Usage: Run after procedures are created; choose one scheduling method.
+Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
+Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
 SELECT
     max(captured_at) AS last_capture_ts,
