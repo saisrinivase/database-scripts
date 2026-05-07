@@ -7,6 +7,7 @@ Purpose: Document compatibility expectations for PostgreSQL 15-18.
 - Target versions: `PostgreSQL 15, 16, 17, 18`.
 - Validated in this workspace: `PostgreSQL 18.0` (full run, all scripts passed).
 - Latest targeted validation in this workspace: `38_observability_360/*.sql` passed on PostgreSQL `18.3`.
+- Latest observer-agent validation in this workspace: `39_observer_agent_monitoring/*.sql` passed on PostgreSQL `18.3`.
 - Validation artifact: `_validation_runs/20260218_174311/report.md`.
 - Object inventory pack validation artifact: `29_object_inventory_health/samples_20260218_pgbench_test/summary.tsv`.
 
@@ -45,6 +46,7 @@ These scripts auto-switch logic with `psql` meta commands (`\gset`, `\if`) for v
 - `pg_stat_io` requires PostgreSQL 16+.
 - `pg_stat_progress_copy` is used in `29_object_inventory_health/13_insert_copy_activity.sql` (available in 15-18 target range).
 - `38_observability_360` scripts use only PostgreSQL SQL-visible metrics; host/cloud-only metrics still require CloudWatch, OS tools, or provider APIs.
+- `39_observer_agent_monitoring` stores SQL-visible observer snapshots in schema `dba_observer`; run the repository setup script first.
 
 ## Important Execution Note
 

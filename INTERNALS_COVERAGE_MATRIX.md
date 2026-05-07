@@ -20,6 +20,7 @@ Purpose: Map administration topics to PostgreSQL internals sources and ready-to-
 | Session/lock internals | `pg_stat_activity`, `pg_blocking_pids()` | `06_activity_locks/01_active_sessions.sql`, `06_activity_locks/02_blocking_and_blocked_sessions.sql` |
 | 360 observability dashboard | `pg_stat_activity`, `pg_locks`, `pg_stat_database`, `pg_stat_wal`, `pg_stat_bgwriter`, `pg_stat_checkpointer`, `pg_stat_replication` | `38_observability_360/01_instance_health_360_dashboard.sql` |
 | CloudWatch metric equivalents | SQL-visible stats plus provider/OS-only gap classification | `38_observability_360/02_cloudwatch_metric_equivalents.sql` |
+| Observer-agent repository | `dba_observer.observer_snapshots`, `dba_observer.observer_findings`, `dba_observer.observer_metric_thresholds` | `39_observer_agent_monitoring/01_create_observer_repository.sql`, `39_observer_agent_monitoring/02_capture_observer_snapshot.sql` |
 | Vacuum/bloat internals | `pg_stat_user_tables`, `relfrozenxid`, `pg_stat_progress_vacuum` | `07_vacuum_bloat/01_table_bloat_estimate.sql`, `07_vacuum_bloat/03_freeze_age_risk.sql`, `07_vacuum_bloat/05_vacuum_progress.sql` |
 | Replication state | `pg_stat_replication`, `pg_is_in_recovery()` | `08_replication_ha/01_primary_replication_status.sql`, `08_replication_ha/02_standby_replay_status.sql` |
 | Replication slot retention | `pg_replication_slots`, LSN diff functions | `08_replication_ha/03_replication_slots_health.sql` |

@@ -12,8 +12,8 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 
 ## Scope
 
-- Coverage: `40` operational folders, including two legacy `27_*` folders retained for compatibility.
-- Current SQL scripts: `222`.
+- Coverage: `41` operational folders, including two legacy `27_*` folders retained for compatibility.
+- Current SQL scripts: `232`.
 - Script style: every SQL file includes `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes` headers.
 - Goal: any DBA/engineer can open an area and run purpose-specific scripts quickly.
 
@@ -59,6 +59,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `36_cloud_provider_signals`: optional managed-service fingerprint, parameter drift, replica lag/failover, cloud incident checklist.
 - `37_object_lifecycle_capacity`: lifecycle repository, DDL event tracking, object growth, monthly capacity reports, and advisory views.
 - `38_observability_360`: CloudWatch-style command-line dashboards, metric equivalents, stat coverage checks, waits, WAL/checkpoint/archive, vacuum/analyze, replication, pg_stat_statements capture quality, and SME triage routing.
+- `39_observer_agent_monitoring`: observer-agent repository, scheduled snapshots, health scoring, incident detection, pressure classification, baseline deviation, SLA risk, and DBA action routing.
 
 Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionally retained for backward compatibility.
 
@@ -84,6 +85,7 @@ Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionall
 - Candidate scripts (index drop, partitioning, extended statistics, etc.) are advisory; review plans and workload before changes.
 - Target support: PostgreSQL `15` through `18`.
 - Current validated execution in this workspace: PostgreSQL `18.3` for the new observability pack; historical full-run artifact used PostgreSQL `18.0`.
+- Observer-agent monitoring pack `39_observer_agent_monitoring/*.sql` validated on PostgreSQL `18.3`.
 - Some scripts use `psql` guards (`\\if`, `\\gset`) to support differences between `15/16` and `17/18` views/columns.
 
 ## Extension/Feature Dependencies

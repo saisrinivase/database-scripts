@@ -4,12 +4,13 @@ Purpose: document how close this repository is to a 360-degree SME command-line 
 
 ## Current State
 
-- SQL scripts: `222`.
-- Operational folders: `40`, including the two legacy `27_*` folders.
+- SQL scripts: `232`.
+- Operational folders: `41`, including the two legacy `27_*` folders.
 - Header coverage: every SQL file has `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes`.
 - Sample coverage: every SQL file has an embedded `SAMPLE_OUTPUT_BEGIN` / `SAMPLE_OUTPUT_END` block.
 - First-look dashboard: `38_observability_360/01_instance_health_360_dashboard.sql`.
 - CloudWatch-style SQL mapping: `38_observability_360/02_cloudwatch_metric_equivalents.sql`.
+- Observer-agent monitoring layer: `39_observer_agent_monitoring`.
 - Searchable script inventory: `SCRIPT_CATALOG.md`.
 
 ## What PostgreSQL SQL Can See Well
@@ -26,6 +27,7 @@ Purpose: document how close this repository is to a 360-degree SME command-line 
 | Capacity/growth | `38_observability_360/11_growth_and_capacity_snapshot_now.sql`, `15_capacity_forecasting/*`, `37_object_lifecycle_capacity/*` | `pg_database`, `pg_class`, repository snapshots |
 | Backup/PITR/DR | `30_backup_restore_pitr_dr/*` | archive settings, archiver stats, replication state, optional evidence table |
 | Cloud/provider correlation | `36_cloud_provider_signals/*`, `38_observability_360/02_cloudwatch_metric_equivalents.sql` | SQL-visible proxies plus provider-console checklist |
+| Observer-agent monitoring | `39_observer_agent_monitoring/*` | `dba_observer` snapshots, findings, health score, baseline deviation, action queue |
 
 ## CloudWatch-Like Limits
 
@@ -55,6 +57,7 @@ The repository now handles this explicitly instead of pretending SQL can see eve
 | Need CloudWatch-style metric mapping | Added `02_cloudwatch_metric_equivalents.sql`. |
 | Need script discovery by purpose | Added `SCRIPT_CATALOG.md`. |
 | Need symptom-to-script routing | Added `12_sme_triage_command_router.sql`. |
+| Need pro observer-agent workflow | Added `39_observer_agent_monitoring` with capture, score, detect, classify, route, baseline deviation, SLA risk, and summary scripts. |
 
 ## Recommended First-Use Flow
 
@@ -63,3 +66,4 @@ The repository now handles this explicitly instead of pretending SQL can see eve
 3. Check stat coverage with `38_observability_360/03_stat_view_coverage_check.sql`.
 4. Use the relevant deep-dive area from `SCRIPT_CATALOG.md`.
 5. For historical growth/rate analysis, schedule `15_capacity_forecasting` and `37_object_lifecycle_capacity` snapshot scripts.
+6. For continuous observer-agent monitoring, run `39_observer_agent_monitoring/01_create_observer_repository.sql` once, then schedule `39_observer_agent_monitoring/02_capture_observer_snapshot.sql`.

@@ -2,7 +2,7 @@
 
 Purpose: searchable catalog of every SQL script in the postgres branch, with title, purpose, and sample-output coverage.
 
-Total SQL scripts: `222`.
+Total SQL scripts: `232`.
 
 ## Area Counts
 
@@ -48,6 +48,7 @@ Total SQL scripts: `222`.
 | `36_cloud_provider_signals` | 5 |
 | `37_object_lifecycle_capacity` | 12 |
 | `38_observability_360` | 12 |
+| `39_observer_agent_monitoring` | 10 |
 
 ## Scripts
 
@@ -275,6 +276,16 @@ Total SQL scripts: `222`.
 | `38_observability_360` | `38_observability_360/10_query_capture_quality_pgss.sql` | Query Capture Quality PGSS | Verify pg_stat_statements capture quality and show whether query history is useful enough for tuning. | yes |
 | `38_observability_360` | `38_observability_360/11_growth_and_capacity_snapshot_now.sql` | Growth And Capacity Snapshot Now | Capture a current one-shot view of database size, largest relations, WAL retention, XID age, and temp usage. | yes |
 | `38_observability_360` | `38_observability_360/12_sme_triage_command_router.sql` | SME Triage Command Router | Map common DBA symptoms to the best scripts in this repository so users can move from signal to diagnosis quickly. | yes |
+| `39_observer_agent_monitoring` | `39_observer_agent_monitoring/01_create_observer_repository.sql` | Create Observer Repository | Create repository tables for observer-agent snapshots, findings, thresholds, and run history. | yes |
+| `39_observer_agent_monitoring` | `39_observer_agent_monitoring/02_capture_observer_snapshot.sql` | Capture Observer Snapshot | Capture current observer metrics, score health, and store findings with recommended next scripts. | yes |
+| `39_observer_agent_monitoring` | `39_observer_agent_monitoring/03_health_score_dashboard.sql` | Health Score Dashboard | Show latest observer health score, status, metric summary, and open findings. | yes |
+| `39_observer_agent_monitoring` | `39_observer_agent_monitoring/04_active_incident_detector.sql` | Active Incident Detector | Detect current performance incidents from live PostgreSQL metrics without requiring stored snapshots. | yes |
+| `39_observer_agent_monitoring` | `39_observer_agent_monitoring/05_wait_lock_io_wal_classifier.sql` | Wait Lock IO WAL Classifier | Classify current pressure into wait, lock, I/O, temp, WAL, archive, and replication domains. | yes |
+| `39_observer_agent_monitoring` | `39_observer_agent_monitoring/06_top_root_cause_action_queue.sql` | Top Root Cause Action Queue | Build a prioritized action queue from live signals and pg_stat_statements hotspots. | yes |
+| `39_observer_agent_monitoring` | `39_observer_agent_monitoring/07_baseline_deviation_report.sql` | Baseline Deviation Report | Compare the latest observer snapshot with the previous snapshot to highlight fast-changing metrics. | yes |
+| `39_observer_agent_monitoring` | `39_observer_agent_monitoring/08_sla_risk_dashboard.sql` | SLA Risk Dashboard | Summarize live availability, latency, throughput, recoverability, and maintenance risks. | yes |
+| `39_observer_agent_monitoring` | `39_observer_agent_monitoring/09_generate_agent_summary.sql` | Generate Agent Summary | Generate a concise observer-agent summary with health, likely issues, and next scripts. | yes |
+| `39_observer_agent_monitoring` | `39_observer_agent_monitoring/10_observer_scheduler_runbook.sql` | Observer Scheduler Runbook | Provide scheduler commands and operating guidance for running the observer-agent scripts continuously. | yes |
 
 ## Conventions
 

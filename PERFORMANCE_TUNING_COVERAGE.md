@@ -10,6 +10,13 @@ Purpose: Map performance topics to script areas so teams can quickly diagnose ro
   - `38_observability_360/03_stat_view_coverage_check.sql`
   - `38_observability_360/12_sme_triage_command_router.sql`
 
+- `Observer-agent monitoring, health score, incident detection, and action routing`
+  - `39_observer_agent_monitoring/02_capture_observer_snapshot.sql`
+  - `39_observer_agent_monitoring/03_health_score_dashboard.sql`
+  - `39_observer_agent_monitoring/04_active_incident_detector.sql`
+  - `39_observer_agent_monitoring/06_top_root_cause_action_queue.sql`
+  - `39_observer_agent_monitoring/09_generate_agent_summary.sql`
+
 - `Optimize PostgreSQL for high speed and tune database parameters`
   - `27_high_speed_tuning/01_bottleneck_overview_dashboard.sql`
   - `27_high_speed_tuning/05_parameter_tuning_advisor.sql`
