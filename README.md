@@ -13,7 +13,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 ## Scope
 
 - Coverage: `41` operational folders, including two legacy `27_*` folders retained for compatibility.
-- Current SQL scripts: `232`.
+- Current SQL scripts: `236`.
 - Script style: every SQL file includes `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes` headers.
 - Goal: any DBA/engineer can open an area and run purpose-specific scripts quickly.
 
@@ -30,7 +30,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `08_replication_ha`: replication lag, slots, standby replay, WAL rates.
 - `09_security_roles`: role privilege and object-access auditing.
 - `10_maintenance_monitoring`: checkpoints, cache ratio, config drift, connection capacity.
-- `11_performance_tuning`: query-level hotspots and tuning-related settings.
+- `11_performance_tuning`: query-level hotspots, top CPU-like SQL, temp disk spills, memory-pressure proxies, live runtime pressure, and tuning-related settings.
 - `12_planner_statistics`: planner stats quality, analyze drift, extended stats candidates.
 - `13_io_wal_checkpoints`: read/write pressure, temp usage, WAL archiver/checkpoint stress.
 - `14_connection_workload`: connection behavior, limits, backend type, transaction hygiene.

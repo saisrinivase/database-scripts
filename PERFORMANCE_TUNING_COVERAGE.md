@@ -22,6 +22,12 @@ Purpose: Map performance topics to script areas so teams can quickly diagnose ro
   - `27_high_speed_tuning/05_parameter_tuning_advisor.sql`
   - `27_high_speed_tuning/06_query_tuning_action_queue.sql`
 
+- `PgAdmin-friendly top 10 SME query deep dives`
+  - `11_performance_tuning/07_top_10_cpu_intensive_queries_pgadmin.sql`
+  - `11_performance_tuning/08_top_10_temp_disk_spill_queries_pgadmin.sql`
+  - `11_performance_tuning/09_top_10_memory_pressure_queries_pgadmin.sql`
+  - `11_performance_tuning/10_active_top_10_runtime_pressure_pgadmin.sql`
+
 - `Detect bottlenecks and find missing indexes with ease`
   - `27_high_speed_tuning/02_waits_and_blocking_details.sql`
   - `27_high_speed_tuning/03_missing_index_candidates_from_scan_pressure.sql`

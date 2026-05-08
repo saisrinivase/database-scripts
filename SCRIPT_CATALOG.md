@@ -2,7 +2,7 @@
 
 Purpose: searchable catalog of every SQL script in the postgres branch, with title, purpose, and sample-output coverage.
 
-Total SQL scripts: `232`.
+Total SQL scripts: `236`.
 
 ## Area Counts
 
@@ -19,7 +19,7 @@ Total SQL scripts: `232`.
 | `08_replication_ha` | 4 |
 | `09_security_roles` | 4 |
 | `10_maintenance_monitoring` | 5 |
-| `11_performance_tuning` | 6 |
+| `11_performance_tuning` | 10 |
 | `12_planner_statistics` | 6 |
 | `13_io_wal_checkpoints` | 7 |
 | `14_connection_workload` | 6 |
@@ -107,6 +107,10 @@ Total SQL scripts: `232`.
 | `11_performance_tuning` | `11_performance_tuning/04_io_bound_query_candidates.sql` | IO Bound Query Candidates | Flag queries with high physical read pressure relative to cache hits. | yes |
 | `11_performance_tuning` | `11_performance_tuning/05_performance_related_settings.sql` | Performance Related Settings | Show key performance tuning settings in one result set. | yes |
 | `11_performance_tuning` | `11_performance_tuning/06_function_hotspots.sql` | Function Hotspots | Identify expensive user-defined functions by total execution time. | yes |
+| `11_performance_tuning` | `11_performance_tuning/07_top_10_cpu_intensive_queries_pgadmin.sql` | Top 10 CPU Intensive Queries PgAdmin | Rank the top CPU-heavy SQL statements using pg_stat_statements execution time and low temp/I/O block footprint. | yes |
+| `11_performance_tuning` | `11_performance_tuning/08_top_10_temp_disk_spill_queries_pgadmin.sql` | Top 10 Temp Disk Spill Queries PgAdmin | Rank statements writing the most temporary blocks, commonly caused by sort/hash/materialize spills. | yes |
+| `11_performance_tuning` | `11_performance_tuning/09_top_10_memory_pressure_queries_pgadmin.sql` | Top 10 Memory Pressure Queries PgAdmin | Identify queries most likely to create memory pressure using temp spills, high rows per call, block churn, and runtime variance. | yes |
+| `11_performance_tuning` | `11_performance_tuning/10_active_top_10_runtime_pressure_pgadmin.sql` | Active Top 10 Runtime Pressure PgAdmin | Show the top currently running sessions by age with wait, lock, transaction, and query text context. | yes |
 | `12_planner_statistics` | `12_planner_statistics/01_tables_needing_analyze.sql` | Tables Needing Analyze | Identify tables where modifications have outpaced analyze activity. | yes |
 | `12_planner_statistics` | `12_planner_statistics/02_seq_scan_hotspots.sql` | Seq Scan Hotspots | Highlight tables dominated by sequential scans (possible index or query design issue). | yes |
 | `12_planner_statistics` | `12_planner_statistics/03_column_stats_profile.sql` | Column Stats Profile | Inspect planner statistics profile for user-table columns. | yes |

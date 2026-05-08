@@ -4,7 +4,7 @@ Purpose: document how close this repository is to a 360-degree SME command-line 
 
 ## Current State
 
-- SQL scripts: `232`.
+- SQL scripts: `236`.
 - Operational folders: `41`, including the two legacy `27_*` folders.
 - Header coverage: every SQL file has `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes`.
 - Sample coverage: every SQL file has an embedded `SAMPLE_OUTPUT_BEGIN` / `SAMPLE_OUTPUT_END` block.
@@ -21,6 +21,7 @@ Purpose: document how close this repository is to a 360-degree SME command-line 
 | Database workload | `38_observability_360/05_database_activity_metrics.sql`, `13_io_wal_checkpoints/01_database_io_profile.sql` | `pg_stat_database` |
 | Table/index heat | `38_observability_360/06_table_index_activity_heatmap.sql`, `03_index_analysis/*`, `19_dml_optimization/*` | `pg_stat_user_tables`, `pg_stat_user_indexes` |
 | Query workload | `38_observability_360/10_query_capture_quality_pgss.sql`, `11_performance_tuning/*`, `28_pgss_resource_attribution/*` | `pg_stat_statements` |
+| PgAdmin-friendly top 10 deep dives | `11_performance_tuning/07_top_10_cpu_intensive_queries_pgadmin.sql`, `11_performance_tuning/08_top_10_temp_disk_spill_queries_pgadmin.sql`, `11_performance_tuning/09_top_10_memory_pressure_queries_pgadmin.sql`, `11_performance_tuning/10_active_top_10_runtime_pressure_pgadmin.sql` | Plain SQL, no `psql` meta commands |
 | WAL/checkpoints/archive | `38_observability_360/07_wal_checkpoint_archiver_dashboard.sql`, `13_io_wal_checkpoints/*`, `30_backup_restore_pitr_dr/*` | `pg_stat_wal`, `pg_stat_bgwriter`, `pg_stat_checkpointer`, `pg_stat_archiver` |
 | Vacuum/analyze/bloat | `38_observability_360/08_autovacuum_vacuum_analyze_progress.sql`, `07_vacuum_bloat/*`, `33_bgwriter_memory_pressure/03_autovacuum_worker_pressure.sql` | `pg_stat_progress_vacuum`, `pg_stat_progress_analyze`, `pg_stat_user_tables` |
 | Replication/HA | `38_observability_360/09_replication_and_slot_dashboard.sql`, `08_replication_ha/*`, `36_cloud_provider_signals/03_replica_lag_failover_signals.sql` | `pg_stat_replication`, `pg_stat_wal_receiver`, `pg_replication_slots` |
