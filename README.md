@@ -12,8 +12,8 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 
 ## Scope
 
-- Coverage: `41` operational folders, including two legacy `27_*` folders retained for compatibility.
-- Current SQL scripts: `236`.
+- Coverage: `42` operational folders, including two legacy `27_*` folders retained for compatibility.
+- Current SQL scripts: `248`.
 - Script style: every SQL file includes `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes` headers.
 - Goal: any DBA/engineer can open an area and run purpose-specific scripts quickly.
 
@@ -60,6 +60,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `37_object_lifecycle_capacity`: lifecycle repository, DDL event tracking, object growth, monthly capacity reports, and advisory views.
 - `38_observability_360`: CloudWatch-style command-line dashboards, metric equivalents, stat coverage checks, waits, WAL/checkpoint/archive, vacuum/analyze, replication, pg_stat_statements capture quality, and SME triage routing.
 - `39_observer_agent_monitoring`: observer-agent repository, scheduled snapshots, health scoring, incident detection, pressure classification, baseline deviation, SLA risk, and DBA action routing.
+- `40_pgadmin_safe_diagnostics`: pgAdmin Query Tool friendly PostgreSQL 15+ diagnostics for vacuum, checkpoints, pg_stat_io fallback, pg_stat_statements, CloudWatch-style metrics, HA, WAL/archive, observer health, root-cause queue, backup evidence, and SME routing.
 
 Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionally retained for backward compatibility.
 
@@ -86,6 +87,7 @@ Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionall
 - Target support: PostgreSQL `15` through `18`.
 - Current validated execution in this workspace: PostgreSQL `18.3` for the new observability pack; historical full-run artifact used PostgreSQL `18.0`.
 - Observer-agent monitoring pack `39_observer_agent_monitoring/*.sql` validated on PostgreSQL `18.3`.
+- PgAdmin-safe diagnostics pack `40_pgadmin_safe_diagnostics/*.sql` validated on PostgreSQL `18.3`; `04_pgadmin_safe_pg_stat_io_overview.sql` was also smoke-tested inside pgAdmin's PSQL panel.
 - Some scripts use `psql` guards (`\\if`, `\\gset`) to support differences between `15/16` and `17/18` views/columns.
 
 ## Extension/Feature Dependencies

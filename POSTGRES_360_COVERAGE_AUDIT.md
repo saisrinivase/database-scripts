@@ -4,13 +4,14 @@ Purpose: document how close this repository is to a 360-degree SME command-line 
 
 ## Current State
 
-- SQL scripts: `236`.
-- Operational folders: `41`, including the two legacy `27_*` folders.
+- SQL scripts: `248`.
+- Operational folders: `42`, including the two legacy `27_*` folders.
 - Header coverage: every SQL file has `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes`.
 - Sample coverage: every SQL file has an embedded `SAMPLE_OUTPUT_BEGIN` / `SAMPLE_OUTPUT_END` block.
 - First-look dashboard: `38_observability_360/01_instance_health_360_dashboard.sql`.
 - CloudWatch-style SQL mapping: `38_observability_360/02_cloudwatch_metric_equivalents.sql`.
 - Observer-agent monitoring layer: `39_observer_agent_monitoring`.
+- PgAdmin-safe PostgreSQL 15+ diagnosis layer: `40_pgadmin_safe_diagnostics`.
 - Searchable script inventory: `SCRIPT_CATALOG.md`.
 
 ## What PostgreSQL SQL Can See Well
@@ -29,6 +30,7 @@ Purpose: document how close this repository is to a 360-degree SME command-line 
 | Backup/PITR/DR | `30_backup_restore_pitr_dr/*` | archive settings, archiver stats, replication state, optional evidence table |
 | Cloud/provider correlation | `36_cloud_provider_signals/*`, `38_observability_360/02_cloudwatch_metric_equivalents.sql` | SQL-visible proxies plus provider-console checklist |
 | Observer-agent monitoring | `39_observer_agent_monitoring/*` | `dba_observer` snapshots, findings, health score, baseline deviation, action queue |
+| PgAdmin-safe diagnostics | `40_pgadmin_safe_diagnostics/*` | Plain SQL and temporary session-local helper functions, no `psql` meta commands |
 
 ## CloudWatch-Like Limits
 
@@ -59,12 +61,14 @@ The repository now handles this explicitly instead of pretending SQL can see eve
 | Need script discovery by purpose | Added `SCRIPT_CATALOG.md`. |
 | Need symptom-to-script routing | Added `12_sme_triage_command_router.sql`. |
 | Need pro observer-agent workflow | Added `39_observer_agent_monitoring` with capture, score, detect, classify, route, baseline deviation, SLA risk, and summary scripts. |
+| Need diagnostics that run directly in pgAdmin Query Tool | Added `40_pgadmin_safe_diagnostics` with 12 plain-SQL PostgreSQL 15+ scripts and compatibility replacements for psql-meta diagnostics. |
 
 ## Recommended First-Use Flow
 
 1. Run `38_observability_360/01_instance_health_360_dashboard.sql`.
 2. If the signal is unclear, run `38_observability_360/12_sme_triage_command_router.sql`.
-3. Check stat coverage with `38_observability_360/03_stat_view_coverage_check.sql`.
-4. Use the relevant deep-dive area from `SCRIPT_CATALOG.md`.
-5. For historical growth/rate analysis, schedule `15_capacity_forecasting` and `37_object_lifecycle_capacity` snapshot scripts.
-6. For continuous observer-agent monitoring, run `39_observer_agent_monitoring/01_create_observer_repository.sql` once, then schedule `39_observer_agent_monitoring/02_capture_observer_snapshot.sql`.
+3. In pgAdmin Query Tool, start with `40_pgadmin_safe_diagnostics/12_pgadmin_safe_sme_diagnosis_router.sql` or `40_pgadmin_safe_diagnostics/09_pgadmin_safe_observer_health_dashboard.sql`.
+4. Check stat coverage with `38_observability_360/03_stat_view_coverage_check.sql`.
+5. Use the relevant deep-dive area from `SCRIPT_CATALOG.md`.
+6. For historical growth/rate analysis, schedule `15_capacity_forecasting` and `37_object_lifecycle_capacity` snapshot scripts.
+7. For continuous observer-agent monitoring, run `39_observer_agent_monitoring/01_create_observer_repository.sql` once, then schedule `39_observer_agent_monitoring/02_capture_observer_snapshot.sql`.

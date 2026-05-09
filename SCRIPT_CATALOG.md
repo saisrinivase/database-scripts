@@ -2,7 +2,7 @@
 
 Purpose: searchable catalog of every SQL script in the postgres branch, with title, purpose, and sample-output coverage.
 
-Total SQL scripts: `236`.
+Total SQL scripts: `248`.
 
 ## Area Counts
 
@@ -49,6 +49,7 @@ Total SQL scripts: `236`.
 | `37_object_lifecycle_capacity` | 12 |
 | `38_observability_360` | 12 |
 | `39_observer_agent_monitoring` | 10 |
+| `40_pgadmin_safe_diagnostics` | 12 |
 
 ## Scripts
 
@@ -290,6 +291,18 @@ Total SQL scripts: `236`.
 | `39_observer_agent_monitoring` | `39_observer_agent_monitoring/08_sla_risk_dashboard.sql` | SLA Risk Dashboard | Summarize live availability, latency, throughput, recoverability, and maintenance risks. | yes |
 | `39_observer_agent_monitoring` | `39_observer_agent_monitoring/09_generate_agent_summary.sql` | Generate Agent Summary | Generate a concise observer-agent summary with health, likely issues, and next scripts. | yes |
 | `39_observer_agent_monitoring` | `39_observer_agent_monitoring/10_observer_scheduler_runbook.sql` | Observer Scheduler Runbook | Provide scheduler commands and operating guidance for running the observer-agent scripts continuously. | yes |
+| `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/01_pgadmin_compatibility_audit.sql` | PgAdmin Compatibility Audit | Map psql-meta diagnostic scripts to pgAdmin-safe replacements. | yes |
+| `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/02_pgadmin_safe_vacuum_progress.sql` | PgAdmin Safe Vacuum Progress | Show vacuum progress and blockers without psql meta commands. | yes |
+| `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/03_pgadmin_safe_checkpoint_bgwriter.sql` | PgAdmin Safe Checkpoint Bgwriter | Diagnose checkpoint and bgwriter pressure across PostgreSQL versions. | yes |
+| `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/04_pgadmin_safe_pg_stat_io_overview.sql` | PgAdmin Safe Pg Stat IO Overview | Show pg_stat_io I/O pressure with a PostgreSQL 15 fallback message. | yes |
+| `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/05_pgadmin_safe_pg_stat_statements_quality.sql` | PgAdmin Safe Pg Stat Statements Quality | Verify pg_stat_statements and surface high time, temp, WAL, and read-heavy SQL. | yes |
+| `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/06_pgadmin_safe_cloudwatch_metric_equivalents.sql` | PgAdmin Safe CloudWatch Metric Equivalents | Map SQL-visible PostgreSQL metrics to CloudWatch-style DBA signals. | yes |
+| `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/07_pgadmin_safe_replication_ha_dashboard.sql` | PgAdmin Safe Replication HA Dashboard | Check primary/standby role, replication lag, slots, and receiver state. | yes |
+| `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/08_pgadmin_safe_wal_checkpoint_archiver.sql` | PgAdmin Safe WAL Checkpoint Archiver | Diagnose WAL generation, archiver health, and checkpoint pressure. | yes |
+| `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/09_pgadmin_safe_observer_health_dashboard.sql` | PgAdmin Safe Observer Health Dashboard | Summarize live DBA health across connections, waits, locks, temp, XID, lag, and archive risk. | yes |
+| `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/10_pgadmin_safe_root_cause_action_queue.sql` | PgAdmin Safe Root Cause Action Queue | Produce prioritized P1/P2/P3 incident actions from live PostgreSQL signals. | yes |
+| `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/11_pgadmin_safe_backup_restore_evidence.sql` | PgAdmin Safe Backup Restore Evidence | Check backup, restore, PITR, DR, archiver, and slot evidence visible inside PostgreSQL. | yes |
+| `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/12_pgadmin_safe_sme_diagnosis_router.sql` | PgAdmin Safe SME Diagnosis Router | Route common DBA symptoms to the right pgAdmin-safe diagnostic script. | yes |
 
 ## Conventions
 

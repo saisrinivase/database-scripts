@@ -8,6 +8,7 @@ Purpose: Document compatibility expectations for PostgreSQL 15-18.
 - Validated in this workspace: `PostgreSQL 18.0` (full run, all scripts passed).
 - Latest targeted validation in this workspace: `38_observability_360/*.sql` passed on PostgreSQL `18.3`.
 - Latest observer-agent validation in this workspace: `39_observer_agent_monitoring/*.sql` passed on PostgreSQL `18.3`.
+- Latest pgAdmin-safe validation in this workspace: `40_pgadmin_safe_diagnostics/*.sql` passed on PostgreSQL `18.3`; scripts avoid `psql` meta commands for pgAdmin Query Tool compatibility.
 - Validation artifact: `_validation_runs/20260218_174311/report.md`.
 - Object inventory pack validation artifact: `29_object_inventory_health/samples_20260218_pgbench_test/summary.tsv`.
 
@@ -47,8 +48,10 @@ These scripts auto-switch logic with `psql` meta commands (`\gset`, `\if`) for v
 - `pg_stat_progress_copy` is used in `29_object_inventory_health/13_insert_copy_activity.sql` (available in 15-18 target range).
 - `38_observability_360` scripts use only PostgreSQL SQL-visible metrics; host/cloud-only metrics still require CloudWatch, OS tools, or provider APIs.
 - `39_observer_agent_monitoring` stores SQL-visible observer snapshots in schema `dba_observer`; run the repository setup script first.
+- `40_pgadmin_safe_diagnostics` uses plain SQL and session-local `pg_temp` helper functions for optional feature/version handling. It is intended for pgAdmin Query Tool and command-line execution.
 
 ## Important Execution Note
 
 - Version-guarded scripts rely on `psql` meta commands.
 - Recommended execution path: `psql -f <script.sql>`.
+- For pgAdmin Query Tool, use `40_pgadmin_safe_diagnostics/*.sql`; those scripts avoid `\gset`, `\if`, `\pset`, `\echo`, and other `psql`-only commands.

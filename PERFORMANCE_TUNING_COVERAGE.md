@@ -28,6 +28,14 @@ Purpose: Map performance topics to script areas so teams can quickly diagnose ro
   - `11_performance_tuning/09_top_10_memory_pressure_queries_pgadmin.sql`
   - `11_performance_tuning/10_active_top_10_runtime_pressure_pgadmin.sql`
 
+- `PgAdmin-safe 360 diagnostics and incident routing`
+  - `40_pgadmin_safe_diagnostics/01_pgadmin_compatibility_audit.sql`
+  - `40_pgadmin_safe_diagnostics/05_pgadmin_safe_pg_stat_statements_quality.sql`
+  - `40_pgadmin_safe_diagnostics/06_pgadmin_safe_cloudwatch_metric_equivalents.sql`
+  - `40_pgadmin_safe_diagnostics/09_pgadmin_safe_observer_health_dashboard.sql`
+  - `40_pgadmin_safe_diagnostics/10_pgadmin_safe_root_cause_action_queue.sql`
+  - `40_pgadmin_safe_diagnostics/12_pgadmin_safe_sme_diagnosis_router.sql`
+
 - `Detect bottlenecks and find missing indexes with ease`
   - `27_high_speed_tuning/02_waits_and_blocking_details.sql`
   - `27_high_speed_tuning/03_missing_index_candidates_from_scan_pressure.sql`
