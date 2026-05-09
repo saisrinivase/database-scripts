@@ -1,29 +1,150 @@
 /*
 PostgreSQL DBA Script: Top Statements Pg Stat Statements
-Purpose: Rank expensive SQL statements by total execution time.
+Purpose: Show the top SQL statements with percentage contribution and CPU/IO/memory/WAL pressure classification.
 Area: Maintenance and Monitoring
-Usage: Requires pg_stat_statements extension.
+Usage: Requires pg_stat_statements extension. Use this as a first query-performance triage screen before running deeper CPU, memory/temp-spill, I/O, or WAL-specific scripts.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
-Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
+Notes: Read-only diagnostic. PostgreSQL core does not expose exact historical per-query CPU or memory; CPU and memory below are practical proxies from pg_stat_statements timing, block I/O, temp blocks, and WAL counters.
 */
+WITH statement_base AS (
+    SELECT
+        s.queryid,
+        s.calls,
+        s.total_exec_time,
+        s.mean_exec_time,
+        s.rows,
+        s.shared_blks_hit,
+        s.shared_blks_read,
+        s.shared_blks_dirtied,
+        s.shared_blks_written,
+        s.local_blks_hit,
+        s.local_blks_read,
+        s.local_blks_dirtied,
+        s.local_blks_written,
+        s.temp_blks_read,
+        s.temp_blks_written,
+        coalesce(s.shared_blk_read_time, 0)
+            + coalesce(s.shared_blk_write_time, 0)
+            + coalesce(s.local_blk_read_time, 0)
+            + coalesce(s.local_blk_write_time, 0)
+            + coalesce(s.temp_blk_read_time, 0)
+            + coalesce(s.temp_blk_write_time, 0) AS io_time_ms,
+        greatest(
+            s.total_exec_time
+            - (
+                coalesce(s.shared_blk_read_time, 0)
+                + coalesce(s.shared_blk_write_time, 0)
+                + coalesce(s.local_blk_read_time, 0)
+                + coalesce(s.local_blk_write_time, 0)
+                + coalesce(s.temp_blk_read_time, 0)
+                + coalesce(s.temp_blk_write_time, 0)
+            ),
+            0
+        ) AS cpu_proxy_time_ms,
+        (coalesce(s.temp_blks_read, 0) + coalesce(s.temp_blks_written, 0)) * current_setting('block_size')::bigint AS temp_bytes_total,
+        coalesce(s.temp_blks_written, 0) * current_setting('block_size')::bigint AS temp_bytes_written,
+        (coalesce(s.shared_blks_read, 0) + coalesce(s.local_blks_read, 0)) * current_setting('block_size')::bigint AS read_bytes,
+        (coalesce(s.shared_blks_written, 0) + coalesce(s.local_blks_written, 0)) * current_setting('block_size')::bigint AS write_bytes,
+        coalesce(s.wal_bytes, 0)::numeric AS wal_bytes,
+        left(regexp_replace(s.query, '\s+', ' ', 'g'), 500) AS query_snippet
+    FROM pg_stat_statements s
+),
+totals AS (
+    SELECT
+        sum(total_exec_time) AS all_exec_ms,
+        sum(cpu_proxy_time_ms) AS all_cpu_proxy_ms,
+        sum(io_time_ms) AS all_io_ms,
+        sum(temp_bytes_total) AS all_temp_bytes,
+        sum(read_bytes) AS all_read_bytes,
+        sum(write_bytes) AS all_write_bytes,
+        sum(wal_bytes) AS all_wal_bytes,
+        sum(calls) AS all_calls
+    FROM statement_base
+),
+ranked AS (
+    SELECT
+        b.*,
+        row_number() OVER (ORDER BY b.total_exec_time DESC) AS rank_by_total_time
+    FROM statement_base b
+)
 SELECT
-    queryid,
-    calls,
-    total_exec_time,
-    mean_exec_time,
-    rows,
-    shared_blks_hit,
-    shared_blks_read,
-    temp_blks_written,
-    left(query, 500) AS query_snippet
-FROM pg_stat_statements
-ORDER BY total_exec_time DESC
-LIMIT 50;
+    r.rank_by_total_time,
+    r.queryid,
+    r.calls,
+    round((100.0 * r.calls / NULLIF(t.all_calls, 0))::numeric, 2) AS pct_calls,
+    round(r.total_exec_time::numeric, 2) AS total_exec_ms,
+    round((100.0 * r.total_exec_time / NULLIF(t.all_exec_ms, 0))::numeric, 2) AS pct_total_exec_time,
+    round(r.mean_exec_time::numeric, 2) AS mean_exec_ms,
+    r.rows,
+    round((r.rows::numeric / NULLIF(r.calls, 0)), 2) AS rows_per_call,
+    round(r.cpu_proxy_time_ms::numeric, 2) AS cpu_proxy_ms,
+    round((100.0 * r.cpu_proxy_time_ms / NULLIF(t.all_cpu_proxy_ms, 0))::numeric, 2) AS pct_cpu_proxy,
+    round(r.io_time_ms::numeric, 2) AS io_time_ms,
+    round((100.0 * r.io_time_ms / NULLIF(t.all_io_ms, 0))::numeric, 2) AS pct_io_time,
+    pg_size_pretty(r.read_bytes::bigint) AS read_volume,
+    round((100.0 * r.read_bytes / NULLIF(t.all_read_bytes, 0))::numeric, 2) AS pct_read_volume,
+    pg_size_pretty(r.write_bytes::bigint) AS write_volume,
+    round((100.0 * r.write_bytes / NULLIF(t.all_write_bytes, 0))::numeric, 2) AS pct_write_volume,
+    pg_size_pretty(r.temp_bytes_total::bigint) AS temp_spill_volume,
+    round((100.0 * r.temp_bytes_total / NULLIF(t.all_temp_bytes, 0))::numeric, 2) AS pct_temp_spill,
+    pg_size_pretty(r.wal_bytes::bigint) AS wal_volume,
+    round((100.0 * r.wal_bytes / NULLIF(t.all_wal_bytes, 0))::numeric, 2) AS pct_wal_volume,
+    r.shared_blks_hit,
+    r.shared_blks_read,
+    r.temp_blks_read,
+    r.temp_blks_written,
+    CASE
+        WHEN r.temp_bytes_total > 0
+             AND (
+                 r.temp_bytes_total >= 1024::bigint * 1024 * 1024
+                 OR r.temp_bytes_total >= greatest(r.read_bytes, r.write_bytes, r.wal_bytes)
+             )
+            THEN 'MEMORY/TEMP-SPILL intensive'
+        WHEN r.io_time_ms > r.cpu_proxy_time_ms
+             OR (
+                 r.read_bytes > 0
+                 AND r.read_bytes >= greatest(r.temp_bytes_total, r.write_bytes, r.wal_bytes)
+             )
+            THEN 'IO intensive'
+        WHEN r.wal_bytes > 0
+             AND (
+                 r.wal_bytes >= 1024::bigint * 1024 * 1024
+                 OR r.wal_bytes >= greatest(r.temp_bytes_total, r.read_bytes, r.write_bytes)
+             )
+            THEN 'WAL/WRITE intensive'
+        WHEN r.cpu_proxy_time_ms >= greatest(r.io_time_ms, 0)
+            THEN 'CPU intensive proxy'
+        ELSE 'MIXED resource profile'
+    END AS dominant_resource_profile,
+    CASE
+        WHEN r.temp_bytes_total > 0
+            THEN 'Check sort/hash spill plans, work_mem scope, row estimates, indexes, and temp file pressure.'
+        WHEN r.io_time_ms > r.cpu_proxy_time_ms OR r.read_bytes > 0
+            THEN 'Check read-heavy plans, missing indexes, cache hit ratio, pg_stat_io/storage latency, and full scans.'
+        WHEN r.wal_bytes > 0 AND (r.shared_blks_dirtied + r.shared_blks_written + r.local_blks_dirtied + r.local_blks_written) > 0
+            THEN 'Check write amplification, indexes on write-heavy tables, batch size, checkpoint/WAL pressure, and autovacuum.'
+        ELSE 'Check execution plan, joins, functions, expressions, row estimates, and CPU saturation.'
+    END AS recommended_next_step,
+    'Deep dives: 11_performance_tuning/07_top_10_cpu_intensive_queries_pgadmin.sql; 11_performance_tuning/08_top_10_temp_disk_spill_queries_pgadmin.sql; 11_performance_tuning/09_top_10_memory_pressure_queries_pgadmin.sql; 11_performance_tuning/04_io_bound_query_candidates.sql; 28_pgss_resource_attribution/01_pgss_query_resource_percent.sql' AS followup_scripts,
+    r.query_snippet
+FROM ranked r
+CROSS JOIN totals t
+WHERE r.rank_by_total_time <= 10
+ORDER BY r.rank_by_total_time;
 
 
 
 
 -- SAMPLE_OUTPUT_BEGIN
+--  rank_by_total_time | queryid | calls | pct_calls | total_exec_ms | pct_total_exec_time | pct_cpu_proxy | pct_io_time | read_volume | pct_read_volume | temp_spill_volume | pct_temp_spill | wal_volume | pct_wal_volume | dominant_resource_profile   | recommended_next_step
+-- --------------------+---------+-------+-----------+---------------+---------------------+---------------+-------------+-------------+-----------------+-------------------+----------------+------------+----------------+-----------------------------+------------------------------
+--                   1 | 12345   | 10000 |     12.50 |     250000.00 |               40.25 |         42.10 |        2.00 | 10 MB       |            0.20 | 0 bytes           |           0.00 | 0 bytes    |           0.00 | CPU intensive proxy         | Check execution plan...
+--                   2 | 45678   |   250 |      0.31 |      90000.00 |               14.49 |          8.00 |       51.25 | 80 GB       |           65.00 | 0 bytes           |           0.00 | 0 bytes    |           0.00 | IO intensive                | Check read-heavy plans...
+--                   3 | 98765   |    12 |      0.01 |      45000.00 |                7.25 |          4.00 |        3.00 | 500 MB      |            1.00 | 30 GB             |          88.00 | 0 bytes    |           0.00 | MEMORY/TEMP-SPILL intensive | Check sort/hash spill...
+-- (10 rows)
+-- SAMPLE_OUTPUT_END
+
+-- HISTORICAL_SAMPLE_BEGIN
 -- Sample output captured from database: pgbench_test
 -- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
 --
@@ -180,4 +301,4 @@ LIMIT 50;
 --   3689806360888379158 |  360000 |  297.5106209998934 |  0.0008264183916666604 |  360000 |         1440036 |                0 |                 0 | SELECT $2 FROM ONLY "migration_v1_lab"."parent_accounts" x WHERE "account_id" OPERATOR(pg_catalog.=) $1 FOR KEY SHARE OF x
 -- (50 rows)
 -- 
--- SAMPLE_OUTPUT_END
+-- HISTORICAL_SAMPLE_END
