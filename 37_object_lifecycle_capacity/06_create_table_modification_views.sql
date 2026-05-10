@@ -106,6 +106,86 @@ SELECT
     last_capture_in_month
 FROM base;
 
+SELECT
+    'step_01_schema_ready' AS setup_step,
+    'dba_metrics' AS object_name,
+    CASE WHEN to_regnamespace('dba_metrics') IS NOT NULL THEN 'READY' ELSE 'FAILED' END AS status,
+    'Schema for table modification reporting views.' AS purpose,
+    'Continue only when status is READY.' AS next_action;
+
+SELECT
+    'step_02_dependency_check' AS setup_step,
+    'dba_metrics.table_mod_snap' AS object_name,
+    CASE WHEN to_regclass('dba_metrics.table_mod_snap') IS NOT NULL THEN 'READY' ELSE 'MISSING' END AS status,
+    'Source snapshot table for insert, update, delete, HOT update, dead tuple, vacuum, and analyze counters.' AS purpose,
+    'If missing, run 01_create_lifecycle_repository.sql and 04_capture_snapshot_now.sql.' AS next_action;
+
+SELECT
+    'step_03_view_status' AS setup_step,
+    object_name,
+    CASE WHEN to_regclass(object_name) IS NOT NULL THEN 'READY' ELSE 'MISSING' END AS status,
+    purpose,
+    next_action
+FROM (
+    VALUES
+        ('dba_metrics.vw_table_modification_delta', 'Per-snapshot table DML deltas and dead tuple percentage.', 'Use this for recent write pressure and vacuum/analyze diagnosis.'),
+        ('dba_metrics.vw_table_modifications_monthly', 'Monthly DML rollup by table.', 'Use this for monthly write pressure and capacity planning.')
+) AS v(object_name, purpose, next_action)
+ORDER BY object_name;
+
+SELECT
+    'step_04_delta_row_count' AS setup_step,
+    'dba_metrics.vw_table_modification_delta' AS object_name,
+    count(*)::text AS output_value,
+    'Rows available in the delta view. Zero means snapshots have not been captured yet.' AS purpose,
+    'Run 04_capture_snapshot_now.sql at least twice with workload between captures.' AS next_action
+FROM dba_metrics.vw_table_modification_delta;
+
+WITH summary_rows AS (
+    SELECT
+        month_start,
+        schema_name,
+        table_name,
+        total_dml,
+        max_dead_tuple_pct,
+        max_table_total_size_pretty
+    FROM dba_metrics.vw_table_modifications_monthly
+    ORDER BY month_start DESC, total_dml DESC
+    LIMIT 20
+)
+SELECT
+    'step_05_monthly_dml_preview' AS setup_step,
+    month_start,
+    schema_name,
+    table_name,
+    total_dml,
+    max_dead_tuple_pct,
+    max_table_total_size_pretty,
+    CASE
+        WHEN total_dml >= 10000000 THEN 'HIGH_DML_PRESSURE'
+        WHEN total_dml >= 1000000 THEN 'MEDIUM_DML_PRESSURE'
+        WHEN max_dead_tuple_pct >= 20 THEN 'DEAD_TUPLE_REVIEW'
+        ELSE 'OBSERVE'
+    END AS interpretation,
+    CASE
+        WHEN total_dml >= 1000000 THEN 'Review autovacuum thresholds, HOT update ratio, indexes, and partitioning strategy.'
+        WHEN max_dead_tuple_pct >= 20 THEN 'Review vacuum/analyze cadence and table bloat diagnostics.'
+        ELSE 'No immediate action from this preview row.'
+    END AS next_action
+FROM summary_rows
+UNION ALL
+SELECT
+    'step_05_monthly_dml_preview',
+    NULL::date,
+    NULL::text,
+    'NO_DATA',
+    0::numeric,
+    NULL::numeric,
+    NULL::text,
+    'NO_DATA',
+    'No monthly table modification rows found. Capture snapshots before using monthly DML reports.'
+WHERE NOT EXISTS (SELECT 1 FROM summary_rows);
+
 
 -- SAMPLE_OUTPUT_BEGIN
 -- Sample output captured from database: pgbench_test

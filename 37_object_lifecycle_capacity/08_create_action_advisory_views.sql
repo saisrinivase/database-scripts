@@ -106,6 +106,86 @@ FROM latest_table_month t
 WHERE t.total_dml >= 1000000
 ORDER BY severity DESC, metric_bytes DESC NULLS LAST, metric_value DESC NULLS LAST;
 
+SELECT
+    'step_01_schema_ready' AS setup_step,
+    'dba_metrics' AS object_name,
+    CASE WHEN to_regnamespace('dba_metrics') IS NOT NULL THEN 'READY' ELSE 'FAILED' END AS status,
+    'Schema for advisory/action queue views.' AS purpose,
+    'Continue only when status is READY.' AS next_action;
+
+SELECT
+    'step_02_dependency_check' AS setup_step,
+    object_name,
+    CASE WHEN to_regclass(object_name) IS NOT NULL THEN 'READY' ELSE 'MISSING' END AS status,
+    purpose,
+    next_action
+FROM (
+    VALUES
+        ('dba_metrics.vw_index_lifecycle', 'Source for unused/stale index advisory rows.', 'If missing, run 05_create_index_lifecycle_views.sql.'),
+        ('dba_metrics.vw_object_growth_monthly', 'Source for fast-growing object advisory rows.', 'If missing, run 07_create_growth_views.sql.'),
+        ('dba_metrics.vw_table_modifications_monthly', 'Source for high-DML table advisory rows.', 'If missing, run 06_create_table_modification_views.sql.')
+) AS d(object_name, purpose, next_action)
+ORDER BY object_name;
+
+SELECT
+    'step_03_view_status' AS setup_step,
+    'dba_metrics.vw_capacity_action_queue' AS object_name,
+    CASE WHEN to_regclass('dba_metrics.vw_capacity_action_queue') IS NOT NULL THEN 'READY' ELSE 'MISSING' END AS status,
+    'Prioritized action queue for unused indexes, high-growth objects, and high-DML tables.' AS purpose,
+    'Review HIGH first, then MEDIUM; validate before any DDL change.' AS next_action;
+
+WITH queue_rows AS (
+    SELECT
+        finding_type,
+        severity,
+        count(*) AS finding_count,
+        pg_size_pretty(sum(coalesce(metric_bytes, 0))::bigint) AS total_metric_size
+    FROM dba_metrics.vw_capacity_action_queue
+    GROUP BY finding_type, severity
+)
+SELECT
+    'step_04_action_summary' AS setup_step,
+    finding_type,
+    severity,
+    finding_count,
+    round(100.0 * finding_count / nullif(sum(finding_count) OVER (), 0), 2) AS pct_of_findings,
+    total_metric_size,
+    CASE
+        WHEN severity = 'HIGH' THEN 'Create a remediation task and review this in the monthly DBA meeting.'
+        WHEN severity = 'MEDIUM' THEN 'Validate whether the trend repeats next cycle.'
+        ELSE 'Keep for awareness.'
+    END AS next_action
+FROM queue_rows
+UNION ALL
+SELECT
+    'step_04_action_summary',
+    'NO_FINDINGS',
+    'INFO',
+    0,
+    0.00,
+    '0 bytes',
+    'No current advisory rows met thresholds. Continue scheduled snapshots.'
+WHERE NOT EXISTS (SELECT 1 FROM queue_rows)
+ORDER BY severity, finding_type;
+
+SELECT
+    'step_05_top_actions' AS setup_step,
+    finding_type,
+    severity,
+    schema_name,
+    table_name,
+    object_name,
+    pg_size_pretty(metric_bytes) AS metric_size,
+    metric_value,
+    lifecycle_status,
+    recommendation
+FROM dba_metrics.vw_capacity_action_queue
+ORDER BY
+    CASE severity WHEN 'HIGH' THEN 1 WHEN 'MEDIUM' THEN 2 ELSE 3 END,
+    metric_bytes DESC NULLS LAST,
+    metric_value DESC NULLS LAST
+LIMIT 40;
+
 
 -- SAMPLE_OUTPUT_BEGIN
 -- Sample output captured from database: pgbench_test

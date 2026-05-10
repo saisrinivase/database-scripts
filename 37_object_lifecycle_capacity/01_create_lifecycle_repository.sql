@@ -140,6 +140,63 @@ CREATE INDEX IF NOT EXISTS idx_object_size_snap_object_oid
 CREATE INDEX IF NOT EXISTS idx_capture_run_captured_at
     ON dba_metrics.capture_run (captured_at);
 
+SELECT
+    'step_01_schema_ready' AS setup_step,
+    'dba_metrics' AS object_name,
+    CASE WHEN to_regnamespace('dba_metrics') IS NOT NULL THEN 'READY' ELSE 'FAILED' END AS status,
+    'Schema used by all lifecycle and capacity monitoring objects.' AS purpose,
+    'Continue only when status is READY.' AS next_action;
+
+SELECT
+    'step_02_repository_tables' AS setup_step,
+    object_name,
+    CASE WHEN to_regclass(object_name) IS NOT NULL THEN 'READY' ELSE 'MISSING' END AS status,
+    purpose,
+    next_action
+FROM (
+    VALUES
+        ('dba_metrics.capture_run', 'One row per snapshot execution.', 'Created by this script; used to join all snapshot tables.'),
+        ('dba_metrics.ddl_event_log', 'DDL create/drop event history.', 'Populate by running 02_create_ddl_event_triggers.sql as superuser.'),
+        ('dba_metrics.index_usage_snap', 'Index usage counters by snapshot.', 'Populate by running 04_capture_snapshot_now.sql or scheduling the capture procedure.'),
+        ('dba_metrics.table_mod_snap', 'Table DML and vacuum/analyze counters by snapshot.', 'Populate by running 04_capture_snapshot_now.sql or scheduling the capture procedure.'),
+        ('dba_metrics.object_size_snap', 'Object size snapshots for growth reports.', 'Populate by running 04_capture_snapshot_now.sql or scheduling the capture procedure.'),
+        ('dba_metrics.database_size_snap', 'Database size snapshots for monthly capacity reports.', 'Populate by running 04_capture_snapshot_now.sql or scheduling the capture procedure.'),
+        ('dba_metrics.tablespace_size_snap', 'Tablespace size snapshots.', 'Populate by running 04_capture_snapshot_now.sql or scheduling the capture procedure.'),
+        ('dba_metrics.db_stats_reset_snap', 'Database stats reset timestamp history.', 'Use this to detect stat resets that can affect deltas.')
+) AS t(object_name, purpose, next_action)
+ORDER BY object_name;
+
+SELECT
+    'step_03_repository_indexes' AS setup_step,
+    index_name AS object_name,
+    CASE WHEN to_regclass(index_name) IS NOT NULL THEN 'READY' ELSE 'MISSING' END AS status,
+    purpose,
+    next_action
+FROM (
+    VALUES
+        ('dba_metrics.idx_ddl_event_log_object_identity', 'Speeds DDL event lookup by object identity.', 'No action when READY.'),
+        ('dba_metrics.idx_ddl_event_log_object_type', 'Speeds DDL event lookup by object type.', 'No action when READY.'),
+        ('dba_metrics.idx_index_usage_snap_index_oid', 'Speeds index usage history lookup by index OID.', 'No action when READY.'),
+        ('dba_metrics.idx_table_mod_snap_table_oid', 'Speeds table modification history lookup by table OID.', 'No action when READY.'),
+        ('dba_metrics.idx_object_size_snap_object_oid', 'Speeds object growth history lookup by object OID.', 'No action when READY.'),
+        ('dba_metrics.idx_capture_run_captured_at', 'Speeds latest snapshot and retention cleanup.', 'No action when READY.')
+) AS i(index_name, purpose, next_action)
+ORDER BY index_name;
+
+SELECT
+    'step_04_next_steps' AS setup_step,
+    step_order,
+    task_name,
+    purpose,
+    sql_to_run
+FROM (
+    VALUES
+        (1, 'create_snapshot_procedures', 'Create capture and purge procedures.', 'Run 37_object_lifecycle_capacity/03_create_snapshot_procedures.sql'),
+        (2, 'enable_ddl_event_triggers', 'Optional but recommended for index create/drop history.', 'Run 37_object_lifecycle_capacity/02_create_ddl_event_triggers.sql as superuser.'),
+        (3, 'capture_first_snapshot', 'Seed repository tables with the current database state.', 'Run 37_object_lifecycle_capacity/04_capture_snapshot_now.sql')
+) AS s(step_order, task_name, purpose, sql_to_run)
+ORDER BY step_order;
+
 
 -- SAMPLE_OUTPUT_BEGIN
 -- Sample output captured from database: pgbench_test

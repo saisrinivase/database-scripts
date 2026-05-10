@@ -258,6 +258,68 @@ BEGIN
 END;
 $$;
 
+SELECT
+    'step_01_schema_ready' AS setup_step,
+    'dba_metrics' AS object_name,
+    CASE WHEN to_regnamespace('dba_metrics') IS NOT NULL THEN 'READY' ELSE 'FAILED' END AS status,
+    'Schema for capture and purge procedures.' AS purpose,
+    'Continue only when status is READY.' AS next_action;
+
+SELECT
+    'step_02_repository_dependencies' AS setup_step,
+    object_name,
+    CASE WHEN to_regclass(object_name) IS NOT NULL THEN 'READY' ELSE 'MISSING' END AS status,
+    purpose,
+    next_action
+FROM (
+    VALUES
+        ('dba_metrics.capture_run', 'Required by the capture procedure for run metadata.', 'If MISSING, run 01_create_lifecycle_repository.sql.'),
+        ('dba_metrics.index_usage_snap', 'Stores index usage snapshot rows.', 'If MISSING, run 01_create_lifecycle_repository.sql.'),
+        ('dba_metrics.table_mod_snap', 'Stores table modification snapshot rows.', 'If MISSING, run 01_create_lifecycle_repository.sql.'),
+        ('dba_metrics.object_size_snap', 'Stores object size snapshot rows.', 'If MISSING, run 01_create_lifecycle_repository.sql.'),
+        ('dba_metrics.database_size_snap', 'Stores database size snapshot rows.', 'If MISSING, run 01_create_lifecycle_repository.sql.'),
+        ('dba_metrics.tablespace_size_snap', 'Stores tablespace size snapshot rows.', 'If MISSING, run 01_create_lifecycle_repository.sql.'),
+        ('dba_metrics.db_stats_reset_snap', 'Stores stats reset timestamps for delta trust checks.', 'If MISSING, run 01_create_lifecycle_repository.sql.')
+) AS d(object_name, purpose, next_action)
+ORDER BY object_name;
+
+SELECT
+    'step_03_procedure_status' AS setup_step,
+    procedure_name AS object_name,
+    CASE WHEN to_regprocedure(procedure_signature) IS NOT NULL THEN 'READY' ELSE 'MISSING' END AS status,
+    purpose,
+    next_action
+FROM (
+    VALUES
+        (
+            'dba_metrics.sp_capture_operational_snapshot',
+            'dba_metrics.sp_capture_operational_snapshot(text,text)',
+            'Captures index usage, table DML, object size, database size, tablespace size, and stats reset snapshots.',
+            'Run CALL dba_metrics.sp_capture_operational_snapshot(''manual'', ''first capture'');'
+        ),
+        (
+            'dba_metrics.sp_purge_history',
+            'dba_metrics.sp_purge_history(integer)',
+            'Purges old capture and DDL event history after the retention window.',
+            'Run CALL dba_metrics.sp_purge_history(18); during planned maintenance.'
+        )
+) AS p(procedure_name, procedure_signature, purpose, next_action)
+ORDER BY procedure_name;
+
+SELECT
+    'step_04_next_steps' AS setup_step,
+    step_order,
+    task_name,
+    purpose,
+    sql_to_run
+FROM (
+    VALUES
+        (1, 'capture_now', 'Take the first baseline snapshot.', 'Run 37_object_lifecycle_capacity/04_capture_snapshot_now.sql'),
+        (2, 'schedule_capture', 'Keep history current for growth and lifecycle decisions.', 'Run 37_object_lifecycle_capacity/09_scheduler_runbook.sql'),
+        (3, 'create_reporting_views', 'Create lifecycle, modification, growth, and advisory views.', 'Run scripts 05, 06, 07, and 08.')
+) AS s(step_order, task_name, purpose, sql_to_run)
+ORDER BY step_order;
+
 
 -- SAMPLE_OUTPUT_BEGIN
 -- Sample output captured from database: pgbench_test

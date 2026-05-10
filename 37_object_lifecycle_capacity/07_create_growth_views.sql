@@ -100,6 +100,122 @@ SELECT
     pg_size_pretty(coalesce(size_bytes - prev_size_bytes, 0)) AS growth_pretty
 FROM series;
 
+SELECT
+    'step_01_schema_ready' AS setup_step,
+    'dba_metrics' AS object_name,
+    CASE WHEN to_regnamespace('dba_metrics') IS NOT NULL THEN 'READY' ELSE 'FAILED' END AS status,
+    'Schema for monthly capacity growth views.' AS purpose,
+    'Continue only when status is READY.' AS next_action;
+
+SELECT
+    'step_02_dependency_check' AS setup_step,
+    object_name,
+    CASE WHEN to_regclass(object_name) IS NOT NULL THEN 'READY' ELSE 'MISSING' END AS status,
+    purpose,
+    next_action
+FROM (
+    VALUES
+        ('dba_metrics.object_size_snap', 'Source object size snapshots for object growth.', 'If missing, run 01_create_lifecycle_repository.sql and 04_capture_snapshot_now.sql.'),
+        ('dba_metrics.database_size_snap', 'Source database size snapshots for database growth.', 'If missing, run 01_create_lifecycle_repository.sql and 04_capture_snapshot_now.sql.')
+) AS d(object_name, purpose, next_action)
+ORDER BY object_name;
+
+SELECT
+    'step_03_view_status' AS setup_step,
+    object_name,
+    CASE WHEN to_regclass(object_name) IS NOT NULL THEN 'READY' ELSE 'MISSING' END AS status,
+    purpose,
+    next_action
+FROM (
+    VALUES
+        ('dba_metrics.vw_object_growth_monthly', 'Monthly object growth by table, index, toast, sequence, and materialized view.', 'Use this to find storage growth drivers.'),
+        ('dba_metrics.vw_database_growth_monthly', 'Monthly database growth by database.', 'Use this for capacity trend and run-rate analysis.')
+) AS v(object_name, purpose, next_action)
+ORDER BY object_name;
+
+WITH db_rows AS (
+    SELECT
+        month_start,
+        database_name,
+        size_pretty,
+        growth_pretty,
+        growth_pct
+    FROM dba_metrics.vw_database_growth_monthly
+    ORDER BY month_start DESC
+    LIMIT 12
+)
+SELECT
+    'step_04_database_growth_preview' AS setup_step,
+    month_start,
+    database_name,
+    size_pretty,
+    growth_pretty,
+    growth_pct,
+    CASE
+        WHEN growth_pct >= 25 THEN 'HIGH_GROWTH'
+        WHEN growth_pct >= 10 THEN 'MEDIUM_GROWTH'
+        WHEN growth_pct IS NULL THEN 'BASELINE'
+        ELSE 'LOW_GROWTH'
+    END AS interpretation,
+    'Compare with object growth preview to identify what changed.' AS next_action
+FROM db_rows
+UNION ALL
+SELECT
+    'step_04_database_growth_preview',
+    NULL::date,
+    current_database(),
+    NULL::text,
+    NULL::text,
+    NULL::numeric,
+    'NO_DATA',
+    'Capture snapshots before using database growth reports.'
+WHERE NOT EXISTS (SELECT 1 FROM db_rows);
+
+WITH object_rows AS (
+    SELECT
+        month_start,
+        schema_name,
+        object_name,
+        object_type,
+        total_size_pretty,
+        growth_pretty,
+        growth_pct
+    FROM dba_metrics.vw_object_growth_monthly
+    WHERE growth_bytes IS NOT NULL
+    ORDER BY month_start DESC, growth_bytes DESC NULLS LAST
+    LIMIT 20
+)
+SELECT
+    'step_05_object_growth_preview' AS setup_step,
+    month_start,
+    schema_name,
+    object_name,
+    object_type,
+    total_size_pretty,
+    growth_pretty,
+    growth_pct,
+    CASE
+        WHEN growth_pct >= 50 THEN 'HIGH_GROWTH'
+        WHEN growth_pct >= 20 THEN 'MEDIUM_GROWTH'
+        WHEN growth_pct IS NULL THEN 'BASELINE'
+        ELSE 'LOW_GROWTH'
+    END AS interpretation,
+    'Review retention, partitioning, index count, and bloat for high-growth objects.' AS next_action
+FROM object_rows
+UNION ALL
+SELECT
+    'step_05_object_growth_preview',
+    NULL::date,
+    NULL::text,
+    'NO_DATA',
+    NULL::text,
+    NULL::text,
+    NULL::text,
+    NULL::numeric,
+    'NO_DATA',
+    'Need at least two monthly snapshot points to calculate object growth.'
+WHERE NOT EXISTS (SELECT 1 FROM object_rows);
+
 
 -- SAMPLE_OUTPUT_BEGIN
 -- Sample output captured from database: pgbench_test

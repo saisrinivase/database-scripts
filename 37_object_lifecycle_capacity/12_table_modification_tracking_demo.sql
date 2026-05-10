@@ -8,6 +8,13 @@ Notes: Read-only diagnostic unless the script explicitly creates objects, change
 */
 CREATE SCHEMA IF NOT EXISTS dba_metrics_lab;
 
+SELECT
+    'step_01_lab_schema' AS demo_step,
+    'dba_metrics_lab' AS object_name,
+    'READY' AS status,
+    'Schema for disposable table modification demo objects.' AS purpose,
+    'The next step creates or reuses the demo table.' AS next_action;
+
 CREATE TABLE IF NOT EXISTS dba_metrics_lab.index_demo_orders (
     order_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     customer_id int NOT NULL,
@@ -16,10 +23,27 @@ CREATE TABLE IF NOT EXISTS dba_metrics_lab.index_demo_orders (
     payload text
 );
 
+SELECT
+    'step_02_demo_table_ready' AS demo_step,
+    'dba_metrics_lab.index_demo_orders' AS object_name,
+    count(*) AS starting_rows,
+    pg_size_pretty(pg_total_relation_size('dba_metrics_lab.index_demo_orders')) AS table_size,
+    'Demo table is ready for insert/update/delete workload.' AS purpose
+FROM dba_metrics_lab.index_demo_orders;
+
 CALL dba_metrics.sp_capture_operational_snapshot(
     'dml_demo_before',
     'Before INSERT/UPDATE/DELETE demo workload'
 );
+
+SELECT
+    'step_03_before_dml_snapshot' AS demo_step,
+    max(run_id) AS run_id,
+    max(captured_at) AS captured_at,
+    'Baseline captured before demo DML workload.' AS purpose,
+    'The next steps run INSERT, UPDATE, DELETE, ANALYZE, and stats flush.' AS next_action
+FROM dba_metrics.capture_run
+WHERE capture_source = 'dml_demo_before';
 
 INSERT INTO dba_metrics_lab.index_demo_orders (customer_id, order_date, status_code, payload)
 SELECT
@@ -48,6 +72,14 @@ WHERE order_id IN (
     LIMIT 90
 );
 
+SELECT
+    'step_04_dml_workload_complete' AS demo_step,
+    'index_demo_orders' AS table_name,
+    count(*) AS ending_rows,
+    'Inserted 250 rows, updated 180 recent rows, and deleted 90 oldest rows.' AS purpose,
+    'Analyze and capture after-workload snapshot next.' AS next_action
+FROM dba_metrics_lab.index_demo_orders;
+
 ANALYZE dba_metrics_lab.index_demo_orders;
 
 SELECT pg_stat_force_next_flush();
@@ -57,12 +89,22 @@ CALL dba_metrics.sp_capture_operational_snapshot(
     'After INSERT/UPDATE/DELETE demo workload'
 );
 
+SELECT
+    'step_05_after_dml_snapshot' AS demo_step,
+    max(run_id) AS run_id,
+    max(captured_at) AS captured_at,
+    'Snapshot captured after demo DML workload.' AS purpose,
+    'Next output shows the captured DML deltas.' AS next_action
+FROM dba_metrics.capture_run
+WHERE capture_source = 'dml_demo_after';
+
 WITH latest_after AS (
     SELECT max(run_id) AS run_id
     FROM dba_metrics.capture_run
     WHERE capture_source = 'dml_demo_after'
 )
 SELECT
+    'step_06_delta_result' AS demo_step,
     captured_at,
     schema_name,
     table_name,
@@ -80,6 +122,7 @@ WHERE schema_name = 'dba_metrics_lab'
 ORDER BY captured_at DESC;
 
 SELECT
+    'step_07_monthly_rollup_result' AS demo_step,
     month_start,
     schema_name,
     table_name,

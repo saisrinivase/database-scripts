@@ -8,6 +8,13 @@ Notes: Read-only diagnostic unless the script explicitly creates objects, change
 */
 CREATE SCHEMA IF NOT EXISTS dba_metrics_lab;
 
+SELECT
+    'step_01_lab_schema' AS demo_step,
+    'dba_metrics_lab' AS object_name,
+    'READY' AS status,
+    'Schema for disposable index lifecycle demo objects.' AS purpose,
+    'The next step recreates the demo table.' AS next_action;
+
 DROP TABLE IF EXISTS dba_metrics_lab.index_demo_orders;
 
 CREATE TABLE dba_metrics_lab.index_demo_orders (
@@ -26,6 +33,14 @@ SELECT
     md5(gs::text)
 FROM generate_series(1, 120000) AS gs;
 
+SELECT
+    'step_02_demo_table_seeded' AS demo_step,
+    'dba_metrics_lab.index_demo_orders' AS object_name,
+    count(*) AS row_count,
+    pg_size_pretty(pg_total_relation_size('dba_metrics_lab.index_demo_orders')) AS table_size,
+    'Demo table has been loaded for index usage testing.' AS purpose
+FROM dba_metrics_lab.index_demo_orders;
+
 DROP INDEX IF EXISTS dba_metrics_lab.idx_demo_orders_customer;
 DROP INDEX IF EXISTS dba_metrics_lab.idx_demo_orders_status_payload;
 
@@ -35,10 +50,30 @@ CREATE INDEX idx_demo_orders_customer
 CREATE INDEX idx_demo_orders_status_payload
     ON dba_metrics_lab.index_demo_orders (status_code, payload);
 
+SELECT
+    'step_03_demo_indexes_created' AS demo_step,
+    indexname AS object_name,
+    pg_size_pretty(pg_relation_size(format('%I.%I', schemaname, indexname)::regclass)) AS index_size,
+    'READY' AS status,
+    'These demo indexes are used to prove scan/dropped-index lifecycle reporting.' AS purpose
+FROM pg_indexes
+WHERE schemaname = 'dba_metrics_lab'
+  AND tablename = 'index_demo_orders'
+ORDER BY indexname;
+
 CALL dba_metrics.sp_capture_operational_snapshot(
     'demo_before_use',
     'Before running index-using queries in lab'
 );
+
+SELECT
+    'step_04_before_use_snapshot' AS demo_step,
+    max(run_id) AS run_id,
+    max(captured_at) AS captured_at,
+    'Baseline captured before forcing index usage.' AS purpose,
+    'Next step runs index-using queries.' AS next_action
+FROM dba_metrics.capture_run
+WHERE capture_source = 'demo_before_use';
 
 SET enable_seqscan = off;
 
@@ -59,6 +94,13 @@ SELECT count(*)
 FROM dba_metrics_lab.index_demo_orders
 WHERE customer_id IN (333, 777, 999);
 
+SELECT
+    'step_05_index_usage_queries' AS demo_step,
+    'customer_id predicates executed' AS object_name,
+    'COMPLETED' AS status,
+    'Queries above should increment usage for idx_demo_orders_customer after stats flush/snapshot.' AS purpose,
+    'Next step captures after-use state.' AS next_action;
+
 RESET enable_seqscan;
 
 CALL dba_metrics.sp_capture_operational_snapshot(
@@ -66,7 +108,23 @@ CALL dba_metrics.sp_capture_operational_snapshot(
     'After running index-using queries in lab'
 );
 
+SELECT
+    'step_06_after_use_snapshot' AS demo_step,
+    max(run_id) AS run_id,
+    max(captured_at) AS captured_at,
+    'Snapshot captured after index-using queries.' AS purpose,
+    'Next step drops the unused demo index.' AS next_action
+FROM dba_metrics.capture_run
+WHERE capture_source = 'demo_after_use';
+
 DROP INDEX dba_metrics_lab.idx_demo_orders_status_payload;
+
+SELECT
+    'step_07_unused_index_dropped' AS demo_step,
+    'dba_metrics_lab.idx_demo_orders_status_payload' AS object_name,
+    CASE WHEN to_regclass('dba_metrics_lab.idx_demo_orders_status_payload') IS NULL THEN 'DROPPED' ELSE 'STILL_EXISTS' END AS status,
+    'Demo unused index was dropped to verify DDL/lifecycle tracking.' AS purpose,
+    'Next step captures after-drop state.' AS next_action;
 
 CALL dba_metrics.sp_capture_operational_snapshot(
     'demo_after_drop',
@@ -74,6 +132,16 @@ CALL dba_metrics.sp_capture_operational_snapshot(
 );
 
 SELECT
+    'step_08_after_drop_snapshot' AS demo_step,
+    max(run_id) AS run_id,
+    max(captured_at) AS captured_at,
+    'Snapshot captured after dropping the unused demo index.' AS purpose,
+    'Final output shows lifecycle status for demo indexes.' AS next_action
+FROM dba_metrics.capture_run
+WHERE capture_source = 'demo_after_drop';
+
+SELECT
+    'step_09_lifecycle_result' AS demo_step,
     schema_name,
     table_name,
     index_name,
