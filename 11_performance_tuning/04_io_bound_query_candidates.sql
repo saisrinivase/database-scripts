@@ -3,10 +3,18 @@ PostgreSQL DBA Script: IO Bound Query Candidates
 Purpose: Flag queries with high physical read pressure relative to cache hits.
 Area: Performance Tuning
 Usage: Requires pg_stat_statements; use with EXPLAIN plans.
+       Optional filter:
+       SELECT set_config('pgdiag.min_io_pct','30',false); -- show only SQL >= 30% of shared read load
+       -- Optional timestamp placeholders when using your own pg_stat_statements snapshot table:
+       -- AND snapshot_ts >= timestamp '2026-05-10 09:00:00'
+       -- AND snapshot_ts <  timestamp '2026-05-10 10:00:00'
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
-WITH base AS (
+WITH params AS (
+    SELECT coalesce(nullif(current_setting('pgdiag.min_io_pct', true), '')::numeric, 0) AS min_io_pct
+),
+base AS (
     SELECT
         queryid,
         calls,
@@ -20,6 +28,10 @@ WITH base AS (
         temp_blks_written,
         left(query, 500) AS query_snippet
     FROM pg_stat_statements
+),
+totals AS (
+    SELECT sum(shared_blks_read) AS all_shared_reads
+    FROM base
 )
 SELECT
     queryid,
@@ -28,13 +40,16 @@ SELECT
     mean_exec_time,
     shared_blks_read,
     shared_blks_hit,
+    round(100.0 * shared_blks_read / NULLIF(t.all_shared_reads, 0), 2) AS pct_io_read_load,
     round(100.0 * shared_blks_read / NULLIF(shared_blks_read + shared_blks_hit, 0), 2) AS shared_read_pct,
     temp_blks_written,
     query_snippet
 FROM base
+CROSS JOIN totals t
 WHERE calls >= 20
+  AND round(100.0 * shared_blks_read / NULLIF(t.all_shared_reads, 0), 2) >= (SELECT min_io_pct FROM params)
 ORDER BY shared_read_pct DESC NULLS LAST, total_exec_time DESC
-LIMIT 100;
+LIMIT 10;
 
 
 

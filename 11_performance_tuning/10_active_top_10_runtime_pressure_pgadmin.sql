@@ -3,9 +3,25 @@ PostgreSQL DBA Script: Active Top 10 Runtime Pressure PgAdmin
 Purpose: Show the top currently running sessions by age with wait, lock, transaction, and query text context.
 Area: Performance Tuning
 Usage: Run in pgAdmin, psql, or any SQL client during a live slowdown.
+       This is live pg_stat_activity data. Historical timestamp filtering requires snapshotting pg_stat_activity externally.
+       -- Optional snapshot-table placeholders:
+       -- AND snapshot_ts >= timestamp '2026-05-10 09:00:00'
+       -- AND snapshot_ts <  timestamp '2026-05-10 10:00:00'
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only. This is the live companion to pg_stat_statements historical top-query scripts.
 */
+WITH active_sessions AS (
+    SELECT
+        a.*,
+        greatest(extract(epoch FROM (now() - a.query_start)), 0) AS query_age_seconds
+    FROM pg_stat_activity a
+    WHERE a.pid <> pg_backend_pid()
+      AND a.state IS DISTINCT FROM 'idle'
+),
+totals AS (
+    SELECT sum(query_age_seconds) AS all_query_age_seconds
+    FROM active_sessions
+)
 SELECT
     a.pid,
     a.datname AS database_name,
@@ -17,6 +33,7 @@ SELECT
     a.wait_event_type,
     a.wait_event,
     now() - a.query_start AS query_age,
+    round(100.0 * a.query_age_seconds / NULLIF(t.all_query_age_seconds, 0), 2) AS pct_active_runtime_age,
     now() - a.xact_start AS transaction_age,
     now() - a.backend_start AS backend_age,
     cardinality(pg_blocking_pids(a.pid)) AS blocking_session_count,
@@ -30,9 +47,8 @@ SELECT
         ELSE 'Review query age, transaction age, and wait event.'
     END AS sme_diagnosis,
     left(regexp_replace(a.query, '\s+', ' ', 'g'), 260) AS query_sample
-FROM pg_stat_activity a
-WHERE a.pid <> pg_backend_pid()
-  AND a.state IS DISTINCT FROM 'idle'
+FROM active_sessions a
+CROSS JOIN totals t
 ORDER BY
     CASE WHEN cardinality(pg_blocking_pids(a.pid)) > 0 THEN 0 ELSE 1 END,
     a.query_start NULLS LAST,

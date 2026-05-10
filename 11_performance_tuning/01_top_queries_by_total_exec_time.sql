@@ -1,24 +1,86 @@
 /*
 PostgreSQL DBA Script: Top Queries By Total Exec Time
-Purpose: Rank statements by cumulative execution time to identify biggest workload contributors.
+Purpose: Rank real application SQL by cumulative execution time, with percentage contribution and noise filtering.
 Area: Performance Tuning
-Usage: Requires pg_stat_statements extension.
+Usage: Requires pg_stat_statements. Optional runtime filters without editing this file:
+       SELECT set_config('pgdiag.min_calls','10',false);
+       SELECT set_config('pgdiag.max_rows','10',false);
+       SELECT set_config('pgdiag.min_exec_pct','30',false); -- optional: show only SQL >= 30% of total exec time
+       SELECT set_config('pgdiag.query_filter','invoice',false);
+       SELECT set_config('pgdiag.include_noise','on',false);
+       -- Optional timestamp placeholders when using your own pg_stat_statements snapshot table:
+       -- AND snapshot_ts >= timestamp '2026-05-10 09:00:00'
+       -- AND snapshot_ts <  timestamp '2026-05-10 10:00:00'
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
+WITH params AS (
+    SELECT
+        coalesce(nullif(current_setting('pgdiag.min_calls', true), '')::bigint, 1) AS min_calls,
+        coalesce(nullif(current_setting('pgdiag.max_rows', true), '')::integer, 10) AS max_rows,
+        coalesce(nullif(current_setting('pgdiag.min_exec_pct', true), '')::numeric, 0) AS min_exec_pct,
+        coalesce(nullif(current_setting('pgdiag.query_filter', true), ''), '') AS query_filter,
+        coalesce(nullif(current_setting('pgdiag.include_noise', true), '')::boolean, false) AS include_noise
+),
+base AS (
+    SELECT
+        s.queryid,
+        s.calls,
+        s.total_exec_time,
+        s.mean_exec_time,
+        s.rows,
+        s.shared_blks_hit,
+        s.shared_blks_read,
+        s.temp_blks_written,
+        left(regexp_replace(s.query, '\s+', ' ', 'g'), 500) AS query_snippet
+    FROM pg_stat_statements s
+    CROSS JOIN params p
+    WHERE s.calls >= p.min_calls
+      AND (p.query_filter = '' OR s.query ILIKE '%' || p.query_filter || '%')
+      AND (
+          p.include_noise
+          OR s.query !~* '^\s*(begin|commit|end|rollback|set|show|reset|discard|deallocate|analyze|vacuum)\b'
+      )
+      AND (
+          p.include_noise
+          OR s.query !~* '(pg_catalog|information_schema|pg_stat_activity|pg_show_all_settings|pg_settings|pg_backend_pid\(\)|set_config\()'
+      )
+),
+totals AS (
+    SELECT
+        sum(total_exec_time) AS all_exec_ms,
+        sum(calls) AS all_calls,
+        sum(shared_blks_read) AS all_shared_reads,
+        sum(temp_blks_written) AS all_temp_written
+    FROM base
+)
 SELECT
-    queryid,
-    calls,
-    total_exec_time,
-    mean_exec_time,
-    rows,
-    shared_blks_hit,
-    shared_blks_read,
-    temp_blks_written,
-    left(query, 500) AS query_snippet
-FROM pg_stat_statements
-ORDER BY total_exec_time DESC
-LIMIT 100;
+    row_number() OVER (ORDER BY b.total_exec_time DESC) AS rank_by_total_time,
+    b.queryid,
+    b.calls,
+    round((100.0 * b.calls / NULLIF(t.all_calls, 0))::numeric, 2) AS pct_calls,
+    round(b.total_exec_time::numeric, 2) AS total_exec_ms,
+    round((100.0 * b.total_exec_time / NULLIF(t.all_exec_ms, 0))::numeric, 2) AS pct_total_exec_time,
+    round(b.mean_exec_time::numeric, 4) AS mean_exec_ms,
+    b.rows,
+    round((b.rows::numeric / NULLIF(b.calls, 0)), 2) AS rows_per_call,
+    b.shared_blks_hit,
+    b.shared_blks_read,
+    round((100.0 * b.shared_blks_read / NULLIF(t.all_shared_reads, 0))::numeric, 2) AS pct_shared_reads,
+    b.temp_blks_written,
+    pg_size_pretty((b.temp_blks_written * current_setting('block_size')::bigint)) AS temp_written,
+    round((100.0 * b.temp_blks_written / NULLIF(t.all_temp_written, 0))::numeric, 2) AS pct_temp_written,
+    CASE
+        WHEN b.temp_blks_written > 0 THEN 'Temp spill present; inspect sort/hash plans and work_mem scope.'
+        WHEN b.shared_blks_read > b.shared_blks_hit THEN 'Read-heavy; check full scans, missing indexes, and cache/storage latency.'
+        ELSE 'High total DB time; inspect EXPLAIN plan and business criticality.'
+    END AS recommended_action,
+    b.query_snippet
+FROM base b
+CROSS JOIN totals t
+WHERE round((100.0 * b.total_exec_time / NULLIF(t.all_exec_ms, 0))::numeric, 2) >= (SELECT min_exec_pct FROM params)
+ORDER BY b.total_exec_time DESC
+LIMIT (SELECT max_rows FROM params);
 
 
 
@@ -541,4 +603,3 @@ LIMIT 100;
 -- (100 rows)
 -- 
 -- SAMPLE_OUTPUT_END
-

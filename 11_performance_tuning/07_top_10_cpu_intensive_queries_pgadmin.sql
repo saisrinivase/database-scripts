@@ -3,10 +3,18 @@ PostgreSQL DBA Script: Top 10 CPU Intensive Queries PgAdmin
 Purpose: Rank the top CPU-heavy SQL statements using pg_stat_statements execution time and low temp/I/O block footprint.
 Area: Performance Tuning
 Usage: Run in pgAdmin, psql, or any SQL client after pg_stat_statements is installed in the current database.
+       Optional filter:
+       SELECT set_config('pgdiag.min_cpu_pct','30',false); -- show only SQL >= 30% of total exec time
+       -- Optional timestamp placeholders when using your own pg_stat_statements snapshot table:
+       -- AND snapshot_ts >= timestamp '2026-05-10 09:00:00'
+       -- AND snapshot_ts <  timestamp '2026-05-10 10:00:00'
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only. PostgreSQL does not expose exact per-query CPU in core SQL; this uses CPU-like pressure from total execution time, calls, block footprint, and temp footprint.
 */
-WITH pgss AS (
+WITH params AS (
+    SELECT coalesce(nullif(current_setting('pgdiag.min_cpu_pct', true), '')::numeric, 0) AS min_cpu_pct
+),
+pgss AS (
     SELECT
         s.userid,
         s.dbid,
@@ -31,6 +39,10 @@ WITH pgss AS (
         s.wal_bytes,
         s.query
     FROM pg_stat_statements s
+),
+totals AS (
+    SELECT sum(total_exec_time) AS total_exec_time_all
+    FROM pgss
 )
 SELECT
     coalesce(r.rolname, pgss.userid::text) AS user_name,
@@ -39,6 +51,7 @@ SELECT
     pgss.calls,
     round(pgss.total_exec_time::numeric, 2) AS total_exec_ms,
     round(pgss.total_exec_time::numeric, 2) AS cpu_like_exec_ms,
+    round((100.0 * pgss.total_exec_time / NULLIF(t.total_exec_time_all, 0))::numeric, 2) AS pct_cpu_like_exec_time,
     round((100.0 * pgss.shared_blks_hit / NULLIF(pgss.shared_blks_hit + pgss.shared_blks_read + pgss.temp_blks_read + pgss.temp_blks_written, 0))::numeric, 2) AS cache_or_cpu_work_pct,
     round(pgss.mean_exec_time::numeric, 4) AS mean_exec_ms,
     round(pgss.max_exec_time::numeric, 2) AS max_exec_ms,
@@ -58,13 +71,15 @@ SELECT
     END AS sme_diagnosis,
     left(regexp_replace(pgss.query, '\s+', ' ', 'g'), 220) AS query_sample
 FROM pgss
+CROSS JOIN totals t
 LEFT JOIN pg_roles r ON r.oid = pgss.userid
 LEFT JOIN pg_database d ON d.oid = pgss.dbid
+WHERE round((100.0 * pgss.total_exec_time / NULLIF(t.total_exec_time_all, 0))::numeric, 2) >= (SELECT min_cpu_pct FROM params)
 ORDER BY pgss.total_exec_time DESC NULLS LAST
 LIMIT 10;
 
 -- SAMPLE_OUTPUT_BEGIN
--- user_name | database_name | queryid | calls | total_exec_ms | cpu_like_exec_ms | cache_or_cpu_work_pct | mean_exec_ms | sme_diagnosis
--- ----------+---------------+---------+-------+---------------+------------------+-----------------------+--------------+--------------------------------------------
--- app_user  | appdb         | 123456  | 84000 |     920000.00 |        920000.00 |                 96.74 |      10.9524 | Likely CPU-bound; inspect functions...
+-- user_name | database_name | queryid | calls | total_exec_ms | pct_cpu_like_exec_time | cache_or_cpu_work_pct | mean_exec_ms | sme_diagnosis
+-- ----------+---------------+---------+-------+---------------+------------------------+-----------------------+--------------+--------------------------------------------
+-- app_user  | appdb         | 123456  | 84000 |     920000.00 |                  31.44 |                 96.74 |      10.9524 | Likely CPU-bound; inspect functions...
 -- SAMPLE_OUTPUT_END

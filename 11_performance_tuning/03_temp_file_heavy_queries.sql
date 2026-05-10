@@ -3,22 +3,41 @@ PostgreSQL DBA Script: Temp File Heavy Queries
 Purpose: Detect statements causing heavy temp file writes (sort/hash spill candidates).
 Area: Performance Tuning
 Usage: Requires pg_stat_statements; review work_mem and execution plans.
+       Optional filter:
+       SELECT set_config('pgdiag.min_temp_pct','40',false); -- show only SQL >= 40% of temp write load
+       -- Optional timestamp placeholders when using your own pg_stat_statements snapshot table:
+       -- AND snapshot_ts >= timestamp '2026-05-10 09:00:00'
+       -- AND snapshot_ts <  timestamp '2026-05-10 10:00:00'
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
+WITH params AS (
+    SELECT coalesce(nullif(current_setting('pgdiag.min_temp_pct', true), '')::numeric, 0) AS min_temp_pct
+),
+base AS (
+    SELECT *
+    FROM pg_stat_statements
+    WHERE temp_blks_written > 0
+),
+totals AS (
+    SELECT sum(temp_blks_written) AS all_temp_blks_written
+    FROM base
+)
 SELECT
     queryid,
     calls,
     temp_blks_read,
     temp_blks_written,
+    round(100.0 * temp_blks_written / NULLIF(t.all_temp_blks_written, 0), 2) AS pct_temp_write_load,
     (temp_blks_written * current_setting('block_size')::bigint) AS temp_bytes_written,
     pg_size_pretty((temp_blks_written * current_setting('block_size')::bigint)::bigint) AS temp_written_pretty,
     mean_exec_time,
     left(query, 500) AS query_snippet
-FROM pg_stat_statements
-WHERE temp_blks_written > 0
+FROM base
+CROSS JOIN totals t
+WHERE round(100.0 * temp_blks_written / NULLIF(t.all_temp_blks_written, 0), 2) >= (SELECT min_temp_pct FROM params)
 ORDER BY temp_bytes_written DESC
-LIMIT 100;
+LIMIT 10;
 
 
 

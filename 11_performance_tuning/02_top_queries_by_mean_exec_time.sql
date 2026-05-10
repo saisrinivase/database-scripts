@@ -1,25 +1,78 @@
 /*
 PostgreSQL DBA Script: Top Queries By Mean Exec Time
-Purpose: Find high-latency statements (average execution time) with meaningful call counts.
+Purpose: Find high-latency application SQL by average execution time, with percentage contribution and noise filtering.
 Area: Performance Tuning
-Usage: Requires pg_stat_statements extension; adjust minimum calls threshold.
+Usage: Requires pg_stat_statements. Optional runtime filters without editing this file:
+       SELECT set_config('pgdiag.min_calls','50',false);
+       SELECT set_config('pgdiag.max_rows','10',false);
+       SELECT set_config('pgdiag.min_exec_pct','30',false); -- optional: show only SQL >= 30% of total exec time
+       SELECT set_config('pgdiag.query_filter','invoice',false);
+       SELECT set_config('pgdiag.include_noise','on',false);
+       -- Optional timestamp placeholders when using your own pg_stat_statements snapshot table:
+       -- AND snapshot_ts >= timestamp '2026-05-10 09:00:00'
+       -- AND snapshot_ts <  timestamp '2026-05-10 10:00:00'
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
+WITH params AS (
+    SELECT
+        coalesce(nullif(current_setting('pgdiag.min_calls', true), '')::bigint, 50) AS min_calls,
+        coalesce(nullif(current_setting('pgdiag.max_rows', true), '')::integer, 10) AS max_rows,
+        coalesce(nullif(current_setting('pgdiag.min_exec_pct', true), '')::numeric, 0) AS min_exec_pct,
+        coalesce(nullif(current_setting('pgdiag.query_filter', true), ''), '') AS query_filter,
+        coalesce(nullif(current_setting('pgdiag.include_noise', true), '')::boolean, false) AS include_noise
+),
+base AS (
+    SELECT
+        s.queryid,
+        s.calls,
+        s.total_exec_time,
+        s.mean_exec_time,
+        s.min_exec_time,
+        s.max_exec_time,
+        s.stddev_exec_time,
+        s.rows,
+        left(regexp_replace(s.query, '\s+', ' ', 'g'), 500) AS query_snippet
+    FROM pg_stat_statements s
+    CROSS JOIN params p
+    WHERE s.calls >= p.min_calls
+      AND (p.query_filter = '' OR s.query ILIKE '%' || p.query_filter || '%')
+      AND (
+          p.include_noise
+          OR s.query !~* '^\s*(begin|commit|end|rollback|set|show|reset|discard|deallocate|analyze|vacuum)\b'
+      )
+      AND (
+          p.include_noise
+          OR s.query !~* '(pg_catalog|information_schema|pg_stat_activity|pg_show_all_settings|pg_settings|pg_backend_pid\(\)|set_config\()'
+      )
+),
+totals AS (
+    SELECT sum(total_exec_time) AS all_exec_ms, sum(calls) AS all_calls FROM base
+)
 SELECT
-    queryid,
-    calls,
-    total_exec_time,
-    mean_exec_time,
-    min_exec_time,
-    max_exec_time,
-    stddev_exec_time,
-    rows,
-    left(query, 500) AS query_snippet
-FROM pg_stat_statements
-WHERE calls >= 50
-ORDER BY mean_exec_time DESC
-LIMIT 100;
+    row_number() OVER (ORDER BY b.mean_exec_time DESC) AS rank_by_mean_time,
+    b.queryid,
+    b.calls,
+    round((100.0 * b.calls / NULLIF(t.all_calls, 0))::numeric, 2) AS pct_calls,
+    round(b.total_exec_time::numeric, 2) AS total_exec_ms,
+    round((100.0 * b.total_exec_time / NULLIF(t.all_exec_ms, 0))::numeric, 2) AS pct_total_exec_time,
+    round(b.mean_exec_time::numeric, 4) AS mean_exec_ms,
+    round(b.min_exec_time::numeric, 4) AS min_exec_ms,
+    round(b.max_exec_time::numeric, 4) AS max_exec_ms,
+    round(b.stddev_exec_time::numeric, 4) AS stddev_exec_ms,
+    b.rows,
+    round((b.rows::numeric / NULLIF(b.calls, 0)), 2) AS rows_per_call,
+    CASE
+        WHEN b.calls < 100 THEN 'High latency but low frequency; validate business impact before tuning.'
+        WHEN b.stddev_exec_time > b.mean_exec_time THEN 'Latency varies; check parameter skew, plan instability, locks, and cache effects.'
+        ELSE 'Consistent high latency; inspect EXPLAIN plan and indexing/statistics.'
+    END AS recommended_action,
+    b.query_snippet
+FROM base b
+CROSS JOIN totals t
+WHERE round((100.0 * b.total_exec_time / NULLIF(t.all_exec_ms, 0))::numeric, 2) >= (SELECT min_exec_pct FROM params)
+ORDER BY b.mean_exec_time DESC
+LIMIT (SELECT max_rows FROM params);
 
 
 
