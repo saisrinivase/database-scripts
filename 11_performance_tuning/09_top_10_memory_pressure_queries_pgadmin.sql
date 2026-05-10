@@ -1,72 +1,46 @@
 /*
 PostgreSQL DBA Script: Top 10 Memory Pressure Queries PgAdmin
-Purpose: Identify queries most likely to create memory pressure using temp spills, high rows per call, block churn, and runtime variance.
+Purpose: Identify the top SQL statements spilling to temporary files using plain PostgreSQL statistics views.
 Area: Performance Tuning
 Usage: Run in pgAdmin, psql, or any SQL client after pg_stat_statements is installed in the current database.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
-Notes: Read-only. PostgreSQL core does not expose exact historical per-query memory usage; this script ranks memory-pressure proxies.
+Notes: Read-only. Uses only pg_stat_statements, pg_roles, pg_database, and current_setting().
+       PostgreSQL does not expose exact historical per-query memory allocation; temp blocks are the strongest SQL-visible spill signal.
 */
-WITH settings AS (
-    SELECT
-        current_setting('block_size')::numeric AS block_size_bytes,
-        pg_size_bytes(current_setting('work_mem'))::numeric AS work_mem_bytes,
-        pg_size_bytes(current_setting('maintenance_work_mem'))::numeric AS maintenance_work_mem_bytes,
-        current_setting('hash_mem_multiplier', true)::numeric AS hash_mem_multiplier
-),
-ranked AS (
-    SELECT
-        s.*,
-        ((s.temp_blks_read + s.temp_blks_written) * settings.block_size_bytes) AS temp_bytes_total,
-        (s.temp_blks_written * settings.block_size_bytes) AS temp_bytes_written,
-        (s.shared_blks_hit + s.shared_blks_read + s.local_blks_hit + s.local_blks_read) AS total_blocks_touched,
-        settings.work_mem_bytes,
-        settings.hash_mem_multiplier,
-        (
-            ((s.temp_blks_read + s.temp_blks_written) * settings.block_size_bytes)
-            + greatest(s.rows, 0)::numeric
-            + ((s.shared_blks_hit + s.shared_blks_read + s.local_blks_hit + s.local_blks_read) * settings.block_size_bytes * 0.01)
-            + greatest(s.stddev_exec_time, 0)::numeric * 1024
-        ) AS memory_pressure_score
-    FROM pg_stat_statements s
-    CROSS JOIN settings
-)
 SELECT
-    coalesce(r.rolname, ranked.userid::text) AS user_name,
-    coalesce(d.datname, ranked.dbid::text) AS database_name,
-    ranked.queryid,
-    regexp_replace(ranked.query, '\s+', ' ', 'g') AS query_text,
-    ranked.calls,
-    round(ranked.memory_pressure_score::numeric, 2) AS memory_pressure_score,
-    pg_size_pretty(ranked.temp_bytes_total::bigint) AS temp_total_pretty,
-    pg_size_pretty(ranked.temp_bytes_written::bigint) AS temp_written_pretty,
-    round((ranked.temp_bytes_total / NULLIF(ranked.calls, 0)), 2) AS temp_bytes_per_call,
-    ranked.rows,
-    round((ranked.rows::numeric / NULLIF(ranked.calls, 0)), 2) AS rows_per_call,
-    ranked.total_blocks_touched,
-    round(ranked.total_exec_time::numeric, 2) AS total_exec_ms,
-    round(ranked.mean_exec_time::numeric, 4) AS mean_exec_ms,
-    round(ranked.stddev_exec_time::numeric, 2) AS stddev_exec_ms,
-    pg_size_pretty(ranked.work_mem_bytes::bigint) AS current_work_mem,
-    ranked.hash_mem_multiplier,
+    coalesce(r.rolname, s.userid::text) AS user_name,
+    coalesce(d.datname, s.dbid::text) AS database_name,
+    s.queryid,
+    regexp_replace(s.query, '\s+', ' ', 'g') AS query_text,
+    s.calls,
+    s.temp_blks_read,
+    s.temp_blks_written,
+    (s.temp_blks_read + s.temp_blks_written) AS temp_blks_total,
+    pg_size_pretty(((s.temp_blks_read + s.temp_blks_written) * current_setting('block_size')::bigint)) AS temp_total_pretty,
+    pg_size_pretty((s.temp_blks_written * current_setting('block_size')::bigint)) AS temp_written_pretty,
+    round((((s.temp_blks_read + s.temp_blks_written) * current_setting('block_size')::numeric) / NULLIF(s.calls, 0)), 2) AS temp_bytes_per_call,
+    round(s.total_exec_time::numeric, 2) AS total_exec_ms,
+    round(s.mean_exec_time::numeric, 4) AS mean_exec_ms,
+    s.rows,
+    round((s.rows::numeric / NULLIF(s.calls, 0)), 2) AS rows_per_call,
+    s.shared_blks_read,
+    s.shared_blks_hit,
     CASE
-        WHEN ranked.temp_bytes_total > ranked.work_mem_bytes * 100 THEN 'Severe spill proxy; inspect sort/hash/aggregate nodes and avoid broad work_mem changes.'
-        WHEN ranked.temp_bytes_total > 0 THEN 'Spill proxy; review plan, row estimates, indexes, and per-session work_mem only if justified.'
-        WHEN ranked.rows / NULLIF(ranked.calls, 0) > 100000 THEN 'Large rows-per-call; check result size, aggregation, joins, and pagination.'
-        WHEN ranked.stddev_exec_time > ranked.mean_exec_time THEN 'Runtime variance; check parameter-sensitive memory usage and plan changes.'
-        ELSE 'Memory proxy signal; validate with EXPLAIN (ANALYZE, BUFFERS).'
+        WHEN s.temp_blks_written > 0 AND s.calls <= 10 THEN 'Few large spill events; inspect plan for big sort/hash/aggregate.'
+        WHEN s.temp_blks_written > 0 AND s.calls > 1000 THEN 'Frequent spill pattern; tune SQL, indexes, work_mem scope, or batching.'
+        WHEN s.temp_blks_read > s.temp_blks_written THEN 'Repeated temp rereads; inspect multi-pass sorts/hashes.'
+        ELSE 'Review execution plan and work_mem-sensitive operators.'
     END AS sme_diagnosis,
-    left(regexp_replace(ranked.query, '\s+', ' ', 'g'), 220) AS query_sample
-FROM ranked
-LEFT JOIN pg_roles r ON r.oid = ranked.userid
-LEFT JOIN pg_database d ON d.oid = ranked.dbid
-WHERE ranked.temp_bytes_total > 0
-   OR ranked.rows / NULLIF(ranked.calls, 0) > 100000
-   OR ranked.total_blocks_touched > 1000000
-ORDER BY ranked.memory_pressure_score DESC NULLS LAST
+    left(regexp_replace(s.query, '\s+', ' ', 'g'), 220) AS query_sample
+FROM pg_stat_statements s
+LEFT JOIN pg_roles r ON r.oid = s.userid
+LEFT JOIN pg_database d ON d.oid = s.dbid
+WHERE s.temp_blks_read + s.temp_blks_written > 0
+ORDER BY temp_blks_total DESC, s.total_exec_time DESC
 LIMIT 10;
 
 -- SAMPLE_OUTPUT_BEGIN
--- user_name | database_name | queryid | query_text | calls | memory_pressure_score | temp_total_pretty | current_work_mem | sme_diagnosis
--- ----------+---------------+---------+------------+-------+-----------------------+-------------------+------------------+---------------------------------------------
--- app_user  | appdb         | 987654  | SELECT ... |    24 |        73400320000.00 | 68 GB             | 4 MB             | Severe spill proxy; inspect sort/hash...
+-- user_name | database_name | queryid | query_text | calls | temp_blks_written | temp_blks_total | temp_total_pretty | temp_bytes_per_call | sme_diagnosis
+-- ----------+---------------+---------+------------+-------+-------------------+-----------------+-------------------+---------------------+---------------------------------------------
+-- app_user  | appdb         | 987654  | SELECT ... |    24 |           8388608 |         8388608 | 64 GB             |       2863311530.67 | Few large spill events; inspect plan...
 -- SAMPLE_OUTPUT_END
