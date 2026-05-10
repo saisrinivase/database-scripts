@@ -34,6 +34,7 @@ SELECT
     coalesce(r.rolname, ranked.userid::text) AS user_name,
     coalesce(d.datname, ranked.dbid::text) AS database_name,
     ranked.queryid,
+    regexp_replace(ranked.query, '\s+', ' ', 'g') AS query_text,
     ranked.calls,
     round(ranked.memory_pressure_score::numeric, 2) AS memory_pressure_score,
     pg_size_pretty(ranked.temp_bytes_total::bigint) AS temp_total_pretty,
@@ -65,7 +66,7 @@ ORDER BY ranked.memory_pressure_score DESC NULLS LAST
 LIMIT 10;
 
 -- SAMPLE_OUTPUT_BEGIN
--- user_name | database_name | queryid | calls | memory_pressure_score | temp_total_pretty | current_work_mem | sme_diagnosis
--- ----------+---------------+---------+-------+-----------------------+-------------------+------------------+---------------------------------------------
--- app_user  | appdb         | 987654  |    24 |        73400320000.00 | 68 GB             | 4 MB             | Severe spill proxy; inspect sort/hash...
+-- user_name | database_name | queryid | query_text | calls | memory_pressure_score | temp_total_pretty | current_work_mem | sme_diagnosis
+-- ----------+---------------+---------+------------+-------+-----------------------+-------------------+------------------+---------------------------------------------
+-- app_user  | appdb         | 987654  | SELECT ... |    24 |        73400320000.00 | 68 GB             | 4 MB             | Severe spill proxy; inspect sort/hash...
 -- SAMPLE_OUTPUT_END
