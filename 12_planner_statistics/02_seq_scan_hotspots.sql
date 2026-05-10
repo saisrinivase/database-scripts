@@ -1,24 +1,104 @@
 /*
 PostgreSQL DBA Script: Seq Scan Hotspots
-Purpose: Highlight tables dominated by sequential scans (possible index or query design issue).
+Purpose: Highlight tables dominated by sequential scans, explain why they matter, and show what can happen if no action is taken.
 Area: Planner and Statistics
-Usage: Validate with query plans before adding indexes.
+Usage: Use when queries are slow, I/O is high, cache hit ratio is low, or CPU rises from repeated table scans. Validate with EXPLAIN before adding indexes because sequential scans can be normal for small tables, broad reports, or queries returning a large share of a table.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
-Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
+Notes: Read-only diagnostic. High sequential scan percentage on a large/highly used table can indicate missing indexes, stale statistics, non-sargable predicates, or query patterns that force full-table reads.
 */
+WITH table_scan_stats AS (
+    SELECT
+        schemaname AS schema_name,
+        relname AS table_name,
+        relid,
+        seq_scan,
+        idx_scan,
+        n_live_tup,
+        n_dead_tup,
+        analyze_count,
+        autoanalyze_count,
+        last_analyze,
+        last_autoanalyze,
+        pg_total_relation_size(relid) AS total_bytes,
+        CASE
+            WHEN seq_scan + idx_scan = 0 THEN NULL
+            ELSE round(100.0 * seq_scan / (seq_scan + idx_scan), 2)
+        END AS seq_scan_pct
+    FROM pg_stat_user_tables
+)
 SELECT
-    schemaname AS schema_name,
-    relname AS table_name,
+    schema_name,
+    table_name,
     seq_scan,
     idx_scan,
     n_live_tup,
+    n_dead_tup,
+    seq_scan_pct,
+    pg_size_pretty(total_bytes) AS total_size,
+    analyze_count,
+    autoanalyze_count,
+    last_analyze,
+    last_autoanalyze,
     CASE
-        WHEN seq_scan + idx_scan = 0 THEN NULL
-        ELSE round(100.0 * seq_scan / (seq_scan + idx_scan), 2)
-    END AS seq_scan_pct,
-    pg_size_pretty(pg_total_relation_size(relid)) AS total_size
-FROM pg_stat_user_tables
-ORDER BY seq_scan DESC, seq_scan_pct DESC NULLS LAST;
+        WHEN seq_scan >= 1000
+             AND coalesce(seq_scan_pct, 0) >= 80
+             AND total_bytes >= 1024::bigint * 1024 * 1024
+            THEN 'CRITICAL'
+        WHEN seq_scan >= 100
+             AND coalesce(seq_scan_pct, 0) >= 70
+             AND total_bytes >= 256::bigint * 1024 * 1024
+            THEN 'HIGH'
+        WHEN seq_scan >= 10
+             AND coalesce(seq_scan_pct, 0) >= 50
+             AND total_bytes >= 64::bigint * 1024 * 1024
+            THEN 'MEDIUM'
+        WHEN seq_scan > 0 AND coalesce(seq_scan_pct, 0) >= 80
+            THEN 'LOW_REVIEW'
+        ELSE 'LOW'
+    END AS seq_scan_risk_level,
+    CASE
+        WHEN seq_scan = 0
+            THEN 'No sequential scan pressure recorded since stats reset.'
+        WHEN total_bytes < 64::bigint * 1024 * 1024
+            THEN 'Sequential scans may be normal because the table is small. Review only if query latency is visible or scans are very frequent.'
+        WHEN coalesce(seq_scan_pct, 0) >= 80 AND idx_scan = 0
+            THEN 'Table is mostly or entirely read by full scans. If ignored, repeated queries may read the full table, increase I/O, reduce cache efficiency, and slow down as data grows.'
+        WHEN coalesce(seq_scan_pct, 0) >= 50
+            THEN 'Mixed access pattern with significant full scans. If ignored, workload can become storage-heavy and query latency may grow with table size.'
+        ELSE 'Index usage dominates or scan pressure is low. Sequential scans may be expected for broad reporting queries.'
+    END AS what_happens_if_ignored,
+    CASE
+        WHEN seq_scan = 0
+            THEN 'No action required from this metric.'
+        WHEN total_bytes < 64::bigint * 1024 * 1024
+            THEN 'Usually no index action. Confirm with EXPLAIN only if this table appears in slow queries.'
+        WHEN last_analyze IS NULL AND last_autoanalyze IS NULL
+            THEN 'Run ANALYZE or verify autovacuum/analyze settings, then recheck plans before adding indexes.'
+        WHEN coalesce(seq_scan_pct, 0) >= 80 AND idx_scan = 0
+            THEN 'Find top SQL touching this table, run EXPLAIN (ANALYZE, BUFFERS), check predicates, and add/adjust indexes only for selective filters or joins.'
+        WHEN coalesce(seq_scan_pct, 0) >= 50
+            THEN 'Review whether scans are expected reports. If not, inspect missing indexes, stale stats, functions on indexed columns, casts, LIKE patterns, and low-selectivity predicates.'
+        ELSE 'Monitor trend and correlate with slow SQL before changing indexes.'
+    END AS recommended_action
+FROM table_scan_stats
+ORDER BY
+    CASE
+        WHEN seq_scan >= 1000
+             AND coalesce(seq_scan_pct, 0) >= 80
+             AND total_bytes >= 1024::bigint * 1024 * 1024
+            THEN 1
+        WHEN seq_scan >= 100
+             AND coalesce(seq_scan_pct, 0) >= 70
+             AND total_bytes >= 256::bigint * 1024 * 1024
+            THEN 2
+        WHEN seq_scan >= 10
+             AND coalesce(seq_scan_pct, 0) >= 50
+             AND total_bytes >= 64::bigint * 1024 * 1024
+            THEN 3
+        ELSE 4
+    END,
+    seq_scan DESC,
+    seq_scan_pct DESC NULLS LAST;
 
 
 
@@ -27,40 +107,11 @@ ORDER BY seq_scan DESC, seq_scan_pct DESC NULLS LAST;
 -- Sample output captured from database: pgbench_test
 -- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
 --
---    schema_name    |       table_name        | seq_scan | idx_scan | n_live_tup | seq_scan_pct | total_size 
--- ------------------+-------------------------+----------+----------+------------+--------------+------------
---  migration_v2_lab | order_fact              |       11 |        0 |     300000 |       100.00 | 49 MB
---  migration_v2_lab | amount_mapping_risk     |        4 |        0 |     120000 |       100.00 | 19 MB
---  migration_v2_lab | customer_contact_compat |        4 |        0 |      90000 |       100.00 | 13 MB
---  migration_v1_lab | product_catalog         |        3 |        0 |      50000 |       100.00 | 6032 kB
---  migration_v2_lab | sales_catalog           |        3 |        0 |     120000 |       100.00 | 14 MB
---  migration_v2_lab | child_events            |        3 |        0 |     250000 |       100.00 | 25 MB
---  public           | pgbench_branches        |        3 |  5332823 |       2000 |         0.00 | 7048 kB
---  migration_v1_lab | child_transactions      |        2 |        0 |     120000 |       100.00 | 11 MB
---  public           | pgbench_accounts        |        2 | 10665646 |  200000029 |         0.00 | 30 GB
---  migration_v2_lab | trigger_audit_demo      |        1 |        0 |          0 |       100.00 | 16 kB
---  migration_v2_lab | customer_staging_no_pk  |        1 |        0 |      60000 |       100.00 | 5016 kB
---  migration_v2_lab | issue_manifest          |        1 |        0 |         11 |       100.00 | 32 kB
---  migration_v1_lab | orders_no_pk            |        1 |        0 |      10000 |       100.00 | 872 kB
---  migration_v2_lab | stale_stats_table       |        1 |        0 |     180000 |       100.00 | 24 MB
---  migration_v1_lab | stale_stats_table       |        1 |        0 |      60000 |       100.00 | 7768 kB
---  migration_v1_lab | sales_orders            |        1 |        0 |       1000 |       100.00 | 128 kB
---  migration_v2_lab | partitioned_events_2025 |        1 |        0 |      52194 |       100.00 | 5560 kB
---  migration_v2_lab | quoted_orders           |        1 |        0 |       5000 |       100.00 | 496 kB
---  migration_v2_lab | partitioned_events_2026 |        1 |        0 |      47806 |       100.00 | 5104 kB
---  migration_v2_lab | bloat_pressure_table    |        1 |        1 |      42000 |        50.00 | 14 MB
---  migration_v1_lab | dml_bloat_table         |        1 |        1 |      12000 |        50.00 | 4248 kB
---  public           | pgbench_tellers         |        1 |  5332823 |      20000 |         0.00 | 3712 kB
---  migration_v1_lab | parent_accounts         |        1 |   120000 |      10000 |         0.00 | 792 kB
---  migration_v2_lab | parent_accounts         |        1 |   250000 |      50000 |         0.00 | 4096 kB
---  dba_metrics      | table_size_snapshots    |        1 |          |         25 |              | 16 kB
---  dba_metrics      | database_size_snapshots |        1 |          |          7 |              | 16 kB
---  migration_v2_lab | partitioned_events      |        0 |        0 |          0 |              | 0 bytes
---  dba_metrics      | index_size_snapshots    |        0 |          |         21 |              | 16 kB
---  migration_v2_lab | mv_daily_order_volume   |        0 |          |          1 |              | 24 kB
---  dba_metrics      | connection_snapshots    |        0 |          |          3 |              | 16 kB
---  public           | pgbench_history         |        0 |          |    5331130 |              | 270 MB
---  dba_metrics      | wal_snapshots           |        0 |          |          1 |              | 16 kB
--- (32 rows)
+--  schema_name | table_name  | seq_scan | idx_scan | n_live_tup | seq_scan_pct | total_size | seq_scan_risk_level | what_happens_if_ignored                         | recommended_action
+-- -------------+-------------+----------+----------+------------+--------------+------------+---------------------+-------------------------------------------------+------------------------------
+--  public      | big_orders  |     1200 |        0 |    9000000 |       100.00 | 8 GB       | CRITICAL            | Table is mostly or entirely read by full scans...| Find top SQL touching this table...
+--  public      | app_events  |       42 |       36 |      80000 |        53.85 | 81 MB      | MEDIUM              | Mixed access pattern with significant full scans | Review whether scans are expected...
+--  public      | small_codes |      384 |       33 |        500 |        92.09 | 184 kB     | LOW_REVIEW          | Sequential scans may be normal because small...  | Usually no index action...
+-- (3 rows)
 -- 
 -- SAMPLE_OUTPUT_END
