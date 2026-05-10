@@ -1,4 +1,0 @@
- pid | user_name | application_name | client_addr | xact_start | xact_age | state | wait_event_type | wait_event | query_snippet 
------+-----------+------------------+-------------+------------+----------+-------+-----------------+------------+---------------
-(0 rows)
-

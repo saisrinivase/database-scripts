@@ -1,4 +1,0 @@
- application_name | user_name | database_name | idle_in_txn_sessions | oldest_xact_start | max_xact_age 
-------------------+-----------+---------------+----------------------+-------------------+--------------
-(0 rows)
-

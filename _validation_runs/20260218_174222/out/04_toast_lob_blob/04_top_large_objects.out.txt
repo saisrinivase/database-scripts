@@ -1,4 +1,0 @@
- loid | large_object_bytes | large_object_pretty | chunk_count 
-------+--------------------+---------------------+-------------
-(0 rows)
-

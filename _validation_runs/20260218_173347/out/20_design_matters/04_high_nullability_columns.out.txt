@@ -1,4 +1,0 @@
- schema_name | table_name | column_name | null_frac | n_distinct | correlation 
--------------+------------+-------------+-----------+------------+-------------
-(0 rows)
-

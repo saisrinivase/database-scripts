@@ -1,5 +1,0 @@
- table_cache_hit_pct | index_cache_hit_pct 
----------------------+---------------------
-              100.00 |                    
-(1 row)
-

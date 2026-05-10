@@ -1,6 +1,0 @@
- schema_name | table_name | column_name | null_frac | n_distinct | correlation | mcv_count | histogram_bins 
--------------+------------+-------------+-----------+------------+-------------+-----------+----------------
- public      | demo_users | id          |         0 |         -1 |           1 |           |            101
- public      | demo_users | username    |         0 |          3 |  0.33481345 |         3 |               
-(2 rows)
-
