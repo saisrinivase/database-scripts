@@ -6,43 +6,68 @@ Usage: If checksums are off, rely on stronger backup/restore verification and st
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
-SELECT EXISTS (
-           SELECT 1
-           FROM information_schema.columns
-           WHERE table_schema = 'pg_catalog'
-             AND table_name = 'pg_stat_database'
-             AND column_name = 'checksum_failures'
-       ) AS has_checksum_columns
-\gset
+DROP TABLE IF EXISTS pg_temp.checksum_status_and_failures_result;
+CREATE TEMP TABLE pg_temp.checksum_status_and_failures_result (
+    database_name name,
+    data_checksums text,
+    datname name,
+    checksum_failures bigint,
+    stats_reset timestamptz,
+    integrity_signal text,
+    action_hint text
+);
 
-\if :has_checksum_columns
-SELECT
-    current_database() AS database_name,
-    coalesce(current_setting('data_checksums', true), '(unknown)') AS data_checksums,
-    d.datname,
-    s.checksum_failures,
-    s.stats_reset,
-    CASE
-        WHEN coalesce(current_setting('data_checksums', true), 'off') IN ('on', '1') AND s.checksum_failures = 0 THEN 'CHECKSUMS_ENABLED_NO_FAILURES'
-        WHEN coalesce(current_setting('data_checksums', true), 'off') IN ('on', '1') AND s.checksum_failures > 0 THEN 'CHECKSUM_FAILURES_DETECTED'
-        ELSE 'CHECKSUMS_DISABLED_OR_UNKNOWN'
-    END AS integrity_signal,
-    CASE
-        WHEN s.checksum_failures > 0 THEN 'Escalate: run storage and integrity triage, validate replicas/backups immediately.'
-        WHEN coalesce(current_setting('data_checksums', true), 'off') NOT IN ('on', '1') THEN 'Plan checksum-enabled cluster for stronger corruption detection in future upgrades/migrations.'
-        ELSE 'No immediate checksum-driven action.'
-    END AS action_hint
-FROM pg_database d
-JOIN pg_stat_database s
-  ON s.datid = d.oid
-WHERE NOT d.datistemplate
-ORDER BY s.checksum_failures DESC, d.datname;
-\else
-SELECT
-    current_database() AS database_name,
-    coalesce(current_setting('data_checksums', true), '(unknown)') AS data_checksums,
-    'checksum_failures columns are not available in this PostgreSQL version.'::text AS note;
-\endif
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'pg_catalog'
+          AND table_name = 'pg_stat_database'
+          AND column_name = 'checksum_failures'
+    ) THEN
+        EXECUTE $sql$
+            INSERT INTO pg_temp.checksum_status_and_failures_result
+            SELECT
+                current_database(),
+                coalesce(current_setting('data_checksums', true), '(unknown)'),
+                d.datname,
+                s.checksum_failures,
+                s.stats_reset,
+                CASE
+                    WHEN coalesce(current_setting('data_checksums', true), 'off') IN ('on', '1') AND s.checksum_failures = 0 THEN 'CHECKSUMS_ENABLED_NO_FAILURES'
+                    WHEN coalesce(current_setting('data_checksums', true), 'off') IN ('on', '1') AND s.checksum_failures > 0 THEN 'CHECKSUM_FAILURES_DETECTED'
+                    ELSE 'CHECKSUMS_DISABLED_OR_UNKNOWN'
+                END,
+                CASE
+                    WHEN s.checksum_failures > 0 THEN 'Escalate: run storage and integrity triage, validate replicas/backups immediately.'
+                    WHEN coalesce(current_setting('data_checksums', true), 'off') NOT IN ('on', '1') THEN 'Plan checksum-enabled cluster for stronger corruption detection in future upgrades/migrations.'
+                    ELSE 'No immediate checksum-driven action.'
+                END
+            FROM pg_database d
+            JOIN pg_stat_database s ON s.datid = d.oid
+            WHERE NOT d.datistemplate
+            ORDER BY s.checksum_failures DESC, d.datname
+        $sql$;
+    ELSE
+        INSERT INTO pg_temp.checksum_status_and_failures_result (
+            database_name,
+            data_checksums,
+            integrity_signal,
+            action_hint
+        )
+        VALUES (
+            current_database(),
+            coalesce(current_setting('data_checksums', true), '(unknown)'),
+            'CHECKSUM_FAILURE_COLUMNS_UNAVAILABLE',
+            'checksum_failures columns are not available in this PostgreSQL version.'
+        );
+    END IF;
+END;
+$$;
+
+SELECT *
+FROM pg_temp.checksum_status_and_failures_result;
 
 
 

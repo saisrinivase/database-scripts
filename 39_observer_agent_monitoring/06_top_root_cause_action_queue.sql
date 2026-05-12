@@ -6,8 +6,6 @@ Usage: Run after detecting an issue to decide the next DBA action in priority or
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only. pg_stat_statements section appears only when the extension/view is available.
 */
-SELECT (to_regclass('pg_stat_statements') IS NOT NULL) AS has_pgss \gset
-
 WITH action_queue AS (
     SELECT
         10 AS priority,
@@ -104,23 +102,58 @@ SELECT
 FROM action_queue
 ORDER BY priority, evidence_value DESC NULLS LAST;
 
-\if :has_pgss
-SELECT
-    80 AS priority,
-    'top_sql_total_time' AS root_cause,
-    round(total_exec_time::numeric, 2) AS evidence_value,
-    'ms total_exec_time' AS evidence_unit,
-    'Statement is one of the largest cumulative runtime contributors.' AS evidence,
-    'Review plan, rows, IO, temp, WAL, and execution variance before changing SQL/indexes.' AS action,
-    '17_execution_plans/03_generate_explain_for_top_queries.sql' AS next_script,
-    left(regexp_replace(query, '\s+', ' ', 'g'), 180) AS query_sample
-FROM pg_stat_statements
-ORDER BY total_exec_time DESC
-LIMIT 20;
-\else
-SELECT
-    'pg_stat_statements is not available; top SQL action queue is skipped. Run 38_observability_360/10_query_capture_quality_pgss.sql.' AS guidance;
-\endif
+DROP TABLE IF EXISTS pg_temp.top_sql_root_cause_action_queue_result;
+CREATE TEMP TABLE pg_temp.top_sql_root_cause_action_queue_result (
+    priority int,
+    root_cause text,
+    evidence_value numeric,
+    evidence_unit text,
+    evidence text,
+    action text,
+    next_script text,
+    query_sample text
+);
+
+DO $$
+BEGIN
+    IF to_regclass('pg_stat_statements') IS NOT NULL THEN
+        EXECUTE $sql$
+            INSERT INTO pg_temp.top_sql_root_cause_action_queue_result
+            SELECT
+                80 AS priority,
+                'top_sql_total_time' AS root_cause,
+                round(total_exec_time::numeric, 2) AS evidence_value,
+                'ms total_exec_time' AS evidence_unit,
+                'Statement is one of the largest cumulative runtime contributors.' AS evidence,
+                'Review plan, rows, IO, temp, WAL, and execution variance before changing SQL/indexes.' AS action,
+                '17_execution_plans/03_generate_explain_for_top_queries.sql' AS next_script,
+                left(regexp_replace(query, '\s+', ' ', 'g'), 180) AS query_sample
+            FROM pg_stat_statements
+            ORDER BY total_exec_time DESC
+            LIMIT 20
+        $sql$;
+    ELSE
+        INSERT INTO pg_temp.top_sql_root_cause_action_queue_result (
+            priority,
+            root_cause,
+            evidence,
+            action,
+            next_script
+        )
+        VALUES (
+            80,
+            'top_sql_total_time',
+            'pg_stat_statements is not available; top SQL action queue is skipped.',
+            'Enable pg_stat_statements or run 38_observability_360/10_query_capture_quality_pgss.sql.',
+            '38_observability_360/10_query_capture_quality_pgss.sql'
+        );
+    END IF;
+END;
+$$;
+
+SELECT *
+FROM pg_temp.top_sql_root_cause_action_queue_result
+ORDER BY priority, evidence_value DESC NULLS LAST;
 
 -- SAMPLE_OUTPUT_BEGIN
 -- priority | root_cause       | evidence_value | evidence_unit | evidence

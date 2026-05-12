@@ -6,59 +6,77 @@ Usage: Requires pg_stat_statements. Helps decide whether logging threshold is mi
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
-SELECT CASE
-           WHEN EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements') THEN 1
-           ELSE 0
-       END AS has_pgss
-\gset
+DROP TABLE IF EXISTS pg_temp.slow_query_log_vs_pgss_result;
+CREATE TEMP TABLE pg_temp.slow_query_log_vs_pgss_result (
+    queryid bigint,
+    calls bigint,
+    total_exec_time_ms numeric,
+    mean_exec_time_ms numeric,
+    stddev_exec_time_ms numeric,
+    temp_blks_written bigint,
+    shared_blks_read bigint,
+    log_min_duration_statement text,
+    log_visibility text,
+    query_snippet text
+);
 
-\if :has_pgss
-WITH cfg AS (
-    SELECT
-        current_setting('log_min_duration_statement') AS raw_setting,
-        CASE
-            WHEN current_setting('log_min_duration_statement') ~ '^-?[0-9]+$'
-                THEN current_setting('log_min_duration_statement')::numeric
-            ELSE NULL::numeric
-        END AS threshold_ms
-),
-ranked AS (
-    SELECT
-        queryid,
-        calls,
-        total_exec_time,
-        mean_exec_time,
-        stddev_exec_time,
-        temp_blks_written,
-        shared_blks_read,
-        left(query, 200) AS query_snippet
-    FROM pg_stat_statements
-    ORDER BY total_exec_time DESC
-    LIMIT 50
-)
-SELECT
-    r.queryid,
-    r.calls,
-    round(r.total_exec_time::numeric, 2) AS total_exec_time_ms,
-    round(r.mean_exec_time::numeric, 2) AS mean_exec_time_ms,
-    round(r.stddev_exec_time::numeric, 2) AS stddev_exec_time_ms,
-    r.temp_blks_written,
-    r.shared_blks_read,
-    c.raw_setting AS log_min_duration_statement,
-    CASE
-        WHEN c.threshold_ms = -1 THEN 'NOT_LOGGED'
-        WHEN c.threshold_ms = 0 THEN 'LOGGED_ALWAYS'
-        WHEN r.mean_exec_time >= c.threshold_ms THEN 'LIKELY_LOGGED'
-        ELSE 'LIKELY_NOT_LOGGED'
-    END AS log_visibility,
-    r.query_snippet
-FROM ranked r
-CROSS JOIN cfg c
-ORDER BY r.total_exec_time DESC;
-\else
-SELECT
-    'pg_stat_statements extension is not installed. Run: CREATE EXTENSION pg_stat_statements;'::text AS guidance;
-\endif
+DO $$
+BEGIN
+    IF to_regclass('pg_stat_statements') IS NOT NULL THEN
+        EXECUTE $sql$
+            WITH cfg AS (
+                SELECT
+                    current_setting('log_min_duration_statement') AS raw_setting,
+                    CASE
+                        WHEN current_setting('log_min_duration_statement') ~ '^-?[0-9]+$'
+                            THEN current_setting('log_min_duration_statement')::numeric
+                        ELSE NULL::numeric
+                    END AS threshold_ms
+            ),
+            ranked AS (
+                SELECT
+                    queryid,
+                    calls,
+                    total_exec_time,
+                    mean_exec_time,
+                    stddev_exec_time,
+                    temp_blks_written,
+                    shared_blks_read,
+                    left(query, 200) AS query_snippet
+                FROM pg_stat_statements
+                ORDER BY total_exec_time DESC
+                LIMIT 50
+            )
+            INSERT INTO pg_temp.slow_query_log_vs_pgss_result
+            SELECT
+                r.queryid,
+                r.calls,
+                round(r.total_exec_time::numeric, 2),
+                round(r.mean_exec_time::numeric, 2),
+                round(r.stddev_exec_time::numeric, 2),
+                r.temp_blks_written,
+                r.shared_blks_read,
+                c.raw_setting,
+                CASE
+                    WHEN c.threshold_ms = -1 THEN 'NOT_LOGGED'
+                    WHEN c.threshold_ms = 0 THEN 'LOGGED_ALWAYS'
+                    WHEN r.mean_exec_time >= c.threshold_ms THEN 'LIKELY_LOGGED'
+                    ELSE 'LIKELY_NOT_LOGGED'
+                END,
+                r.query_snippet
+            FROM ranked r
+            CROSS JOIN cfg c
+            ORDER BY r.total_exec_time DESC
+        $sql$;
+    ELSE
+        INSERT INTO pg_temp.slow_query_log_vs_pgss_result (log_visibility, query_snippet)
+        VALUES ('PG_STAT_STATEMENTS_MISSING', 'pg_stat_statements extension is not installed. Run: CREATE EXTENSION pg_stat_statements;');
+    END IF;
+END;
+$$;
+
+SELECT *
+FROM pg_temp.slow_query_log_vs_pgss_result;
 
 
 -- SAMPLE_OUTPUT_BEGIN

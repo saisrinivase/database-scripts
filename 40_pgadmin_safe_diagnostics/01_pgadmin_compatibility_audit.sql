@@ -8,10 +8,10 @@ Notes: Read-only static compatibility map.
 */
 SELECT *
 FROM (VALUES
-    ('vacuum_progress', '07_vacuum_bloat/05_vacuum_progress.sql', '40_pgadmin_safe_diagnostics/02_pgadmin_safe_vacuum_progress.sql', 'Version-guarded vacuum progress without psql \\if.'),
+    ('vacuum_progress', '07_vacuum_bloat/05_vacuum_progress.sql', '40_pgadmin_safe_diagnostics/02_pgadmin_safe_vacuum_progress.sql', 'Version-guarded vacuum progress without psql meta-conditionals.'),
     ('checkpoint_bgwriter', '10_maintenance_monitoring/01_bgwriter_checkpoint_stats.sql', '40_pgadmin_safe_diagnostics/03_pgadmin_safe_checkpoint_bgwriter.sql', 'Checkpoint/bgwriter view split handled with pg_temp function.'),
     ('checkpoint_pressure', '13_io_wal_checkpoints/05_checkpoint_pressure_indicators.sql', '40_pgadmin_safe_diagnostics/03_pgadmin_safe_checkpoint_bgwriter.sql', 'Checkpoint pressure usable in pgAdmin.'),
-    ('pg_stat_io', '13_io_wal_checkpoints/07_pg_stat_io_overview_pg16_plus.sql', '40_pgadmin_safe_diagnostics/04_pgadmin_safe_pg_stat_io_overview.sql', 'pg_stat_io availability handled without psql \\if.'),
+    ('pg_stat_io', '13_io_wal_checkpoints/07_pg_stat_io_overview_pg16_plus.sql', '40_pgadmin_safe_diagnostics/04_pgadmin_safe_pg_stat_io_overview.sql', 'pg_stat_io availability handled without psql meta-conditionals.'),
     ('pg_stat_statements_quality', '38_observability_360/10_query_capture_quality_pgss.sql', '40_pgadmin_safe_diagnostics/05_pgadmin_safe_pg_stat_statements_quality.sql', 'Optional pg_stat_statements handled safely.'),
     ('cloudwatch_mapping', '38_observability_360/02_cloudwatch_metric_equivalents.sql', '40_pgadmin_safe_diagnostics/06_pgadmin_safe_cloudwatch_metric_equivalents.sql', 'CloudWatch-style SQL-visible map for pgAdmin.'),
     ('replication_ha', '36_cloud_provider_signals/03_replica_lag_failover_signals.sql', '40_pgadmin_safe_diagnostics/07_pgadmin_safe_replication_ha_dashboard.sql', 'Primary/standby dashboard without psql branching.'),

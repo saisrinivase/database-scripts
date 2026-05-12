@@ -6,45 +6,67 @@ Usage: Requires pg_stat_statements. Run before and after upgrade and compare top
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
-SELECT CASE
-           WHEN EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements') THEN 1
-           ELSE 0
-       END AS has_pgss
-\gset
+DROP TABLE IF EXISTS pg_temp.postupgrade_query_regression_watchlist_result;
+CREATE TEMP TABLE pg_temp.postupgrade_query_regression_watchlist_result (
+    queryid bigint,
+    calls bigint,
+    plans bigint,
+    total_plan_time_ms numeric,
+    total_exec_time_ms numeric,
+    mean_exec_time_ms numeric,
+    stddev_exec_time_ms numeric,
+    plans_per_100_calls numeric,
+    wal_bytes numeric,
+    temp_blks_written bigint,
+    shared_blks_read bigint,
+    query_snippet text,
+    regression_watch_label text
+);
 
-\if :has_pgss
-SELECT
-    queryid,
-    calls,
-    plans,
-    round(total_plan_time::numeric, 2) AS total_plan_time_ms,
-    round(total_exec_time::numeric, 2) AS total_exec_time_ms,
-    round(mean_exec_time::numeric, 2) AS mean_exec_time_ms,
-    round(stddev_exec_time::numeric, 2) AS stddev_exec_time_ms,
-    round(
-        CASE WHEN calls = 0 THEN 0 ELSE (plans::numeric / calls::numeric) * 100 END,
-        2
-    ) AS plans_per_100_calls,
-    wal_bytes,
-    temp_blks_written,
-    shared_blks_read,
-    left(query, 220) AS query_snippet,
-    CASE
-        WHEN stddev_exec_time > greatest(mean_exec_time * 2, 100) THEN 'HIGH_VARIANCE_REVIEW'
-        WHEN mean_exec_time > 500 THEN 'HIGH_MEAN_LATENCY_REVIEW'
-        WHEN temp_blks_written > 1024 THEN 'MEMORY_SPILL_REVIEW'
-        ELSE 'BASELINE_WATCH'
-    END AS regression_watch_label
-FROM pg_stat_statements
-WHERE calls >= 20
-ORDER BY
-    total_exec_time DESC,
-    stddev_exec_time DESC
-LIMIT 120;
-\else
-SELECT
-    'pg_stat_statements extension is not installed. Run: CREATE EXTENSION pg_stat_statements;'::text AS guidance;
-\endif
+DO $$
+BEGIN
+    IF to_regclass('pg_stat_statements') IS NOT NULL THEN
+        EXECUTE $sql$
+            INSERT INTO pg_temp.postupgrade_query_regression_watchlist_result
+            SELECT
+                queryid,
+                calls,
+                plans,
+                round(total_plan_time::numeric, 2),
+                round(total_exec_time::numeric, 2),
+                round(mean_exec_time::numeric, 2),
+                round(stddev_exec_time::numeric, 2),
+                round(CASE WHEN calls = 0 THEN 0 ELSE (plans::numeric / calls::numeric) * 100 END, 2),
+                wal_bytes::numeric,
+                temp_blks_written,
+                shared_blks_read,
+                left(query, 220),
+                CASE
+                    WHEN stddev_exec_time > greatest(mean_exec_time * 2, 100) THEN 'HIGH_VARIANCE_REVIEW'
+                    WHEN mean_exec_time > 500 THEN 'HIGH_MEAN_LATENCY_REVIEW'
+                    WHEN temp_blks_written > 1024 THEN 'MEMORY_SPILL_REVIEW'
+                    ELSE 'BASELINE_WATCH'
+                END
+            FROM pg_stat_statements
+            WHERE calls >= 20
+            ORDER BY total_exec_time DESC, stddev_exec_time DESC
+            LIMIT 120
+        $sql$;
+    ELSE
+        INSERT INTO pg_temp.postupgrade_query_regression_watchlist_result (
+            query_snippet,
+            regression_watch_label
+        )
+        VALUES (
+            'pg_stat_statements extension is not installed. Run: CREATE EXTENSION pg_stat_statements;',
+            'PG_STAT_STATEMENTS_MISSING'
+        );
+    END IF;
+END;
+$$;
+
+SELECT *
+FROM pg_temp.postupgrade_query_regression_watchlist_result;
 
 
 -- SAMPLE_OUTPUT_BEGIN

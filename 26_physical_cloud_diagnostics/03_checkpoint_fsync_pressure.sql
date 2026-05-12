@@ -2,61 +2,76 @@
 PostgreSQL DBA Script: Checkpoint Fsync Pressure
 Purpose: Detect checkpoint and fsync pressure indicative of storage or config issues.
 Area: Physical and Cloud Diagnostics
-Usage: Review with WAL/checkpoint settings and cloud disk metrics.
+Usage: Review with WAL/checkpoint settings and cloud disk metrics. Safe for pgAdmin and psql.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
-Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
+Notes: Read-only diagnostic. Version-specific checkpointer columns are handled with dynamic SQL.
 */
-SELECT (current_setting('server_version_num')::int >= 170000) AS has_pg_stat_checkpointer \gset
+CREATE TEMP TABLE IF NOT EXISTS checkpoint_fsync_pressure_result (
+    checkpoints_timed numeric,
+    checkpoints_req numeric,
+    checkpoint_write_time numeric,
+    checkpoint_sync_time numeric,
+    buffers_checkpoint numeric,
+    slru_written numeric,
+    buffers_clean numeric,
+    maxwritten_clean numeric,
+    buffers_alloc numeric,
+    recommendation text,
+    checkpointer_stats_reset timestamptz,
+    bgwriter_stats_reset timestamptz
+);
 
-\if :has_pg_stat_checkpointer
-SELECT
-    cp.num_timed AS checkpoints_timed,
-    cp.num_requested AS checkpoints_req,
-    cp.write_time AS checkpoint_write_time,
-    cp.sync_time AS checkpoint_sync_time,
-    cp.buffers_written AS buffers_checkpoint,
-    cp.slru_written,
-    bg.buffers_clean,
-    bg.maxwritten_clean,
-    bg.buffers_alloc,
-    CASE
-        WHEN cp.num_requested > cp.num_timed THEN 'Checkpoint pressure'
-        ELSE 'Normal checkpoint profile'
-    END AS recommendation,
-    cp.stats_reset AS checkpointer_stats_reset,
-    bg.stats_reset AS bgwriter_stats_reset
-FROM pg_stat_checkpointer cp
-CROSS JOIN pg_stat_bgwriter bg;
-\else
-SELECT
-    checkpoints_timed,
-    checkpoints_req,
-    checkpoint_write_time,
-    checkpoint_sync_time,
-    buffers_checkpoint,
-    NULL::bigint AS slru_written,
-    buffers_clean,
-    maxwritten_clean,
-    buffers_alloc,
-    CASE
-        WHEN checkpoints_req > checkpoints_timed THEN 'Checkpoint pressure'
-        ELSE 'Normal checkpoint profile'
-    END AS recommendation,
-    stats_reset AS checkpointer_stats_reset,
-    stats_reset AS bgwriter_stats_reset
-FROM pg_stat_bgwriter;
-\endif
+TRUNCATE checkpoint_fsync_pressure_result;
 
+DO $$
+BEGIN
+    IF to_regclass('pg_catalog.pg_stat_checkpointer') IS NOT NULL THEN
+        EXECUTE $sql$
+            INSERT INTO checkpoint_fsync_pressure_result
+            SELECT
+                cp.num_timed,
+                cp.num_requested,
+                cp.write_time,
+                cp.sync_time,
+                cp.buffers_written,
+                cp.slru_written,
+                bg.buffers_clean,
+                bg.maxwritten_clean,
+                bg.buffers_alloc,
+                CASE
+                    WHEN cp.num_requested > cp.num_timed THEN 'Checkpoint pressure'
+                    WHEN cp.sync_time > cp.write_time THEN 'Checkpoint fsync/sync pressure'
+                    ELSE 'Normal checkpoint profile'
+                END,
+                cp.stats_reset,
+                bg.stats_reset
+            FROM pg_stat_checkpointer cp
+            CROSS JOIN pg_stat_bgwriter bg
+        $sql$;
+    ELSE
+        INSERT INTO checkpoint_fsync_pressure_result
+        SELECT
+            NULL::numeric,
+            NULL::numeric,
+            NULL::numeric,
+            NULL::numeric,
+            NULL::numeric,
+            NULL::numeric,
+            buffers_clean,
+            maxwritten_clean,
+            buffers_alloc,
+            'Checkpoint counters are not available in this PostgreSQL version/view.',
+            stats_reset,
+            stats_reset
+        FROM pg_stat_bgwriter;
+    END IF;
+END $$;
 
-
+SELECT *
+FROM checkpoint_fsync_pressure_result;
 
 -- SAMPLE_OUTPUT_BEGIN
--- Sample output captured from database: pgbench_test
--- Capture run directory: /tmp/pgbench_full_refresh_clean_20260218_194330
---
---  checkpoints_timed | checkpoints_req | checkpoint_write_time | checkpoint_sync_time | buffers_checkpoint | slru_written | buffers_clean | maxwritten_clean | buffers_alloc |      recommendation       |   checkpointer_stats_reset    |     bgwriter_stats_reset      
--- -------------------+-----------------+-----------------------+----------------------+--------------------+--------------+---------------+------------------+---------------+---------------------------+-------------------------------+-------------------------------
---                851 |              59 |               4142695 |                48708 |              68025 |          216 |        277435 |             2551 |      10942175 | Normal checkpoint profile | 2026-01-31 20:40:48.109778-05 | 2026-01-31 20:40:48.109778-05
--- (1 row)
--- 
+-- checkpoints_timed | checkpoints_req | checkpoint_write_time | checkpoint_sync_time | recommendation
+-- ------------------+-----------------+-----------------------+----------------------+---------------------------
+--               851 |              59 |               4142695 |                48708 | Normal checkpoint profile
 -- SAMPLE_OUTPUT_END

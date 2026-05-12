@@ -2,59 +2,19 @@
 PostgreSQL DBA Script: Partition Lab Generate 5Gb Timeseries
 Purpose: Create an unpartitioned lab table with 5GB+ time-series data (5/10-year span) to test partition decisions.
 Area: Partitioning
-Usage:
-  psql -d <db> \
-    -v lab_schema='partition_lab' \
-    -v lab_table='fact_events_10y_unpartitioned' \
-    -v history_years='10' \
-    -v target_gb='5' \
-    -v payload_bytes='1024' \
-    -v batch_rows='250000' \
-    -f 05_partitioning/07_partition_lab_generate_5gb_timeseries.sql
+Usage: Edit the pg_temp.partition_lab_params values below when a different lab size/name is needed. Works in pgAdmin and psql.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
-\set ON_ERROR_STOP on
-
-\if :{?lab_schema}
-\else
-\set lab_schema 'partition_lab'
-\endif
-
-\if :{?lab_table}
-\else
-\set lab_table 'fact_events_10y_unpartitioned'
-\endif
-
-\if :{?history_years}
-\else
-\set history_years '10'
-\endif
-
-\if :{?target_gb}
-\else
-\set target_gb '5'
-\endif
-
-\if :{?payload_bytes}
-\else
-\set payload_bytes '1024'
-\endif
-
-\if :{?batch_rows}
-\else
-\set batch_rows '250000'
-\endif
-
 DROP TABLE IF EXISTS pg_temp.partition_lab_params;
 CREATE TEMP TABLE pg_temp.partition_lab_params AS
 SELECT
-    :'lab_schema'::text AS lab_schema,
-    :'lab_table'::text AS lab_table,
-    :'history_years'::int AS history_years,
-    :'target_gb'::numeric AS target_gb,
-    :'payload_bytes'::int AS payload_bytes,
-    :'batch_rows'::int AS batch_rows;
+    'partition_lab'::text AS lab_schema,
+    'fact_events_10y_unpartitioned'::text AS lab_table,
+    10::int AS history_years,
+    5::numeric AS target_gb,
+    1024::int AS payload_bytes,
+    250000::int AS batch_rows;
 
 DO $$
 DECLARE

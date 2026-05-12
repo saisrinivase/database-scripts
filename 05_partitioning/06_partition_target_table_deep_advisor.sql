@@ -2,38 +2,10 @@
 PostgreSQL DBA Script: Partition Target Table Deep Advisor
 Purpose: Deep-dive partition advisor for a specific table and time column, with SME decision score and developer action steps.
 Area: Partitioning
-Usage:
-  psql -d <db> \
-    -v target_schema='partition_lab' \
-    -v target_table='fact_events_10y_unpartitioned' \
-    -v target_time_column='event_date' \
-    -v hot_window_months='6' \
-    -f 05_partitioning/06_partition_target_table_deep_advisor.sql
+Usage: Edit the params CTE near the bottom when targeting a different table. Works in pgAdmin and psql.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
-\set ON_ERROR_STOP on
-
-\if :{?target_schema}
-\else
-\set target_schema 'partition_lab'
-\endif
-
-\if :{?target_table}
-\else
-\set target_table 'fact_events_10y_unpartitioned'
-\endif
-
-\if :{?target_time_column}
-\else
-\set target_time_column 'event_date'
-\endif
-
-\if :{?hot_window_months}
-\else
-\set hot_window_months '6'
-\endif
-
 CREATE OR REPLACE FUNCTION pg_temp.partition_target_table_advisor(
     p_schema text,
     p_table text,
@@ -280,13 +252,21 @@ BEGIN
 END;
 $$;
 
-SELECT *
-FROM pg_temp.partition_target_table_advisor(
-    :'target_schema',
-    :'target_table',
-    :'target_time_column',
-    :'hot_window_months'::int
-);
+WITH params AS (
+    SELECT
+        'partition_lab'::text AS target_schema,
+        'fact_events_10y_unpartitioned'::text AS target_table,
+        'event_date'::text AS target_time_column,
+        6::int AS hot_window_months
+)
+SELECT a.*
+FROM params p
+CROSS JOIN LATERAL pg_temp.partition_target_table_advisor(
+    p.target_schema,
+    p.target_table,
+    p.target_time_column,
+    p.hot_window_months
+) AS a;
 
 
 -- SAMPLE_OUTPUT_BEGIN

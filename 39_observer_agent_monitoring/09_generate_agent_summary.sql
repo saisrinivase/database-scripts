@@ -6,8 +6,6 @@ Usage: Run after active checks or scheduled snapshots to produce a DBA-readable 
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only. Uses live metrics; if observer snapshots exist, includes latest stored snapshot context.
 */
-SELECT (to_regclass('dba_observer.observer_snapshots') IS NOT NULL) AS has_observer_repo \gset
-
 WITH
 live AS (
     SELECT
@@ -53,21 +51,43 @@ SELECT line_no, summary_line
 FROM summary
 ORDER BY line_no;
 
-\if :has_observer_repo
-SELECT
-    'latest_stored_snapshot' AS section,
-    snapshot_id,
-    captured_at,
-    status,
-    health_score,
-    jsonb_array_length(findings) AS findings_count
-FROM dba_observer.observer_snapshots
-ORDER BY snapshot_id DESC
-LIMIT 1;
-\else
-SELECT
-    'observer repository not found; run 01_create_observer_repository.sql and 02_capture_observer_snapshot.sql for stored history.' AS repository_guidance;
-\endif
+DROP TABLE IF EXISTS pg_temp.observer_agent_summary_snapshot_result;
+CREATE TEMP TABLE pg_temp.observer_agent_summary_snapshot_result (
+    section text,
+    snapshot_id bigint,
+    captured_at timestamptz,
+    status text,
+    health_score int,
+    findings_count int,
+    repository_guidance text
+);
+
+DO $$
+BEGIN
+    IF to_regclass('dba_observer.observer_snapshots') IS NOT NULL THEN
+        EXECUTE $sql$
+            INSERT INTO pg_temp.observer_agent_summary_snapshot_result
+            SELECT
+                'latest_stored_snapshot',
+                snapshot_id,
+                captured_at,
+                status,
+                health_score,
+                jsonb_array_length(findings),
+                NULL::text
+            FROM dba_observer.observer_snapshots
+            ORDER BY snapshot_id DESC
+            LIMIT 1
+        $sql$;
+    ELSE
+        INSERT INTO pg_temp.observer_agent_summary_snapshot_result (repository_guidance)
+        VALUES ('observer repository not found; run 01_create_observer_repository.sql and 02_capture_observer_snapshot.sql for stored history.');
+    END IF;
+END;
+$$;
+
+SELECT *
+FROM pg_temp.observer_agent_summary_snapshot_result;
 
 -- SAMPLE_OUTPUT_BEGIN
 -- line_no | summary_line

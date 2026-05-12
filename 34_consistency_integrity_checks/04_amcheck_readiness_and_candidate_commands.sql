@@ -6,21 +6,18 @@ Usage: Run generated commands in a controlled window; prefer replicas for first 
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
-SELECT CASE
-           WHEN EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'amcheck') THEN 1
-           ELSE 0
-       END AS has_amcheck
-\gset
-
-\if :has_amcheck
 SELECT
+    CASE WHEN EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'amcheck')
+         THEN 'AMCHECK_AVAILABLE'
+         ELSE 'AMCHECK_NOT_INSTALLED'
+    END AS status,
     n.nspname AS schema_name,
     c.relname AS index_name,
     pg_size_pretty(pg_relation_size(c.oid)) AS index_size,
-    format(
-        'SELECT bt_index_check(%L::regclass, true);',
-        format('%I.%I', n.nspname, c.relname)
-    ) AS amcheck_command
+    CASE WHEN EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'amcheck')
+         THEN format('SELECT bt_index_check(%L::regclass, true);', format('%I.%I', n.nspname, c.relname))
+         ELSE 'Install with: CREATE EXTENSION amcheck; then rerun this script.'
+    END AS amcheck_command_or_guidance
 FROM pg_class c
 JOIN pg_namespace n
   ON n.oid = c.relnamespace
@@ -34,11 +31,6 @@ WHERE c.relkind = 'i'
   AND n.nspname <> 'information_schema'
 ORDER BY pg_relation_size(c.oid) DESC
 LIMIT 80;
-\else
-SELECT
-    'amcheck extension is not installed.'::text AS status,
-    'Install with: CREATE EXTENSION amcheck; then rerun this script.'::text AS guidance;
-\endif
 
 
 -- SAMPLE_OUTPUT_BEGIN
