@@ -2,7 +2,7 @@
 
 Purpose: searchable catalog of every SQL script in the postgres branch, with title, purpose, and sample-output coverage.
 
-Total SQL scripts: `248`.
+Total tracked SQL scripts: `247`.
 
 ## Area Counts
 
@@ -24,7 +24,7 @@ Total SQL scripts: `248`.
 | `13_io_wal_checkpoints` | 7 |
 | `14_connection_workload` | 6 |
 | `15_capacity_forecasting` | 8 |
-| `16_internals_deep_dive` | 6 |
+| `16_internals_deep_dive` | 13 |
 | `17_execution_plans` | 4 |
 | `18_long_queries_full_scans` | 4 |
 | `19_dml_optimization` | 4 |
@@ -145,6 +145,13 @@ Total SQL scripts: `248`.
 | `16_internals_deep_dive` | `16_internals_deep_dive/04_dependency_fanout_objects.sql` | Dependency Fanout Objects | Identify objects with high dependency fanout in catalog metadata. | yes |
 | `16_internals_deep_dive` | `16_internals_deep_dive/05_fsm_vm_toast_size_breakdown.sql` | Fsm Vm Toast Size Breakdown | Break down main/FSM/VM/TOAST forks to inspect internal storage overhead. | yes |
 | `16_internals_deep_dive` | `16_internals_deep_dive/06_visibility_and_freeze_profile.sql` | Visibility And Freeze Profile | Correlate visibility/freeze internals for table aging and maintenance planning. | yes |
+| `16_internals_deep_dive` | `16_internals_deep_dive/07_toast_compression_storage_policy.sql` | Toast Compression Storage Policy | Show TOAST-capable columns, storage policy, compression policy, and table-level TOAST footprint. | yes |
+| `16_internals_deep_dive` | `16_internals_deep_dive/08_relation_forks_persistence_map.sql` | Relation Forks Persistence Map | Map heap/index/TOAST relation forks and persistence to explain physical storage, VM/FSM growth, and unlogged init forks. | yes |
+| `16_internals_deep_dive` | `16_internals_deep_dive/09_slru_control_checkpoint_internals.sql` | Slru Control Checkpoint Internals | Review SLRU activity, checkpoint control data, and cluster state that affect XID, multixact, notify, and subtransaction internals. | yes |
+| `16_internals_deep_dive` | `16_internals_deep_dive/10_wait_event_internals_live_map.sql` | Wait Event Internals Live Map | Map live wait events to internal subsystems and action hints for fast incident triage. | yes |
+| `16_internals_deep_dive` | `16_internals_deep_dive/11_internal_extension_readiness.sql` | Internal Extension Readiness | Show whether key inspection extensions are installed/available and what diagnostic area each unlocks. | yes |
+| `16_internals_deep_dive` | `16_internals_deep_dive/12_backend_memory_contexts_snapshot.sql` | Backend Memory Contexts Snapshot | Show current backend memory contexts and server process mix for memory-pressure triage. | yes |
+| `16_internals_deep_dive` | `16_internals_deep_dive/13_postgres_internals_keyword_coverage_matrix.sql` | PostgreSQL Internals Keyword Coverage Matrix | Provide a searchable map from PostgreSQL internals keywords to the best diagnostic scripts in this repository. | yes |
 | `17_execution_plans` | `17_execution_plans/01_plan_capture_prerequisites.sql` | Plan Capture Prerequisites | Verify settings required for reliable plan analysis and plan-related diagnostics. | yes |
 | `17_execution_plans` | `17_execution_plans/02_explain_analyze_template.sql` | Explain Analyze Template | Template to read and understand execution plans for problematic queries. | yes |
 | `17_execution_plans` | `17_execution_plans/03_generate_explain_for_top_queries.sql` | Generate Explain For Top Queries | Generate EXPLAIN command text for top queries from pg_stat_statements. | yes |

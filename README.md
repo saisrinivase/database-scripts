@@ -8,12 +8,13 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 2. Run a script with `psql -d <database> -f <area>/<script>.sql`.
 3. Compare your result with the embedded sample output at the bottom of the same script.
 4. Use `SCRIPT_CATALOG.md` to search by purpose, or start with `38_observability_360/01_instance_health_360_dashboard.sql` for a CloudWatch-style first look.
-5. Use coverage maps (`PERFORMANCE_TUNING_COVERAGE.md`, `OBJECT_COVERAGE_MATRIX.md`, `INTERNALS_COVERAGE_MATRIX.md`) for cross-area troubleshooting.
+5. Use `POSTGRES_DIAGNOSTIC_LEARNING_PATH.md` when you want a beginner-to-pro diagnosis flow from symptom to exact scripts.
+6. Use coverage maps (`PERFORMANCE_TUNING_COVERAGE.md`, `OBJECT_COVERAGE_MATRIX.md`, `INTERNALS_COVERAGE_MATRIX.md`) for cross-area troubleshooting.
 
 ## Scope
 
-- Coverage: `42` operational folders, including two legacy `27_*` folders retained for compatibility.
-- Current SQL scripts: `248`.
+- Coverage: `41` operational folders.
+- Current tracked SQL scripts: `247`.
 - Script style: every SQL file includes `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes` headers.
 - Goal: any DBA/engineer can open an area and run purpose-specific scripts quickly.
 
@@ -35,7 +36,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `13_io_wal_checkpoints`: read/write pressure, temp usage, WAL archiver/checkpoint stress.
 - `14_connection_workload`: connection behavior, limits, backend type, transaction hygiene.
 - `15_capacity_forecasting`: snapshot repository, capture scripts, growth reports.
-- `16_internals_deep_dive`: XID/multixact aging, relfilenodes, dependency and fork internals.
+- `16_internals_deep_dive`: XID/multixact aging, relfilenodes, TOAST/compression, FSM/VM forks, SLRU, wait events, extension readiness, backend memory contexts, and keyword routing.
 - `17_execution_plans`: plan diagnostics, EXPLAIN templates, plan red-flag candidates.
 - `18_long_queries_full_scans`: long query tracking and full-scan hotspots.
 - `19_dml_optimization`: write amplification, HOT update ratio, FK index support.
@@ -69,6 +70,7 @@ Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionall
 - Performance topic map: `PERFORMANCE_TUNING_COVERAGE.md`
 - Object topic map: `OBJECT_COVERAGE_MATRIX.md`
 - Internals topic map: `INTERNALS_COVERAGE_MATRIX.md`
+- Beginner-to-pro diagnostic path: `POSTGRES_DIAGNOSTIC_LEARNING_PATH.md`
 - Script catalog: `SCRIPT_CATALOG.md`
 - 360 coverage audit: `POSTGRES_360_COVERAGE_AUDIT.md`
 - Fast triage order: `27_high_speed_tuning/README.md`
@@ -88,7 +90,7 @@ Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionall
 - Current validated execution in this workspace: PostgreSQL `18.3` for the new observability pack; historical full-run artifact used PostgreSQL `18.0`.
 - Observer-agent monitoring pack `39_observer_agent_monitoring/*.sql` validated on PostgreSQL `18.3`.
 - PgAdmin-safe diagnostics pack `40_pgadmin_safe_diagnostics/*.sql` validated on PostgreSQL `18.3`; `04_pgadmin_safe_pg_stat_io_overview.sql` was also smoke-tested inside pgAdmin's PSQL panel.
-- Some scripts use `psql` guards (`\\if`, `\\gset`) to support differences between `15/16` and `17/18` views/columns.
+- PgAdmin copy/paste compatibility is a design goal. Version-sensitive scripts use plain SQL or server-side PL/pgSQL guards instead of psql-only branching.
 
 ## Extension/Feature Dependencies
 
