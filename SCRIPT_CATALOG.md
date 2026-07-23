@@ -58,7 +58,7 @@ Total tracked SQL scripts: `261`.
 | `00_environment` | `00_environment/01_server_instance_overview.sql` | Server Instance Overview | Provide a quick PostgreSQL instance fingerprint for troubleshooting. | yes |
 | `00_environment` | `00_environment/02_extensions_installed.sql` | Extensions Installed | List installed extensions and their schema/version. | yes |
 | `00_environment` | `00_environment/03_database_catalog_overview.sql` | Database Catalog Overview | Show high-level object counts in the current database catalog. | yes |
-| `01_database_size` | `01_database_size/01_databases_size.sql` | Databases Size | Rank all databases by total size. | yes |
+| `01_database_size` | `01_database_size/01_databases_size.sql` | Databases Size | Rank all databases by total size and expose heap, index, and TOAST usage for the connected database. | yes |
 | `01_database_size` | `01_database_size/02_current_database_size_breakdown.sql` | Current Database Size Breakdown | Break down current database storage into table, index, and TOAST components. | yes |
 | `01_database_size` | `01_database_size/03_tablespaces_size.sql` | Tablespaces Size | Show tablespace usage to identify storage pressure by tablespace. | yes |
 | `02_table_storage` | `02_table_storage/01_table_size_breakdown.sql` | Table Size Breakdown | Show per-table storage split (heap, index, TOAST, total). | yes |
