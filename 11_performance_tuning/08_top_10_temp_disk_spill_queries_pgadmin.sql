@@ -47,7 +47,7 @@ SELECT
         WHEN s.temp_blks_read > s.temp_blks_written THEN 'Repeated temp rereads; inspect multi-pass sorts/hashes.'
         ELSE 'Review execution plan and work_mem-sensitive operators.'
     END AS sme_diagnosis,
-    left(regexp_replace(s.query, '\s+', ' ', 'g'), 220) AS query_sample
+    regexp_replace(s.query, '\s+', ' ', 'g') AS query_sample
 FROM base s
 CROSS JOIN totals t
 LEFT JOIN pg_roles r ON r.oid = s.userid

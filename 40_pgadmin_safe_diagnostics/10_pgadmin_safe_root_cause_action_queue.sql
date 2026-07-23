@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: PgAdmin Safe Root Cause Action Queue
 Purpose: pgAdmin-safe root cause action queue for PostgreSQL incidents.
 Scope: Produces prioritized findings for locks, long transactions, XID age, checkpoint/WAL pressure, temp spills, cache pressure, replication, archiving, and pg_stat_statements readiness.
 pgAdmin: Safe to run in Query Tool. Uses a temporary helper function only.

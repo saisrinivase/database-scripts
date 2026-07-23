@@ -49,7 +49,7 @@ SELECT
     prepare_time,
     generic_plans,
     custom_plans,
-    left(statement, 220) AS statement_snippet
+    statement AS statement_snippet
 FROM pg_prepared_statements
 ORDER BY prepare_time ASC
 LIMIT 120;

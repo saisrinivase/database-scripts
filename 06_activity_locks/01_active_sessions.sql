@@ -18,7 +18,7 @@ SELECT
     a.state,
     a.wait_event_type,
     a.wait_event,
-    left(a.query, 400) AS query_snippet
+    regexp_replace(a.query, '\s+', ' ', 'g') AS query_snippet
 FROM pg_stat_activity a
 WHERE a.pid <> pg_backend_pid()
 ORDER BY query_age DESC NULLS LAST;
@@ -43,4 +43,3 @@ ORDER BY query_age DESC NULLS LAST;
 -- (8 rows)
 -- 
 -- SAMPLE_OUTPUT_END
-

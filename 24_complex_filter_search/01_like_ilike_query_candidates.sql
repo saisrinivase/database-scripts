@@ -13,7 +13,7 @@ SELECT
     mean_exec_time,
     shared_blks_read,
     temp_blks_written,
-    left(query, 320) AS query_snippet
+    regexp_replace(query, '\s+', ' ', 'g') AS query_snippet
 FROM pg_stat_statements
 WHERE query ILIKE '% like %'
    OR query ILIKE '% ilike %'
@@ -353,4 +353,3 @@ LIMIT 200;
 -- (32 rows)
 -- 
 -- SAMPLE_OUTPUT_END
-

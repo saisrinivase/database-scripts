@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: PgAdmin Safe Pg Stat IO Overview
 Purpose: pgAdmin-safe PostgreSQL 16+ pg_stat_io overview with a clear fallback on older releases.
 Scope: I/O by backend type, object, and context for SME diagnosis of read, write, extend, fsync, and eviction pressure.
 pgAdmin: Safe to run in Query Tool. Uses a temporary helper function only.

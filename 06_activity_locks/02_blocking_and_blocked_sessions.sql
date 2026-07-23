@@ -12,13 +12,13 @@ SELECT
     blocked.application_name AS blocked_app,
     blocked.state AS blocked_state,
     now() - blocked.query_start AS blocked_query_age,
-    left(blocked.query, 300) AS blocked_query,
+    regexp_replace(blocked.query, '\s+', ' ', 'g') AS blocked_query,
     blocker.pid AS blocker_pid,
     blocker.usename AS blocker_user,
     blocker.application_name AS blocker_app,
     blocker.state AS blocker_state,
     now() - blocker.query_start AS blocker_query_age,
-    left(blocker.query, 300) AS blocker_query
+    regexp_replace(blocker.query, '\s+', ' ', 'g') AS blocker_query
 FROM pg_stat_activity blocked
 CROSS JOIN LATERAL unnest(pg_blocking_pids(blocked.pid)) AS p(blocker_pid)
 JOIN pg_stat_activity blocker

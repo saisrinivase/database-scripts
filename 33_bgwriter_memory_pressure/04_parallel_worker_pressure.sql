@@ -49,7 +49,7 @@ WITH parallel_activity AS (
         wait_event_type,
         wait_event,
         round(extract(epoch FROM (clock_timestamp() - query_start))::numeric, 2) AS query_age_seconds,
-        left(query, 180) AS query_snippet
+        query AS query_snippet
     FROM pg_stat_activity
     WHERE backend_type = 'parallel worker'
 )

@@ -112,7 +112,7 @@ BEGIN
                 s.shared_blks_hit,
                 s.temp_blks_written,
                 s.wal_bytes,
-                left(regexp_replace(s.query, '\s+', ' ', 'g'), 160) AS query_sample
+                regexp_replace(s.query, '\s+', ' ', 'g') AS query_sample
             FROM pg_stat_statements s
             LEFT JOIN pg_database d ON d.oid = s.dbid
             ORDER BY s.total_exec_time DESC

@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: PgAdmin Safe Observer Health Dashboard
 Purpose: pgAdmin-safe observer health dashboard for DBA monitoring and incident triage.
 Scope: Connections, waits, locks, long transactions, vacuum blockers, XID age, temp usage, cache hit, replication, and archive risk.
 pgAdmin: Safe to run in Query Tool.

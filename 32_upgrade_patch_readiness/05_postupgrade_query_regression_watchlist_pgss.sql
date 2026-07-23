@@ -40,7 +40,7 @@ BEGIN
                 wal_bytes::numeric,
                 temp_blks_written,
                 shared_blks_read,
-                left(query, 220),
+                query,
                 CASE
                     WHEN stddev_exec_time > greatest(mean_exec_time * 2, 100) THEN 'HIGH_VARIANCE_REVIEW'
                     WHEN mean_exec_time > 500 THEN 'HIGH_MEAN_LATENCY_REVIEW'

@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: PgAdmin Safe SME Diagnosis Router
 Purpose: pgAdmin-safe SME diagnosis router for PostgreSQL incident analysis.
 Scope: Maps common symptoms to the right local script and first evidence to collect.
 pgAdmin: Safe to run in Query Tool. Static plain SQL reference.

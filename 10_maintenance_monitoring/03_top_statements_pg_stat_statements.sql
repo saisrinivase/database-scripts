@@ -46,7 +46,7 @@ WITH statement_base AS (
         (coalesce(s.shared_blks_read, 0) + coalesce(s.local_blks_read, 0)) * current_setting('block_size')::bigint AS read_bytes,
         (coalesce(s.shared_blks_written, 0) + coalesce(s.local_blks_written, 0)) * current_setting('block_size')::bigint AS write_bytes,
         coalesce(s.wal_bytes, 0)::numeric AS wal_bytes,
-        left(regexp_replace(s.query, '\s+', ' ', 'g'), 500) AS query_snippet
+        regexp_replace(s.query, '\s+', ' ', 'g') AS query_snippet
     FROM pg_stat_statements s
 ),
 totals AS (

@@ -15,7 +15,7 @@ SELECT
     max_exec_time,
     shared_blks_read,
     temp_blks_written,
-    left(query, 400) AS query_snippet
+    regexp_replace(query, '\s+', ' ', 'g') AS query_snippet
 FROM pg_stat_statements
 WHERE calls >= 5
 ORDER BY mean_exec_time DESC

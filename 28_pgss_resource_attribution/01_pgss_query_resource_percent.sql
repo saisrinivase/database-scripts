@@ -32,7 +32,7 @@ WITH base AS (
             ),
             0
         ) AS cpu_proxy_time,
-        left(s.query, 280) AS query_snippet
+        s.query AS query_snippet
     FROM pg_stat_statements s
 ),
 totals AS (
@@ -2354,4 +2354,3 @@ LIMIT 300;
 -- (300 rows)
 -- 
 -- SAMPLE_OUTPUT_END
-

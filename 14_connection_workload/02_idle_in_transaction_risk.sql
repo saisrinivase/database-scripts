@@ -18,7 +18,7 @@ SELECT
     now() - state_change AS idle_in_txn_age,
     wait_event_type,
     wait_event,
-    left(query, 400) AS query_snippet
+    regexp_replace(query, '\s+', ' ', 'g') AS query_snippet
 FROM pg_stat_activity
 WHERE state = 'idle in transaction'
 ORDER BY xact_age DESC NULLS LAST;

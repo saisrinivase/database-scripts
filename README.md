@@ -14,7 +14,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 ## Scope
 
 - Coverage: `41` operational folders.
-- Current tracked SQL scripts: `247`.
+- Current tracked SQL scripts: `252`.
 - Script style: every SQL file includes `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes` headers.
 - Goal: any DBA/engineer can open an area and run purpose-specific scripts quickly.
 
@@ -36,7 +36,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `13_io_wal_checkpoints`: read/write pressure, temp usage, WAL archiver/checkpoint stress.
 - `14_connection_workload`: connection behavior, limits, backend type, transaction hygiene.
 - `15_capacity_forecasting`: snapshot repository, capture scripts, growth reports.
-- `16_internals_deep_dive`: XID/multixact aging, relfilenodes, TOAST/compression, FSM/VM forks, SLRU, wait events, extension readiness, backend memory contexts, and keyword routing.
+- `16_internals_deep_dive`: XID/multixact aging, relfilenodes, TOAST/compression, FSM/VM forks, SLRU, wait events, vacuum internals, WAL/checkpoint write paths, cloud capability checks, query-text capture limits, extension readiness, backend memory contexts, and keyword routing.
 - `17_execution_plans`: plan diagnostics, EXPLAIN templates, plan red-flag candidates.
 - `18_long_queries_full_scans`: long query tracking and full-scan hotspots.
 - `19_dml_optimization`: write amplification, HOT update ratio, FK index support.
@@ -82,6 +82,14 @@ Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionall
 - Markers: `-- SAMPLE_OUTPUT_BEGIN` and `-- SAMPLE_OUTPUT_END`.
 - Samples are for quick understanding; values vary by environment and runtime state.
 - Historical full validation outputs are retained in `_validation_runs/`.
+
+## Complete SQL Text Convention
+
+- Diagnostic output returns complete query or prepared-statement text.
+- Display columns may retain names such as `query_snippet` or `query_sample` for backward compatibility, but their SQL text is not shortened with `left()`, `substr()`, or `substring()`.
+- SQL parsing expressions that extract an object name or statement pattern are not display truncation.
+- PostgreSQL can truncate `pg_stat_activity.query` at `track_activity_query_size` before any script reads it; use `16_internals_deep_dive/18_query_text_capture_limits.sql` to detect that condition.
+- pgAdmin may visually shorten a wide grid cell; open the cell value or use text output to inspect the complete value returned by PostgreSQL.
 
 ## Operational Notes
 

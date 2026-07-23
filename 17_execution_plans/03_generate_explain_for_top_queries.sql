@@ -11,7 +11,7 @@ SELECT
     calls,
     total_exec_time,
     mean_exec_time,
-    left(query, 180) AS query_snippet,
+    query AS query_snippet,
     format('/* queryid=%s */ EXPLAIN (ANALYZE, BUFFERS, VERBOSE, WAL, SETTINGS) %s;', queryid, query) AS explain_sql
 FROM pg_stat_statements
 ORDER BY total_exec_time DESC

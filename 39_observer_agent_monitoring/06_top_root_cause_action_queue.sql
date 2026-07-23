@@ -127,7 +127,7 @@ BEGIN
                 'Statement is one of the largest cumulative runtime contributors.' AS evidence,
                 'Review plan, rows, IO, temp, WAL, and execution variance before changing SQL/indexes.' AS action,
                 '17_execution_plans/03_generate_explain_for_top_queries.sql' AS next_script,
-                left(regexp_replace(query, '\s+', ' ', 'g'), 180) AS query_sample
+                regexp_replace(query, '\s+', ' ', 'g') AS query_sample
             FROM pg_stat_statements
             ORDER BY total_exec_time DESC
             LIMIT 20

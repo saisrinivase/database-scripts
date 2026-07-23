@@ -17,7 +17,7 @@ WITH etl_sessions AS (
         wait_event_type,
         wait_event,
         now() - query_start AS query_age,
-        left(query, 240) AS query_snippet
+        query AS query_snippet
     FROM pg_stat_activity
     WHERE backend_type = 'client backend'
       AND (

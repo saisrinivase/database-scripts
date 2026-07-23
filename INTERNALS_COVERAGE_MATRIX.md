@@ -21,12 +21,12 @@ Purpose: Map administration topics to PostgreSQL internals sources and ready-to-
 | 360 observability dashboard | `pg_stat_activity`, `pg_locks`, `pg_stat_database`, `pg_stat_wal`, `pg_stat_bgwriter`, `pg_stat_checkpointer`, `pg_stat_replication` | `38_observability_360/01_instance_health_360_dashboard.sql` |
 | CloudWatch metric equivalents | SQL-visible stats plus provider/OS-only gap classification | `38_observability_360/02_cloudwatch_metric_equivalents.sql` |
 | Observer-agent repository | `dba_observer.observer_snapshots`, `dba_observer.observer_findings`, `dba_observer.observer_metric_thresholds` | `39_observer_agent_monitoring/01_create_observer_repository.sql`, `39_observer_agent_monitoring/02_capture_observer_snapshot.sql` |
-| Vacuum/bloat internals | `pg_stat_user_tables`, `relfrozenxid`, `pg_stat_progress_vacuum` | `07_vacuum_bloat/01_table_bloat_estimate.sql`, `07_vacuum_bloat/03_freeze_age_risk.sql`, `07_vacuum_bloat/05_vacuum_progress.sql` |
+| Vacuum/bloat internals | `pg_stat_user_tables`, table reloptions, `relfrozenxid`, `backend_xmin`, `pg_stat_progress_vacuum` | `16_internals_deep_dive/14_vacuum_internal_pressure_dashboard.sql`, `07_vacuum_bloat/01_table_bloat_estimate.sql`, `07_vacuum_bloat/03_freeze_age_risk.sql` |
 | Replication state | `pg_stat_replication`, `pg_is_in_recovery()` | `08_replication_ha/01_primary_replication_status.sql`, `08_replication_ha/02_standby_replay_status.sql` |
 | Replication slot retention | `pg_replication_slots`, LSN diff functions | `08_replication_ha/03_replication_slots_health.sql` |
-| WAL internals | `pg_stat_wal`, `pg_stat_archiver`, LSN functions | `08_replication_ha/04_wal_generation_rate.sql`, `13_io_wal_checkpoints/04_wal_archiver_health.sql` |
+| WAL internals | `pg_stat_wal`, `pg_stat_archiver`, `pg_replication_slots`, WAL waits, LSN functions | `16_internals_deep_dive/15_wal_write_path_pressure_dashboard.sql`, `08_replication_ha/04_wal_generation_rate.sql`, `13_io_wal_checkpoints/04_wal_archiver_health.sql` |
 | Security/privilege internals | `pg_roles`, `pg_auth_members`, `pg_default_acl`, `information_schema` | `09_security_roles/*.sql` |
-| Checkpoints and writer internals | `pg_stat_bgwriter`, `pg_stat_checkpointer`, `pg_control_checkpoint()` | `10_maintenance_monitoring/01_bgwriter_checkpoint_stats.sql`, `13_io_wal_checkpoints/05_checkpoint_pressure_indicators.sql`, `16_internals_deep_dive/09_slru_control_checkpoint_internals.sql` |
+| Checkpoints and writer internals | `pg_stat_bgwriter`, `pg_stat_checkpointer`, write-path waits, `pg_control_checkpoint()` | `16_internals_deep_dive/16_checkpoint_background_writer_pressure_15_plus.sql`, `10_maintenance_monitoring/01_bgwriter_checkpoint_stats.sql`, `16_internals_deep_dive/09_slru_control_checkpoint_internals.sql` |
 | Query-level performance | `pg_stat_statements`, `pg_stat_user_functions` | `11_performance_tuning/*.sql` |
 | Planner stats health | `pg_stat_user_tables`, `pg_stats`, `pg_statistic_ext` | `12_planner_statistics/*.sql` |
 | I/O internals | `pg_stat_database`, `pg_statio_*`, `pg_stat_io` | `13_io_wal_checkpoints/*.sql` |
@@ -39,6 +39,8 @@ Purpose: Map administration topics to PostgreSQL internals sources and ready-to-
 | Inspection extension readiness | `pg_available_extensions`, `pg_extension` | `16_internals_deep_dive/11_internal_extension_readiness.sql` |
 | Backend memory internals | `pg_backend_memory_contexts`, `pg_stat_activity` | `16_internals_deep_dive/12_backend_memory_contexts_snapshot.sql` |
 | Internals keyword routing | Repository keyword map | `16_internals_deep_dive/13_postgres_internals_keyword_coverage_matrix.sql`, `POSTGRES_DIAGNOSTIC_LEARNING_PATH.md` |
+| Cloud and managed-service portability | catalog capability detection, role membership, version gates, provider-only metric classification | `16_internals_deep_dive/17_cloud_portability_capability_matrix.sql`, `38_observability_360/02_cloudwatch_metric_equivalents.sql` |
+| Query text capture and truncation | `track_activity_query_size`, `track_activities`, `compute_query_id`, role visibility, `pg_stat_statements` readiness | `16_internals_deep_dive/18_query_text_capture_limits.sql` |
 | Dependency graph internals | `pg_depend` | `16_internals_deep_dive/04_dependency_fanout_objects.sql` |
 | Object type inventory | `pg_class`, `pg_proc`, `pg_type`, `pg_tablespace`, `pg_trigger`, `information_schema.*` | `29_object_inventory_health/01_object_type_inventory.sql` |
 | PK/FK and join-index health | `pg_constraint`, `pg_index`, `pg_stat_user_tables`, `pg_attribute` | `29_object_inventory_health/02_table_pk_fk_health.sql`, `29_object_inventory_health/04_missing_fk_supporting_indexes.sql`, `29_object_inventory_health/05_missing_join_column_indexes.sql` |

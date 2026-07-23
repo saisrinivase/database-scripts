@@ -69,7 +69,7 @@ SELECT
         WHEN pgss.shared_blks_read = 0 AND pgss.temp_blks_written = 0 THEN 'Likely CPU-bound; inspect functions, joins, sorts, expressions, and plan rows.'
         ELSE 'Mixed CPU/IO profile; compare with IO and temp spill scripts.'
     END AS sme_diagnosis,
-    left(regexp_replace(pgss.query, '\s+', ' ', 'g'), 220) AS query_sample
+    regexp_replace(pgss.query, '\s+', ' ', 'g') AS query_sample
 FROM pgss
 CROSS JOIN totals t
 LEFT JOIN pg_roles r ON r.oid = pgss.userid

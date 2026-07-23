@@ -37,7 +37,7 @@ BEGIN
                         WHEN query ~* '\bpg_advisory_lock\b|\bpg_try_advisory_lock\b' THEN 'ADVISORY_LOCK_USAGE'
                         ELSE 'OTHER'
                     END AS incompatibility_pattern,
-                    left(query, 220) AS query_snippet
+                    query AS query_snippet
                 FROM pg_stat_statements
                 WHERE query ~* '\blisten\b|\bunlisten\b|\bcreate\s+temp\b|\btemporary\s+table\b|\bset\s+(session|role|search_path)\b|\bdeclare\b.*\bcursor\b|\bpg_advisory_lock\b|\bpg_try_advisory_lock\b'
             )

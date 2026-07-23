@@ -32,7 +32,7 @@ base AS (
         s.max_exec_time,
         s.stddev_exec_time,
         s.rows,
-        left(regexp_replace(s.query, '\s+', ' ', 'g'), 500) AS query_snippet
+        regexp_replace(s.query, '\s+', ' ', 'g') AS query_snippet
     FROM pg_stat_statements s
     CROSS JOIN params p
     WHERE s.calls >= p.min_calls

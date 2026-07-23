@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: PgAdmin Safe Pg Stat Statements Quality
 Purpose: pgAdmin-safe pg_stat_statements capture quality and top query pressure view.
 Scope: Confirms whether pg_stat_statements is usable, then surfaces slow, temp-spilling, WAL-heavy, and frequently called SQL.
 pgAdmin: Safe to run in Query Tool. Uses a temporary helper function only.
@@ -61,7 +62,7 @@ BEGIN
                 round(((s.shared_blks_read * current_setting('block_size')::numeric) / 1024 / 1024), 2) AS shared_read_mb,
                 round((((s.temp_blks_read + s.temp_blks_written) * current_setting('block_size')::numeric) / 1024 / 1024), 2) AS temp_mb,
                 round((s.wal_bytes::numeric / 1024 / 1024), 2) AS wal_mb,
-                left(regexp_replace(s.query, '\s+', ' ', 'g'), 220)::text AS query_sample,
+                regexp_replace(s.query, '\s+', ' ', 'g')::text AS query_sample,
                 CASE
                     WHEN (s.temp_blks_read + s.temp_blks_written) > 0
                         THEN 'Temp spill. Review work_mem, sort/hash plans, missing indexes, and row estimates.'

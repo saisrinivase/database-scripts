@@ -16,7 +16,7 @@ WITH base AS (
         shared_blks_read,
         temp_blks_written,
         CASE WHEN calls = 0 THEN NULL ELSE rows::numeric / calls END AS rows_per_call,
-        left(query, 260) AS query_snippet
+        query AS query_snippet
     FROM pg_stat_statements
 )
 SELECT
@@ -2123,4 +2123,3 @@ LIMIT 300;
 -- (300 rows)
 -- 
 -- SAMPLE_OUTPUT_END
-

@@ -42,7 +42,7 @@ BEGIN
                     stddev_exec_time,
                     temp_blks_written,
                     shared_blks_read,
-                    left(query, 200) AS query_snippet
+                    query AS query_snippet
                 FROM pg_stat_statements
                 ORDER BY total_exec_time DESC
                 LIMIT 50

@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: PgAdmin Safe Backup Restore Evidence
 Purpose: pgAdmin-safe backup, restore, PITR, and DR evidence checklist.
 Scope: WAL level, archiving configuration, archive status, replication slot risk, backup control functions, and optional custom backup history.
 pgAdmin: Safe to run in Query Tool. Uses a temporary helper function only.

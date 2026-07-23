@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: PgAdmin Safe CloudWatch Metric Equivalents
 Purpose: pgAdmin-safe SQL equivalents for common database-side CloudWatch/RDS-style metrics.
 Scope: Connections, transactions, locks, temp usage, cache hit, replication lag, WAL generation, archiver failures, and checkpoints.
 pgAdmin: Safe to run in Query Tool. Uses only catalog views and a temporary helper function.

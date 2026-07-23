@@ -16,7 +16,7 @@ SELECT
     state,
     wait_event_type,
     wait_event,
-    left(query, 400) AS query_snippet
+    regexp_replace(query, '\s+', ' ', 'g') AS query_snippet
 FROM pg_stat_activity
 WHERE xact_start IS NOT NULL
   AND now() - xact_start >= interval '5 minutes'

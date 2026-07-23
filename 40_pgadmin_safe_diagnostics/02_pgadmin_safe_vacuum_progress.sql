@@ -20,7 +20,7 @@ SELECT
     a.wait_event_type,
     a.wait_event,
     now() - a.query_start AS query_age,
-    left(regexp_replace(a.query, '\s+', ' ', 'g'), 180) AS query_sample
+    regexp_replace(a.query, '\s+', ' ', 'g') AS query_sample
 FROM pg_stat_progress_vacuum p
 JOIN pg_class c ON c.oid = p.relid
 JOIN pg_namespace n ON n.oid = c.relnamespace

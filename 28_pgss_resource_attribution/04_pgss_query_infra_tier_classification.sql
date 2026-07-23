@@ -30,7 +30,7 @@ WITH q AS (
         + coalesce(s.temp_blk_read_time, 0)
         + coalesce(s.temp_blk_write_time, 0) AS io_time,
         coalesce(s.temp_blks_written, 0) * current_setting('block_size')::bigint AS temp_bytes,
-        left(s.query, 280) AS query_snippet
+        s.query AS query_snippet
     FROM pg_stat_statements s
 ),
 t AS (

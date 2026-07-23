@@ -68,7 +68,7 @@ BEGIN
                 temp_blks_written,
                 pg_size_pretty(temp_blks_written::bigint * current_setting('block_size')::int),
                 shared_blks_read,
-                left(query, 220)
+                query
             FROM pg_stat_statements
             WHERE temp_blks_written > 0
             ORDER BY temp_blks_written DESC, total_exec_time DESC

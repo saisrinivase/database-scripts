@@ -46,7 +46,7 @@ SELECT
         WHEN a.state = 'active' AND a.wait_event_type IS NULL THEN 'Running without wait event; possible CPU-bound execution.'
         ELSE 'Review query age, transaction age, and wait event.'
     END AS sme_diagnosis,
-    left(regexp_replace(a.query, '\s+', ' ', 'g'), 260) AS query_sample
+    regexp_replace(a.query, '\s+', ' ', 'g') AS query_sample
 FROM active_sessions a
 CROSS JOIN totals t
 ORDER BY

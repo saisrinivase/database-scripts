@@ -17,7 +17,7 @@ SELECT
         WHEN calls >= 10000 AND mean_exec_time < 10 THEN 'Candidate'
         ELSE 'Observe'
     END AS recommendation,
-    left(query, 240) AS query_snippet
+    query AS query_snippet
 FROM pg_stat_statements
 ORDER BY calls DESC
 LIMIT 200;
@@ -1689,4 +1689,3 @@ LIMIT 200;
 -- (200 rows)
 -- 
 -- SAMPLE_OUTPUT_END
-

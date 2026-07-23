@@ -5,7 +5,7 @@ Purpose: Document compatibility expectations for PostgreSQL 15-18.
 ## Summary
 
 - Target versions: `PostgreSQL 15, 16, 17, 18`.
-- Validated in this workspace: `PostgreSQL 18.0` (full run, all scripts passed).
+- Validated in this workspace: PostgreSQL 18.x. PostgreSQL 15-17 compatibility is implemented through server-side feature detection and version-stable catalog interfaces.
 - Latest targeted validation in this workspace: `38_observability_360/*.sql` passed on PostgreSQL `18.3`.
 - Latest observer-agent validation in this workspace: `39_observer_agent_monitoring/*.sql` passed on PostgreSQL `18.3`.
 - Latest pgAdmin-safe validation in this workspace: `40_pgadmin_safe_diagnostics/*.sql` passed on PostgreSQL `18.3`; scripts avoid `psql` meta commands for pgAdmin Query Tool compatibility.
@@ -14,7 +14,7 @@ Purpose: Document compatibility expectations for PostgreSQL 15-18.
 
 ## Guarded Cross-Version Scripts
 
-These scripts auto-switch logic with `psql` meta commands (`\gset`, `\if`) for view/column differences:
+These scripts use plain SQL, temporary tables, temporary functions, catalog checks, and server-side dynamic SQL for view/column differences. They do not use `psql` meta commands:
 
 - `07_vacuum_bloat/05_vacuum_progress.sql`
   - Uses `max_dead_tuples/num_dead_tuples` on 15/16.
@@ -36,9 +36,20 @@ These scripts auto-switch logic with `psql` meta commands (`\gset`, `\if`) for v
 
 - `29_object_inventory_health/18_object_query_hotspots_pgss.sql`
 - `38_observability_360/10_query_capture_quality_pgss.sql`
-  - Uses `psql` guard logic.
   - Runs hotspot query when `pg_stat_statements` is installed.
   - Returns guidance row when extension is missing.
+
+- `16_internals_deep_dive/14_vacuum_internal_pressure_dashboard.sql`
+  - Uses PostgreSQL 15+ stable vacuum, catalog, and activity interfaces.
+
+- `16_internals_deep_dive/15_wal_write_path_pressure_dashboard.sql`
+  - Uses JSON optional-column access for WAL operation counters that differ across server releases.
+
+- `16_internals_deep_dive/16_checkpoint_background_writer_pressure_15_plus.sql`
+  - Uses server-side dynamic SQL to normalize PostgreSQL 15/16 and 17+ writer statistics.
+
+- `16_internals_deep_dive/17_cloud_portability_capability_matrix.sql`
+  - Distinguishes SQL-visible, privilege-limited, version-specific, and provider-only diagnostics.
 
 ## Feature/Extension Requirements
 
@@ -52,6 +63,7 @@ These scripts auto-switch logic with `psql` meta commands (`\gset`, `\if`) for v
 
 ## Important Execution Note
 
-- Version-guarded scripts rely on `psql` meta commands.
-- Recommended execution path: `psql -f <script.sql>`.
-- For pgAdmin Query Tool, use `40_pgadmin_safe_diagnostics/*.sql`; those scripts avoid `\gset`, `\if`, `\pset`, `\echo`, and other `psql`-only commands.
+- Repository diagnostics are intended to run in both `psql -f <script.sql>` and pgAdmin Query Tool.
+- No tracked SQL script should require `\gset`, `\if`, `\pset`, `\echo`, or another `psql`-only command.
+- Some scripts require `pg_stat_statements`, another optional extension, monitoring privileges, or temporary-object permission; their headers and fallback output describe the requirement.
+- Complete SQL text is returned by query diagnostics. A pgAdmin grid can visually shorten a wide cell without PostgreSQL truncating the value.

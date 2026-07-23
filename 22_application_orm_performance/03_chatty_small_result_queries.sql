@@ -13,7 +13,7 @@ SELECT
     CASE WHEN calls = 0 THEN NULL ELSE round(rows::numeric / calls, 4) END AS avg_rows_per_call,
     mean_exec_time,
     total_exec_time,
-    left(query, 260) AS query_snippet
+    query AS query_snippet
 FROM pg_stat_statements
 WHERE calls >= 5000
 ORDER BY avg_rows_per_call ASC NULLS LAST, calls DESC

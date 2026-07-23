@@ -2,7 +2,7 @@
 
 Purpose: searchable catalog of every SQL script in the postgres branch, with title, purpose, and sample-output coverage.
 
-Total tracked SQL scripts: `247`.
+Total tracked SQL scripts: `252`.
 
 ## Area Counts
 
@@ -24,7 +24,7 @@ Total tracked SQL scripts: `247`.
 | `13_io_wal_checkpoints` | 7 |
 | `14_connection_workload` | 6 |
 | `15_capacity_forecasting` | 8 |
-| `16_internals_deep_dive` | 13 |
+| `16_internals_deep_dive` | 18 |
 | `17_execution_plans` | 4 |
 | `18_long_queries_full_scans` | 4 |
 | `19_dml_optimization` | 4 |
@@ -152,6 +152,11 @@ Total tracked SQL scripts: `247`.
 | `16_internals_deep_dive` | `16_internals_deep_dive/11_internal_extension_readiness.sql` | Internal Extension Readiness | Show whether key inspection extensions are installed/available and what diagnostic area each unlocks. | yes |
 | `16_internals_deep_dive` | `16_internals_deep_dive/12_backend_memory_contexts_snapshot.sql` | Backend Memory Contexts Snapshot | Show current backend memory contexts and server process mix for memory-pressure triage. | yes |
 | `16_internals_deep_dive` | `16_internals_deep_dive/13_postgres_internals_keyword_coverage_matrix.sql` | PostgreSQL Internals Keyword Coverage Matrix | Provide a searchable map from PostgreSQL internals keywords to the best diagnostic scripts in this repository. | yes |
+| `16_internals_deep_dive` | `16_internals_deep_dive/14_vacuum_internal_pressure_dashboard.sql` | Vacuum Internal Pressure Dashboard | Explain autovacuum decisions, worker capacity, cleanup blockers, dead tuples, freeze age, and running vacuum progress. | yes |
+| `16_internals_deep_dive` | `16_internals_deep_dive/15_wal_write_path_pressure_dashboard.sql` | WAL Write Path Pressure Dashboard | Diagnose WAL generation, buffer exhaustion, write/sync latency, archiving, slot retention, live waits, and settings. | yes |
+| `16_internals_deep_dive` | `16_internals_deep_dive/16_checkpoint_background_writer_pressure_15_plus.sql` | Checkpoint Background Writer Pressure 15 Plus | Normalize PostgreSQL 15/16 and 17+ checkpoint and background-writer pressure metrics. | yes |
+| `16_internals_deep_dive` | `16_internals_deep_dive/17_cloud_portability_capability_matrix.sql` | Cloud Portability Capability Matrix | Show SQL diagnostic capability, privilege gaps, version availability, and provider-only metric requirements. | yes |
+| `16_internals_deep_dive` | `16_internals_deep_dive/18_query_text_capture_limits.sql` | Query Text Capture Limits | Detect server settings, privileges, and rows that can make SQL text appear truncated or hidden. | yes |
 | `17_execution_plans` | `17_execution_plans/01_plan_capture_prerequisites.sql` | Plan Capture Prerequisites | Verify settings required for reliable plan analysis and plan-related diagnostics. | yes |
 | `17_execution_plans` | `17_execution_plans/02_explain_analyze_template.sql` | Explain Analyze Template | Template to read and understand execution plans for problematic queries. | yes |
 | `17_execution_plans` | `17_execution_plans/03_generate_explain_for_top_queries.sql` | Generate Explain For Top Queries | Generate EXPLAIN command text for top queries from pg_stat_statements. | yes |

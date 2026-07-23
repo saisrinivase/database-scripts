@@ -22,7 +22,7 @@ SELECT
         WHEN mean_exec_time > 1000 THEN 'High latency plan review'
         ELSE 'Observe'
     END AS recommendation,
-    left(query, 220) AS query_snippet
+    query AS query_snippet
 FROM pg_stat_statements
 ORDER BY total_exec_time DESC
 LIMIT 200;

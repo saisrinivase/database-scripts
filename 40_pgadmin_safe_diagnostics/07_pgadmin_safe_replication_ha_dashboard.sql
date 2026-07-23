@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: PgAdmin Safe Replication HA Dashboard
 Purpose: pgAdmin-safe replication and HA dashboard for primary or standby servers.
 Scope: Recovery role, physical replication lag, receiver status, slots, and HA risk signals.
 pgAdmin: Safe to run in Query Tool.

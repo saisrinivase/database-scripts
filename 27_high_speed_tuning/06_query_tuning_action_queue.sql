@@ -32,7 +32,7 @@ SELECT
         WHEN stddev_exec_time > mean_exec_time THEN 'Check parameter-sensitive plans and stale statistics.'
         ELSE 'Inspect SQL design, indexes, and configuration context.'
     END AS recommended_next_action,
-    left(query, 350) AS query_snippet
+    regexp_replace(query, '\s+', ' ', 'g') AS query_snippet
 FROM pg_stat_statements
 ORDER BY total_exec_time DESC
 LIMIT 300;

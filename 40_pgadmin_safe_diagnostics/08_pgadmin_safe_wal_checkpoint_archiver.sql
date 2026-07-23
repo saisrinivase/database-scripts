@@ -1,4 +1,5 @@
 /*
+PostgreSQL DBA Script: PgAdmin Safe WAL Checkpoint Archiver
 Purpose: pgAdmin-safe WAL, checkpoint, and archiver pressure dashboard.
 Scope: WAL volume, WAL sync/write time, archive failures, checkpoint frequency, requested checkpoint ratio, and write pressure.
 pgAdmin: Safe to run in Query Tool. Uses a temporary helper function only.

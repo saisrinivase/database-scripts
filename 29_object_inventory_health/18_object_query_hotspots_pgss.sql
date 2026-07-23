@@ -36,7 +36,7 @@ BEGIN
                     s.shared_blks_read,
                     s.shared_blks_hit,
                     s.temp_blks_written,
-                    left(s.query, 320) AS query_snippet,
+                    regexp_replace(s.query, '\s+', ' ', 'g') AS query_snippet,
                     coalesce(
                         substring(lower(s.query) FROM 'from[[:space:]]+([a-z0-9_."$]+)'),
                         substring(lower(s.query) FROM 'join[[:space:]]+([a-z0-9_."$]+)')

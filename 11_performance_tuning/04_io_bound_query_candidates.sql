@@ -26,7 +26,7 @@ base AS (
         local_blks_read,
         temp_blks_read,
         temp_blks_written,
-        left(query, 500) AS query_snippet
+        regexp_replace(query, '\s+', ' ', 'g') AS query_snippet
     FROM pg_stat_statements
 ),
 totals AS (

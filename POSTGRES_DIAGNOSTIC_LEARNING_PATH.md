@@ -117,6 +117,11 @@ Use these when the basic symptom route points to PostgreSQL internals.
 | LWLock/wait_event | internal contention route to lock, WAL, buffer, IO, IPC | `16_internals_deep_dive/10_wait_event_internals_live_map.sql` |
 | pg_stat_io | backend/object/context IO attribution | `13_io_wal_checkpoints/07_pg_stat_io_overview_pg16_plus.sql` |
 | pg_backend_memory_contexts | current backend memory context shape | `16_internals_deep_dive/12_backend_memory_contexts_snapshot.sql` |
+| autovacuum internals | triggers, worker saturation, blockers, freeze pressure, and running phases | `16_internals_deep_dive/14_vacuum_internal_pressure_dashboard.sql` |
+| WAL write path | generation, WAL buffers, write/sync, archive, slots, and live waits | `16_internals_deep_dive/15_wal_write_path_pressure_dashboard.sql` |
+| checkpoint/bgwriter | requested checkpoints, write/sync duration, buffer cleaning, and backend fallback | `16_internals_deep_dive/16_checkpoint_background_writer_pressure_15_plus.sql` |
+| cloud portability | available SQL diagnostics, privilege gaps, and provider-only metrics | `16_internals_deep_dive/17_cloud_portability_capability_matrix.sql` |
+| SQL text truncation | server capture limit, hidden query text, query ID, and pg_stat_statements readiness | `16_internals_deep_dive/18_query_text_capture_limits.sql` |
 | pageinspect/amcheck/pg_visibility | deep inspection extension readiness | `16_internals_deep_dive/11_internal_extension_readiness.sql` |
 | full keyword coverage | searchable keyword-to-script map | `16_internals_deep_dive/13_postgres_internals_keyword_coverage_matrix.sql` |
 

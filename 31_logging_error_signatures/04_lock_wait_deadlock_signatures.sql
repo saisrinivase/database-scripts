@@ -16,7 +16,7 @@ WITH waiting AS (
         a.wait_event,
         now() - a.query_start AS blocked_query_age,
         pg_blocking_pids(a.pid) AS blocker_pids,
-        left(a.query, 160) AS blocked_query
+        a.query AS blocked_query
     FROM pg_stat_activity a
     WHERE a.wait_event_type = 'Lock'
       AND a.pid <> pg_backend_pid()
@@ -48,7 +48,7 @@ blocking AS (
         b.application_name AS blocking_app,
         b.state AS blocking_state,
         now() - b.query_start AS blocking_query_age,
-        left(b.query, 160) AS blocking_query,
+        b.query AS blocking_query,
         e.blocked_query
     FROM expanded e
     LEFT JOIN pg_stat_activity b

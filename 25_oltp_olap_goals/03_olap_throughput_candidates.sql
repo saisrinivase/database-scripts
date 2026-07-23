@@ -14,7 +14,7 @@ SELECT
     shared_blks_read,
     temp_blks_written,
     rows,
-    left(query, 260) AS query_snippet
+    query AS query_snippet
 FROM pg_stat_statements
 WHERE mean_exec_time >= 200
    OR shared_blks_read >= 100000
