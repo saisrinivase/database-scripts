@@ -1,10 +1,10 @@
 /*
 PostgreSQL DBA Script: CloudWatch Metric Equivalents
-Purpose: Map common RDS/CloudWatch metrics to PostgreSQL SQL-visible counters and identify host-only gaps.
+Purpose: Show live equivalents for common RDS/CloudWatch metrics and route the complete AWS PostgreSQL metric inventory to deeper diagnostics.
 Area: Observability 360
 Usage: Run when you need CloudWatch-like context from pgAdmin or psql.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
-Notes: Read-only. SQL cannot directly see CPU, free memory, OS disk queue, network throughput, or cloud storage free space.
+Notes: Read-only. For all 83 current PostgreSQL-applicable metric names, run 41_aws_rds_aurora_postgresql/01_cloudwatch_metric_deep_dive_router.sql.
 */
 
 CREATE TEMP TABLE IF NOT EXISTS obs360_cloudwatch_equivalent_report (
@@ -24,7 +24,7 @@ SELECT 'DatabaseConnections', count(*)::text, 'count', 'pg_stat_activity', 'SQL_
        'Current backend connections.', 'Compare with max_connections and pool limits.'
 FROM pg_stat_activity
 UNION ALL
-SELECT 'MaxUsedTransactionIDs', max(age(datfrozenxid))::text, 'xids', 'pg_database', 'SQL_VISIBLE',
+SELECT 'MaximumUsedTransactionIDs', max(age(datfrozenxid))::text, 'xids', 'pg_database', 'SQL_VISIBLE',
        'Oldest database-level transaction ID age.', 'Review freeze-age scripts if this approaches warning thresholds.'
 FROM pg_database
 UNION ALL

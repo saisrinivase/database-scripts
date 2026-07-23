@@ -1,0 +1,109 @@
+/*
+PostgreSQL DBA Script: AWS RDS Aurora PostgreSQL CloudWatch Metric Deep Dive Router
+Purpose: Map every current RDS PostgreSQL and Aurora PostgreSQL CloudWatch metric to an exact SQL or AWS-side investigation path.
+Area: AWS RDS and Aurora PostgreSQL
+Usage: Run in pgAdmin or psql, then filter metric_name in the result grid and execute deep_dive_script.
+Sample Output: See SAMPLE_OUTPUT_BEGIN at the bottom.
+Notes: Read-only static router. Baseline reviewed against official AWS documentation on 2026-07-23.
+*/
+SELECT *
+FROM (VALUES
+    ('ACUUtilization', 'Aurora', 'compute_serverless', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql', 'Average', 'Compare ACU utilization with active sessions, waits, temp spills, and transaction throughput.'),
+    ('AuroraEstimatedSharedMemoryBytes', 'Aurora', 'memory', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql', 'Average', 'Compare the AWS estimate with shared_buffers, connection concurrency, and query spill pressure.'),
+    ('AuroraGlobalDBDataTransferBytes', 'Aurora Global Database', 'global_replication_network', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Sum', 'Use AWS for cross-Region bytes; SQL identifies WAL generation and replication demand.'),
+    ('AuroraGlobalDBProgressLag', 'Aurora Global Database', 'global_replication', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Average', 'Use AWS for storage progress lag; SQL checks replay, receiver, and WAL pressure.'),
+    ('AuroraGlobalDBRPOLag', 'Aurora Global Database', 'global_replication', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Maximum', 'Use AWS for Global Database RPO; SQL checks local replay and transaction pressure.'),
+    ('AuroraGlobalDBReplicatedWriteIO', 'Aurora Global Database', 'global_replication_io', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Sum', 'Use AWS for replicated storage writes; SQL attributes WAL and write workload.'),
+    ('AuroraGlobalDBReplicationLag', 'Aurora Global Database', 'global_replication', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Average', 'Use AWS for cross-Region service lag; SQL checks WAL receiver and replay state.'),
+    ('AuroraOptimizedReadsCacheHitRatio', 'Aurora', 'optimized_reads_cache', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average', 'Aurora exposes the exact cache tier; SQL shows PostgreSQL cache and read pressure.'),
+    ('AuroraReplicaLag', 'Aurora', 'replication', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Maximum', 'Compare AWS replica lag with replay delay, replay LSN, receiver state, and long transactions.'),
+    ('AuroraReplicaLagMaximum', 'Aurora', 'replication', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Maximum', 'Review every reader and the slowest replay/apply path.'),
+    ('AuroraReplicaLagMinimum', 'Aurora', 'replication', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Minimum', 'Compare fastest reader with the maximum to identify reader imbalance.'),
+    ('BackupRetentionPeriodStorageUsed', 'Aurora', 'backup_capacity', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/08_capacity_backup_billing_correlates.sql', 'Average', 'AWS owns backup storage accounting; SQL shows database size, WAL, and archive activity.'),
+    ('BufferCacheHitRatio', 'Aurora', 'cache_io', 'SQL_DIRECT', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average', 'Compare AWS ratio with pg_stat_database and relation-level cache pressure.'),
+    ('BurstBalance', 'RDS', 'storage_credits', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Minimum', 'Use AWS for gp2 burst credits; SQL attributes reads, writes, temp spills, and WAL demand.'),
+    ('CPUCreditBalance', 'RDS and Aurora', 'compute_credits', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql', 'Minimum', 'Use AWS on burstable classes; SQL identifies active CPU-demand candidates.'),
+    ('CPUCreditUsage', 'RDS and Aurora', 'compute_credits', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql', 'Sum', 'Use AWS on burstable classes; SQL identifies workload and parallelism demand.'),
+    ('CPUSurplusCreditBalance', 'RDS and Aurora', 'compute_credits', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql', 'Maximum', 'Use AWS for unlimited-mode surplus debt; SQL identifies sustained compute demand.'),
+    ('CPUSurplusCreditsCharged', 'RDS and Aurora', 'compute_credits', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql', 'Sum', 'Use AWS for billed surplus credits; SQL identifies sustained workload contributors.'),
+    ('CPUUtilization', 'RDS and Aurora', 'compute', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql', 'Average/Maximum', 'CloudWatch is authoritative; SQL ranks runnable sessions and CPU-time query candidates.'),
+    ('CheckpointLag', 'RDS', 'checkpoint', 'SQL_DIRECT', '41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql', 'Maximum', 'Compare checkpoint control time, requested checkpoint ratio, WAL rate, and storage waits.'),
+    ('CommitLatency', 'Aurora', 'commit_wal', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/03_connections_commits_deadlocks.sql', 'Average', 'Correlate commit latency with WAL sync, synchronous replication, locks, and storage latency.'),
+    ('CommitThroughput', 'Aurora', 'transactions', 'SQL_RATE_NEEDS_SNAPSHOTS', '41_aws_rds_aurora_postgresql/03_connections_commits_deadlocks.sql', 'Average', 'Use transaction counter deltas over the CloudWatch period.'),
+    ('DatabaseConnections', 'RDS and Aurora', 'connections', 'SQL_DIRECT', '41_aws_rds_aurora_postgresql/03_connections_commits_deadlocks.sql', 'Average/Maximum', 'Compare pg_stat_activity with max_connections and connection ownership.'),
+    ('Deadlocks', 'Aurora', 'locking', 'SQL_RATE_NEEDS_SNAPSHOTS', '41_aws_rds_aurora_postgresql/03_connections_commits_deadlocks.sql', 'Sum', 'Use pg_stat_database deadlock deltas and PostgreSQL logs for the deadlock graph.'),
+    ('DiskQueueDepth', 'RDS and Aurora', 'storage_queue', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL identifies I/O waits and workload generating physical I/O.'),
+    ('DiskQueueDepthLogVolume', 'RDS dedicated log volume', 'wal_storage_queue', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL checks WAL sync/write, checkpoints, and WAL waits.'),
+    ('EBSByteBalance%', 'RDS', 'ebs_throughput_credits', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Minimum', 'Use AWS for EBS throughput credits; SQL attributes throughput demand.'),
+    ('EBSIOBalance%', 'RDS', 'ebs_iops_credits', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Minimum', 'Use AWS for EBS IOPS credits; SQL attributes operation demand.'),
+    ('EngineUptime', 'Aurora', 'availability', 'SQL_DIRECT', '41_aws_rds_aurora_postgresql/03_connections_commits_deadlocks.sql', 'Minimum', 'Compare now() with pg_postmaster_start_time() and investigate unexpected restarts.'),
+    ('FreeEphemeralStorage', 'Aurora', 'local_storage_capacity', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Minimum', 'Use AWS for free NVMe capacity; SQL finds temp spill and local-storage consumers.'),
+    ('FreeLocalStorage', 'RDS and Aurora', 'local_storage_capacity', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Minimum', 'Use AWS for free local storage; SQL finds temp and workload contributors.'),
+    ('FreeLocalStoragePercent', 'RDS', 'local_storage_capacity', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Minimum', 'Use AWS for free local percentage; SQL finds temp and workload contributors.'),
+    ('FreeStorageSpace', 'RDS', 'storage_capacity', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/08_capacity_backup_billing_correlates.sql', 'Minimum', 'Use AWS for filesystem free space; SQL ranks database and relation growth.'),
+    ('FreeStorageSpaceLogVolume', 'RDS dedicated log volume', 'wal_storage_capacity', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql', 'Minimum', 'Use AWS for log-volume free space; SQL checks WAL generation and slot retention.'),
+    ('FreeableMemory', 'RDS and Aurora', 'memory', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql', 'Minimum', 'AWS is authoritative; SQL checks connection, work_mem, temp spill, and backend pressure.'),
+    ('IamDbAuthConnectionRequests', 'RDS', 'authentication_connections', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/03_connections_commits_deadlocks.sql', 'Sum', 'Use AWS for IAM request count; SQL checks connection saturation and session churn evidence.'),
+    ('MaximumUsedTransactionIDs', 'RDS and Aurora', 'xid_vacuum', 'SQL_DIRECT', '41_aws_rds_aurora_postgresql/07_xid_vacuum_wraparound_pressure.sql', 'Maximum', 'Use database and table XID age, freeze percentage, blockers, and autovacuum state.'),
+    ('NetworkReceiveThroughput', 'RDS and Aurora', 'network', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/09_network_workload_correlates.sql', 'Average/Maximum', 'AWS is authoritative; SQL shows sessions, reads, writes, COPY, and result-volume proxies.'),
+    ('NetworkThroughput', 'Aurora', 'network', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/09_network_workload_correlates.sql', 'Average/Maximum', 'AWS is authoritative; SQL shows workload and connection contributors.'),
+    ('NetworkTransmitThroughput', 'RDS and Aurora', 'network', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/09_network_workload_correlates.sql', 'Average/Maximum', 'AWS is authoritative; SQL ranks high-row and high-call query candidates.'),
+    ('OldestLogicalReplicationSlotLag', 'RDS', 'logical_replication', 'SQL_DIRECT', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Maximum', 'Calculate WAL retained by logical slots and inspect consumer activity.'),
+    ('OldestReplicationSlotLag', 'RDS and Aurora', 'replication_slots', 'SQL_DIRECT', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Maximum', 'Calculate current WAL LSN minus restart_lsn for every slot.'),
+    ('RDSToAuroraPostgreSQLReplicaLag', 'Aurora', 'migration_replication', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Maximum', 'AWS is authoritative; SQL checks receiver, replay, and source WAL pressure.'),
+    ('ReadIOPS', 'RDS and Aurora', 'storage_io', 'SQL_RATE_NEEDS_SNAPSHOTS', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use pg_stat_io on 16+ or database block-read deltas on 15.'),
+    ('ReadIOPSEphemeralStorage', 'Aurora', 'local_storage_io', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL correlates temp-file and spill workload.'),
+    ('ReadIOPSLocalStorage', 'RDS', 'local_storage_io', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL correlates temp-file and spill workload.'),
+    ('ReadIOPSLogVolume', 'RDS dedicated log volume', 'wal_storage_io', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL correlates WAL and recovery read activity.'),
+    ('ReadLatency', 'RDS and Aurora', 'storage_latency', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use AWS latency and correlate with pg_stat_io timing and IO waits.'),
+    ('ReadLatencyEphemeralStorage', 'Aurora', 'local_storage_latency', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use AWS latency and correlate with temp spills and local IO waits.'),
+    ('ReadLatencyLocalStorage', 'RDS', 'local_storage_latency', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use AWS latency and correlate with temp spills and local IO waits.'),
+    ('ReadLatencyLogVolume', 'RDS dedicated log volume', 'wal_storage_latency', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql', 'Average/Maximum', 'Use AWS latency and correlate with WAL/recovery waits.'),
+    ('ReadThroughput', 'RDS and Aurora', 'storage_throughput', 'SQL_RATE_NEEDS_SNAPSHOTS', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Calculate block-byte deltas and compare with AWS physical throughput.'),
+    ('ReadThroughputEphemeralStorage', 'Aurora', 'local_storage_throughput', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL attributes temp and spill workload.'),
+    ('ReadThroughputLocalStorage', 'RDS', 'local_storage_throughput', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL attributes temp and spill workload.'),
+    ('ReadThroughputLogVolume', 'RDS dedicated log volume', 'wal_storage_throughput', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL attributes WAL and recovery workload.'),
+    ('ReplicaLag', 'RDS', 'replication', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Maximum', 'Compare AWS lag with replay timestamp, LSN lag, receiver state, and conflicts.'),
+    ('ReplicationSlotDiskUsage', 'RDS and Aurora', 'replication_slots', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql', 'Maximum', 'Calculate retained WAL by slot; AWS remains authoritative for physical slot-file usage.'),
+    ('ServerlessDatabaseCapacity', 'Aurora', 'compute_serverless', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql', 'Average/Maximum', 'Use AWS for ACUs; SQL explains scaling demand through activity, waits, and throughput.'),
+    ('SnapshotStorageUsed', 'Aurora', 'backup_capacity', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/08_capacity_backup_billing_correlates.sql', 'Average', 'AWS owns snapshot accounting; SQL provides current database-size context.'),
+    ('StorageNetworkReceiveThroughput', 'Aurora', 'storage_network', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use AWS for Aurora storage-network bytes; SQL identifies read workload.'),
+    ('StorageNetworkThroughput', 'Aurora', 'storage_network', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use AWS for Aurora storage-network bytes; SQL identifies read/write workload.'),
+    ('StorageNetworkTransmitThroughput', 'Aurora', 'storage_network', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use AWS for Aurora storage-network bytes; SQL identifies write workload.'),
+    ('SwapUsage', 'RDS and Aurora', 'memory_swap', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql', 'Maximum', 'AWS is authoritative; SQL checks connection memory, temp spills, and active workload.'),
+    ('TempStorageIOPS', 'Aurora Serverless', 'temp_storage_io', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use AWS for local IOPS; SQL identifies temp-block and temp-file generators.'),
+    ('TempStorageThroughput', 'Aurora Serverless', 'temp_storage_throughput', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use AWS for local throughput; SQL identifies temp-byte and spill generators.'),
+    ('TotalBackupStorageBilled', 'Aurora', 'backup_billing', 'AWS_ONLY', '41_aws_rds_aurora_postgresql/08_capacity_backup_billing_correlates.sql', 'Average', 'AWS owns billing; SQL provides database, WAL, archive, and retention-pressure context.'),
+    ('TransactionLogsDiskUsage', 'RDS and Aurora', 'wal_capacity', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql', 'Maximum', 'SQL calculates slot-retained WAL and WAL generation; AWS measures managed storage usage.'),
+    ('TransactionLogsGeneration', 'RDS', 'wal_generation', 'SQL_RATE_NEEDS_SNAPSHOTS', '41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql', 'Average/Maximum', 'Calculate pg_stat_wal.wal_bytes delta over the CloudWatch period.'),
+    ('VolumeBytesUsed', 'Aurora', 'cluster_capacity', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/08_capacity_backup_billing_correlates.sql', 'Average/Maximum', 'Compare AWS cluster volume with database and object sizes; values are not expected to match exactly.'),
+    ('VolumeReadIOPs', 'Aurora', 'cluster_io_billing', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Sum', 'AWS reports billed cluster-volume reads per five minutes; SQL attributes physical read demand.'),
+    ('VolumeWriteIOPs', 'Aurora', 'cluster_io_billing', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Sum', 'AWS reports cluster-volume writes per five minutes; SQL attributes dirty-buffer and WAL demand.'),
+    ('WriteIOPS', 'RDS and Aurora', 'storage_io', 'SQL_RATE_NEEDS_SNAPSHOTS', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use pg_stat_io on 16+ and correlate with checkpoints, WAL, and database writes.'),
+    ('WriteIOPSEphemeralStorage', 'Aurora', 'local_storage_io', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL correlates temp-file and spill workload.'),
+    ('WriteIOPSLocalStorage', 'RDS', 'local_storage_io', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL correlates temp-file and spill workload.'),
+    ('WriteIOPSLogVolume', 'RDS dedicated log volume', 'wal_storage_io', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL correlates WAL writes, syncs, and checkpoints.'),
+    ('WriteLatency', 'RDS and Aurora', 'storage_latency', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use AWS latency and correlate with pg_stat_io timing, WAL, checkpoint, and IO waits.'),
+    ('WriteLatencyEphemeralStorage', 'Aurora', 'local_storage_latency', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use AWS latency and correlate with temp spills and local IO waits.'),
+    ('WriteLatencyLocalStorage', 'RDS', 'local_storage_latency', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Use AWS latency and correlate with temp spills and local IO waits.'),
+    ('WriteLatencyLogVolume', 'RDS dedicated log volume', 'wal_storage_latency', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql', 'Average/Maximum', 'Use AWS latency and correlate with WAL sync and checkpoint waits.'),
+    ('WriteThroughput', 'RDS and Aurora', 'storage_throughput', 'SQL_RATE_NEEDS_SNAPSHOTS', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'Calculate write-byte deltas where available and correlate with WAL/checkpoint output.'),
+    ('WriteThroughputEphemeralStorage', 'Aurora', 'local_storage_throughput', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL attributes temp and spill workload.'),
+    ('WriteThroughputLocalStorage', 'RDS', 'local_storage_throughput', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL attributes temp and spill workload.'),
+    ('WriteThroughputLogVolume', 'RDS dedicated log volume', 'wal_storage_throughput', 'SQL_CORRELATION', '41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql', 'Average/Maximum', 'AWS is authoritative; SQL attributes WAL and checkpoint output.')
+) AS metric_routes(
+    metric_name,
+    service_scope,
+    signal_domain,
+    sql_visibility,
+    deep_dive_script,
+    recommended_cloudwatch_statistic,
+    investigation_goal
+)
+ORDER BY metric_name;
+
+-- SAMPLE_OUTPUT_BEGIN
+-- metric_name       | service_scope | signal_domain | sql_visibility | deep_dive_script
+-- CPUUtilization    | RDS and Aurora | compute       | SQL_CORRELATION | 41_aws.../02_compute_memory_serverless_pressure.sql
+-- DatabaseConnections | RDS and Aurora | connections | SQL_DIRECT | 41_aws.../03_connections_commits_deadlocks.sql
+-- SAMPLE_OUTPUT_END

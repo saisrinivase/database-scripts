@@ -13,8 +13,8 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 
 ## Scope
 
-- Coverage: `41` operational folders.
-- Current tracked SQL scripts: `252`.
+- Coverage: `42` operational folders.
+- Current tracked SQL scripts: `261`.
 - Script style: every SQL file includes `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes` headers.
 - Goal: any DBA/engineer can open an area and run purpose-specific scripts quickly.
 
@@ -48,7 +48,6 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `25_oltp_olap_goals`: workload goal alignment and classification.
 - `26_physical_cloud_diagnostics`: physical/cloud root-cause indicators.
 - `27_high_speed_tuning`: fast bottleneck triage, parameter advisor, missing-index detection.
-- `27_migration_validation`: Oracle-to-PostgreSQL migration health checks and issue simulation/fix flows.
 - `28_pgss_resource_attribution`: pg_stat_statements-based CPU/IO/memory-spill percentage attribution.
 - `29_object_inventory_health`: deep diagnostics for TABLE/VIEW/MVIEW/TABLESPACE/SEQUENCE/INDEX/TRIGGER/GRANT/FUNCTION/PROCEDURE/PARTITION/TYPE/FDW/INSERT-COPY, plus PACKAGE/SYNONYM mapping and KETTLE signals.
 - `30_backup_restore_pitr_dr`: backup/PITR checks, archive readiness, restore-to-timestamp quick test, DR evidence.
@@ -62,8 +61,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `38_observability_360`: CloudWatch-style command-line dashboards, metric equivalents, stat coverage checks, waits, WAL/checkpoint/archive, vacuum/analyze, replication, pg_stat_statements capture quality, and SME triage routing.
 - `39_observer_agent_monitoring`: observer-agent repository, scheduled snapshots, health scoring, incident detection, pressure classification, baseline deviation, SLA risk, and DBA action routing.
 - `40_pgadmin_safe_diagnostics`: pgAdmin Query Tool friendly PostgreSQL 15+ diagnostics for vacuum, checkpoints, pg_stat_io fallback, pg_stat_statements, CloudWatch-style metrics, HA, WAL/archive, observer health, root-cause queue, backup evidence, and SME routing.
-
-Note: both `27_high_speed_tuning` and `27_migration_validation` are intentionally retained for backward compatibility.
+- `41_aws_rds_aurora_postgresql`: metric-by-metric deep-dive routing for all 83 current CloudWatch metrics applicable to RDS PostgreSQL or Aurora PostgreSQL.
 
 ## Coverage Maps
 

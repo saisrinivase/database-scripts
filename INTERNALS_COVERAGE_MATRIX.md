@@ -40,6 +40,7 @@ Purpose: Map administration topics to PostgreSQL internals sources and ready-to-
 | Backend memory internals | `pg_backend_memory_contexts`, `pg_stat_activity` | `16_internals_deep_dive/12_backend_memory_contexts_snapshot.sql` |
 | Internals keyword routing | Repository keyword map | `16_internals_deep_dive/13_postgres_internals_keyword_coverage_matrix.sql`, `POSTGRES_DIAGNOSTIC_LEARNING_PATH.md` |
 | Cloud and managed-service portability | catalog capability detection, role membership, version gates, provider-only metric classification | `16_internals_deep_dive/17_cloud_portability_capability_matrix.sql`, `38_observability_360/02_cloudwatch_metric_equivalents.sql` |
+| AWS RDS/Aurora CloudWatch metrics | 83 unique PostgreSQL-applicable metrics across compute, memory, storage, WAL, replication, XID, backup, serverless, and network | `41_aws_rds_aurora_postgresql/01_cloudwatch_metric_deep_dive_router.sql`, `41_aws_rds_aurora_postgresql/*.sql` |
 | Query text capture and truncation | `track_activity_query_size`, `track_activities`, `compute_query_id`, role visibility, `pg_stat_statements` readiness | `16_internals_deep_dive/18_query_text_capture_limits.sql` |
 | Dependency graph internals | `pg_depend` | `16_internals_deep_dive/04_dependency_fanout_objects.sql` |
 | Object type inventory | `pg_class`, `pg_proc`, `pg_type`, `pg_tablespace`, `pg_trigger`, `information_schema.*` | `29_object_inventory_health/01_object_type_inventory.sql` |

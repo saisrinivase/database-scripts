@@ -121,6 +121,7 @@ Use these when the basic symptom route points to PostgreSQL internals.
 | WAL write path | generation, WAL buffers, write/sync, archive, slots, and live waits | `16_internals_deep_dive/15_wal_write_path_pressure_dashboard.sql` |
 | checkpoint/bgwriter | requested checkpoints, write/sync duration, buffer cleaning, and backend fallback | `16_internals_deep_dive/16_checkpoint_background_writer_pressure_15_plus.sql` |
 | cloud portability | available SQL diagnostics, privilege gaps, and provider-only metrics | `16_internals_deep_dive/17_cloud_portability_capability_matrix.sql` |
+| AWS CloudWatch alarm | exact RDS/Aurora PostgreSQL metric name to deep-dive SQL or AWS-only path | `41_aws_rds_aurora_postgresql/01_cloudwatch_metric_deep_dive_router.sql` |
 | SQL text truncation | server capture limit, hidden query text, query ID, and pg_stat_statements readiness | `16_internals_deep_dive/18_query_text_capture_limits.sql` |
 | pageinspect/amcheck/pg_visibility | deep inspection extension readiness | `16_internals_deep_dive/11_internal_extension_readiness.sql` |
 | full keyword coverage | searchable keyword-to-script map | `16_internals_deep_dive/13_postgres_internals_keyword_coverage_matrix.sql` |

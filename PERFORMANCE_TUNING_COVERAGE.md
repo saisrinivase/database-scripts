@@ -124,6 +124,6 @@ Purpose: Map performance topics to script areas so teams can quickly diagnose ro
 - `SQL/query shape`: long query, full scan, ORM chatty query, complex filter scripts.
 - `Schema/index design`: design matters, missing FK index, index and planner sections.
 - `Runtime behavior`: activity/locks, wait events, function hotspots.
-- `Storage and I/O`: database/table/index size, WAL/checkpoint, I/O latency scripts, CloudWatch-style metric equivalents.
+- `Storage and I/O`: database/table/index size, WAL/checkpoint, I/O latency scripts, CloudWatch equivalents, and metric-specific RDS/Aurora PostgreSQL deep dives.
 - `Infrastructure (physical/cloud)`: platform fingerprint, fsync/checkpoint pressure, replication slot WAL retention, provider-console-only gap checks.
 - `Workload goal alignment`: OLTP vs OLAP classification and mixed workload pressure.

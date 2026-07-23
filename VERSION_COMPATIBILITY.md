@@ -60,6 +60,7 @@ These scripts use plain SQL, temporary tables, temporary functions, catalog chec
 - `38_observability_360` scripts use only PostgreSQL SQL-visible metrics; host/cloud-only metrics still require CloudWatch, OS tools, or provider APIs.
 - `39_observer_agent_monitoring` stores SQL-visible observer snapshots in schema `dba_observer`; run the repository setup script first.
 - `40_pgadmin_safe_diagnostics` uses plain SQL and session-local `pg_temp` helper functions for optional feature/version handling. It is intended for pgAdmin Query Tool and command-line execution.
+- `41_aws_rds_aurora_postgresql` uses PostgreSQL 15+ stable views and server-side optional-column/view detection. AWS-only host and service values are explicitly separated from SQL correlations.
 
 ## Important Execution Note
 

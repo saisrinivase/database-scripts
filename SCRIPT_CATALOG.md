@@ -2,7 +2,7 @@
 
 Purpose: searchable catalog of every SQL script in the postgres branch, with title, purpose, and sample-output coverage.
 
-Total tracked SQL scripts: `252`.
+Total tracked SQL scripts: `261`.
 
 ## Area Counts
 
@@ -29,14 +29,13 @@ Total tracked SQL scripts: `252`.
 | `18_long_queries_full_scans` | 4 |
 | `19_dml_optimization` | 4 |
 | `20_design_matters` | 4 |
-| `21_configuration_parameters` | 4 |
+| `21_configuration_parameters` | 5 |
 | `22_application_orm_performance` | 4 |
 | `23_functions_dynamic_sql` | 4 |
 | `24_complex_filter_search` | 4 |
 | `25_oltp_olap_goals` | 4 |
 | `26_physical_cloud_diagnostics` | 4 |
 | `27_high_speed_tuning` | 6 |
-| `27_migration_validation` | 9 |
 | `28_pgss_resource_attribution` | 4 |
 | `29_object_inventory_health` | 18 |
 | `30_backup_restore_pitr_dr` | 5 |
@@ -50,6 +49,7 @@ Total tracked SQL scripts: `252`.
 | `38_observability_360` | 12 |
 | `39_observer_agent_monitoring` | 10 |
 | `40_pgadmin_safe_diagnostics` | 12 |
+| `41_aws_rds_aurora_postgresql` | 9 |
 
 ## Scripts
 
@@ -177,6 +177,7 @@ Total tracked SQL scripts: `252`.
 | `21_configuration_parameters` | `21_configuration_parameters/02_wal_checkpoint_settings.sql` | WAL Checkpoint Settings | Show WAL and checkpoint settings that affect write latency and recovery behavior. | yes |
 | `21_configuration_parameters` | `21_configuration_parameters/03_autovacuum_settings.sql` | Autovacuum Settings | Report autovacuum and freeze-related settings. | yes |
 | `21_configuration_parameters` | `21_configuration_parameters/04_connection_timeout_settings.sql` | Connection Timeout Settings | Show connection and timeout settings that influence application behavior and contention. | yes |
+| `21_configuration_parameters` | `21_configuration_parameters/05_parameter_deviation_necessity_report.sql` | Parameter Deviation Necessity Report | Combine configuration deviations with workload evidence and recommended actions. | yes |
 | `22_application_orm_performance` | `22_application_orm_performance/01_n_plus_one_query_candidates.sql` | N Plus One Query Candidates | Flag very frequently called, short statements (common N+1 query symptom). | yes |
 | `22_application_orm_performance` | `22_application_orm_performance/02_select_star_candidates.sql` | Select Star Candidates | Identify statements that use SELECT * and may fetch unnecessary columns. | yes |
 | `22_application_orm_performance` | `22_application_orm_performance/03_chatty_small_result_queries.sql` | Chatty Small Result Queries | Detect chatty query patterns with many calls and tiny average row returns. | yes |
@@ -203,15 +204,6 @@ Total tracked SQL scripts: `252`.
 | `27_high_speed_tuning` | `27_high_speed_tuning/04_missing_fk_index_candidates.sql` | Missing FK Index Candidates | Find foreign keys without supporting indexes on referencing columns. | yes |
 | `27_high_speed_tuning` | `27_high_speed_tuning/05_parameter_tuning_advisor.sql` | Parameter Tuning Advisor | Evaluate key performance parameters and output tuning recommendations with severity. | yes |
 | `27_high_speed_tuning` | `27_high_speed_tuning/06_query_tuning_action_queue.sql` | Query Tuning Action Queue | Build an actionable queue of expensive queries with root-cause hints and next actions. | yes |
-| `27_migration_validation` | `27_migration_validation/01_oracle_to_postgres_360_health_report.sql` | Oracle To Postgres 360 Health Report | Generate a single HTML health-check report for PostgreSQL after Oracle migration. | yes |
-| `27_migration_validation` | `27_migration_validation/02_seed_v1_test_issues.sql` | Seed V1 Test Issues | Seed deterministic Oracle->PostgreSQL migration issues for V1 report validation. | yes |
-| `27_migration_validation` | `27_migration_validation/03_fix_v1_test_issues.sql` | Fix V1 Test Issues | Resolve seeded V1 migration issues created by 02_seed_v1_test_issues.sql. | yes |
-| `27_migration_validation` | `27_migration_validation/04_v1_sanity_checks.sql` | V1 Sanity Checks | Sanity assertions for V1 migration validation workflow. | yes |
-| `27_migration_validation` | `27_migration_validation/05_seed_v2_test_issues.sql` | Seed V2 Test Issues | Seed practical, deterministic migration/performance issues using a dedicated lab schema. | yes |
-| `27_migration_validation` | `27_migration_validation/06_fix_v2_test_issues.sql` | Fix V2 Test Issues | Resolve V2 seeded migration/performance issues in migration_v2_lab. | yes |
-| `27_migration_validation` | `27_migration_validation/07_v2_sanity_checks.sql` | V2 Sanity Checks | PASS/FAIL assertions for V2 migration/performance issue scenarios. | yes |
-| `27_migration_validation` | `27_migration_validation/08_oracle_to_postgres_enterprise_report_v2.sql` | Oracle To Postgres Enterprise Report V2 | Generate an enterprise-style HTML report with deep object coverage and issue diagnostics. | yes |
-| `27_migration_validation` | `27_migration_validation/09_enterprise_takeover_gate_v3.sql` | Enterprise Takeover Gate V3 | Enterprise Day-1 takeover gate for Oracle -> PostgreSQL migration. | yes |
 | `28_pgss_resource_attribution` | `28_pgss_resource_attribution/01_pgss_query_resource_percent.sql` | Pg Stat Statements Query Resource Percent | Attribute query resource usage using pg_stat_statements with CPU/IO/memory-spill percentages. | yes |
 | `28_pgss_resource_attribution` | `28_pgss_resource_attribution/02_pgss_resource_percent_by_database.sql` | Pg Stat Statements Resource Percent By Database | Show resource percentage attribution by database from pg_stat_statements. | yes |
 | `28_pgss_resource_attribution` | `28_pgss_resource_attribution/03_pgss_resource_percent_by_user.sql` | Pg Stat Statements Resource Percent By User | Show resource percentage attribution by login role from pg_stat_statements. | yes |
@@ -282,7 +274,7 @@ Total tracked SQL scripts: `252`.
 | `37_object_lifecycle_capacity` | `37_object_lifecycle_capacity/11_index_usage_lab_create_use_drop_demo.sql` | Index Usage Lab Create Use Drop Demo | Demo index lifecycle by creating indexes, forcing index scans, and dropping an unused index. | yes |
 | `37_object_lifecycle_capacity` | `37_object_lifecycle_capacity/12_table_modification_tracking_demo.sql` | Table Modification Tracking Demo | Demonstrate INSERT/UPDATE/DELETE delta monitoring similar to Oracle DBA_TAB_MODIFICATIONS. | yes |
 | `38_observability_360` | `38_observability_360/01_instance_health_360_dashboard.sql` | Instance Health 360 Dashboard | Provide one command-line health dashboard across sessions, locks, cache, temp, WAL, checkpoints, and replication. | yes |
-| `38_observability_360` | `38_observability_360/02_cloudwatch_metric_equivalents.sql` | CloudWatch Metric Equivalents | Map common RDS/CloudWatch metrics to PostgreSQL SQL-visible counters and identify host-only gaps. | yes |
+| `38_observability_360` | `38_observability_360/02_cloudwatch_metric_equivalents.sql` | CloudWatch Metric Equivalents | Show live equivalents for common metrics and route the complete AWS PostgreSQL inventory to deeper diagnostics. | yes |
 | `38_observability_360` | `38_observability_360/03_stat_view_coverage_check.sql` | Stat View Coverage Check | Check whether important PostgreSQL observability views, extensions, and settings are available. | yes |
 | `38_observability_360` | `38_observability_360/04_wait_event_hotspots.sql` | Wait Event Hotspots | Summarize current wait events by type, event, state, backend type, application, and database. | yes |
 | `38_observability_360` | `38_observability_360/05_database_activity_metrics.sql` | Database Activity Metrics | Show per-database transaction, cache, row, temp, conflict, deadlock, and timing counters in one place. | yes |
@@ -315,6 +307,15 @@ Total tracked SQL scripts: `252`.
 | `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/10_pgadmin_safe_root_cause_action_queue.sql` | PgAdmin Safe Root Cause Action Queue | Produce prioritized P1/P2/P3 incident actions from live PostgreSQL signals. | yes |
 | `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/11_pgadmin_safe_backup_restore_evidence.sql` | PgAdmin Safe Backup Restore Evidence | Check backup, restore, PITR, DR, archiver, and slot evidence visible inside PostgreSQL. | yes |
 | `40_pgadmin_safe_diagnostics` | `40_pgadmin_safe_diagnostics/12_pgadmin_safe_sme_diagnosis_router.sql` | PgAdmin Safe SME Diagnosis Router | Route common DBA symptoms to the right pgAdmin-safe diagnostic script. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/01_cloudwatch_metric_deep_dive_router.sql` | AWS RDS Aurora PostgreSQL CloudWatch Metric Deep Dive Router | Route all current PostgreSQL-applicable CloudWatch metrics to SQL or AWS-side investigation paths. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql` | AWS Compute Memory Serverless Pressure | Deep-dive CPU, credits, ACU, free-memory, swap, and Aurora shared-memory alarms. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/03_connections_commits_deadlocks.sql` | AWS Connections Commits Deadlocks | Deep-dive connections, IAM requests, commits, deadlocks, and uptime alarms. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql` | AWS Storage IO Cache Temp Pressure | Deep-dive storage IOPS, latency, throughput, queue, credits, cache, and temp alarms. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql` | AWS WAL Checkpoint Log Volume Pressure | Deep-dive checkpoints, WAL generation/usage, and dedicated log-volume alarms. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql` | AWS Replication Slots Global Database Pressure | Deep-dive replicas, slots, migration lag, and Aurora Global Database alarms. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/07_xid_vacuum_wraparound_pressure.sql` | AWS XID Vacuum Wraparound Pressure | Deep-dive MaximumUsedTransactionIDs with freeze, vacuum, worker, and blocker evidence. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/08_capacity_backup_billing_correlates.sql` | AWS Capacity Backup Billing Correlates | Correlate storage and backup billing metrics with SQL-visible growth and WAL evidence. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/09_network_workload_correlates.sql` | AWS Network Workload Correlates | Correlate network alarms with sessions, tuple volume, COPY, replication, and SQL workload. | yes |
 
 ## Conventions
 
