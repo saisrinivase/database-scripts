@@ -16,23 +16,37 @@ SELECT
 FROM pg_database
 ORDER BY database_bytes DESC;
 
+WITH sizes AS (
+    SELECT
+        n.nspname AS schema_name,
+        c.relname AS object_name,
+        c.relkind,
+        pg_relation_size(c.oid, 'main') AS main_fork_bytes,
+        pg_indexes_size(c.oid) AS index_bytes,
+        CASE
+            WHEN c.reltoastrelid = 0 THEN 0
+            ELSE pg_total_relation_size(c.reltoastrelid)
+        END AS toast_bytes,
+        pg_total_relation_size(c.oid) AS total_bytes
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relkind IN ('r', 'm', 'p')
+      AND n.nspname NOT IN ('pg_catalog', 'information_schema')
+      AND n.nspname !~ '^pg_toast'
+)
 SELECT
-    n.nspname AS schema_name,
-    c.relname AS object_name,
-    c.relkind,
-    pg_relation_size(c.oid) AS main_bytes,
-    pg_indexes_size(c.oid) AS index_bytes,
-    CASE
-        WHEN c.reltoastrelid = 0 THEN 0
-        ELSE pg_total_relation_size(c.reltoastrelid)
-    END AS toast_bytes,
-    pg_total_relation_size(c.oid) AS total_bytes,
-    pg_size_pretty(pg_total_relation_size(c.oid)) AS total_size
-FROM pg_class c
-JOIN pg_namespace n ON n.oid = c.relnamespace
-WHERE c.relkind IN ('r', 'm', 'p')
-  AND n.nspname NOT IN ('pg_catalog', 'information_schema')
-  AND n.nspname !~ '^pg_toast'
+    schema_name,
+    object_name,
+    relkind,
+    main_fork_bytes,
+    greatest(total_bytes - main_fork_bytes - index_bytes - toast_bytes, 0) AS auxiliary_fork_bytes,
+    index_bytes,
+    round(100.0 * index_bytes / NULLIF(total_bytes, 0), 2) AS index_pct,
+    toast_bytes,
+    round(100.0 * toast_bytes / NULLIF(total_bytes, 0), 2) AS toast_pct,
+    total_bytes,
+    pg_size_pretty(total_bytes) AS total_size
+FROM sizes
 ORDER BY total_bytes DESC
 LIMIT 100;
 
@@ -92,5 +106,5 @@ FROM (VALUES
 
 -- SAMPLE_OUTPUT_BEGIN
 -- datname | database_bytes | database_size | xid_age
--- schema_name | object_name | main_bytes | index_bytes | toast_bytes | total_size
+-- schema_name | object_name | main_fork_bytes | auxiliary_fork_bytes | index_bytes | index_pct | toast_bytes | toast_pct | total_size
 -- SAMPLE_OUTPUT_END

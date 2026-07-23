@@ -59,10 +59,10 @@ Total tracked SQL scripts: `261`.
 | `00_environment` | `00_environment/02_extensions_installed.sql` | Extensions Installed | List installed extensions and their schema/version. | yes |
 | `00_environment` | `00_environment/03_database_catalog_overview.sql` | Database Catalog Overview | Show high-level object counts in the current database catalog. | yes |
 | `01_database_size` | `01_database_size/01_databases_size.sql` | Databases Size | Rank all databases by total size and expose heap, index, and TOAST usage for the connected database. | yes |
-| `01_database_size` | `01_database_size/02_current_database_size_breakdown.sql` | Current Database Size Breakdown | Break down current database storage into table, index, and TOAST components. | yes |
+| `01_database_size` | `01_database_size/02_current_database_size_breakdown.sql` | Current Database Size Breakdown | Reconcile the connected database into user-table main forks, auxiliary forks, indexes, TOAST, and other database storage. | yes |
 | `01_database_size` | `01_database_size/03_tablespaces_size.sql` | Tablespaces Size | Show tablespace usage to identify storage pressure by tablespace. | yes |
-| `02_table_storage` | `02_table_storage/01_table_size_breakdown.sql` | Table Size Breakdown | Show per-table storage split (heap, index, TOAST, total). | yes |
-| `02_table_storage` | `02_table_storage/02_top_largest_tables.sql` | Top Largest Tables | Quickly list the largest tables in the current database. | yes |
+| `02_table_storage` | `02_table_storage/01_table_size_breakdown.sql` | Table Size Breakdown | Reconcile every table into main, auxiliary, index, TOAST, and true total storage with percentages. | yes |
+| `02_table_storage` | `02_table_storage/02_top_largest_tables.sql` | Top Largest Tables | Rank the largest tables by true total footprint and show how much is index and TOAST storage. | yes |
 | `02_table_storage` | `02_table_storage/03_table_growth_baseline_snapshot.sql` | Table Growth Baseline Snapshot | Capture current table size and row estimate as a growth baseline snapshot. | yes |
 | `02_table_storage` | `02_table_storage/04_relation_storage_parameters.sql` | Relation Storage Parameters | Inspect per-table storage settings (fillfactor, autovacuum overrides, etc.). | yes |
 | `03_index_analysis` | `03_index_analysis/01_index_size_and_usage.sql` | Index Size And Usage | Correlate index size with usage counters to find expensive or cold indexes. | yes |

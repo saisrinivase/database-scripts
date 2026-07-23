@@ -89,6 +89,14 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - PostgreSQL can truncate `pg_stat_activity.query` at `track_activity_query_size` before any script reads it; use `16_internals_deep_dive/18_query_text_capture_limits.sql` to detect that condition.
 - pgAdmin may visually shorten a wide grid cell; open the cell value or use text output to inspect the complete value returned by PostgreSQL.
 
+## Storage Size Convention
+
+- `pg_database_size()` is the complete database footprint and already includes table, index, TOAST, catalog, and other database-local storage.
+- `pg_total_relation_size()` is used for a table's true footprint: main and auxiliary forks, table indexes, and TOAST.
+- Component reports show main fork, auxiliary forks, indexes, and TOAST separately and include a reconciliation result.
+- `pg_relation_size()` is used alone only for an intentionally isolated main fork or index.
+- PostgreSQL relation catalogs are database-local. Connect to each database when its heap/index/TOAST breakdown is required.
+
 ## Operational Notes
 
 - Candidate scripts (index drop, partitioning, extended statistics, etc.) are advisory; review plans and workload before changes.
