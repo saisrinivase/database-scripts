@@ -5,7 +5,9 @@ Purpose: Route every currently documented CloudWatch metric applicable to RDS Po
 ## Coverage
 
 - Official AWS/RDS applicability rows reviewed: `106`.
-- Unique PostgreSQL-applicable CloudWatch metric names: `83`.
+- Unique RDS/Aurora service metric names: `83`.
+- Database Insights load metric names: `4`.
+- Total exact metric routes: `87`.
 - RDS PostgreSQL metric names: `46`.
 - Aurora PostgreSQL metric names: `60` applicability rows, including service overlap and one repeated cluster/instance metric.
 - PostgreSQL target: `15+`.
@@ -18,6 +20,7 @@ The count is not permanently fixed. AWS adds and removes metrics by engine, inst
 1. `01_cloudwatch_metric_deep_dive_router.sql`
 2. Run the script named in `deep_dive_script` for the alarmed metric.
 3. Compare SQL evidence with the same CloudWatch alarm window and statistic.
+4. Run `13_database_telemetry_completeness_audit.sql` during monitoring design reviews.
 
 ## Deep-Dive Packs
 
@@ -29,6 +32,10 @@ The count is not permanently fixed. AWS adds and removes metrics by engine, inst
 - `07_xid_vacuum_wraparound_pressure.sql`
 - `08_capacity_backup_billing_correlates.sql`
 - `09_network_workload_correlates.sql`
+- `10_database_insights_dbload_deep_dive.sql`
+- `11_disk_queue_depth_deep_dive.sql`
+- `12_buffer_cache_read_write_iops_deep_dive.sql`
+- `13_database_telemetry_completeness_audit.sql`
 
 ## Interpretation Boundary
 
@@ -44,3 +51,4 @@ Do not compare a cumulative PostgreSQL counter directly with a one-minute CloudW
 - RDS CloudWatch metrics: `https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html`
 - Aurora CloudWatch metrics: `https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMonitoring.Metrics.html`
 - Performance Insights counters: `https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_PerfInsights_Counters.html`
+- Database Insights / Performance Insights CloudWatch load metrics: `https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PerfInsights.Cloudwatch.html`

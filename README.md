@@ -13,8 +13,8 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 
 ## Scope
 
-- Coverage: `42` operational folders.
-- Current tracked SQL scripts: `261`.
+- Coverage: `43` operational folders.
+- Current tracked SQL scripts: `272`.
 - Script style: every SQL file includes `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes` headers.
 - Goal: any DBA/engineer can open an area and run purpose-specific scripts quickly.
 
@@ -61,7 +61,8 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `38_observability_360`: CloudWatch-style command-line dashboards, metric equivalents, stat coverage checks, waits, WAL/checkpoint/archive, vacuum/analyze, replication, pg_stat_statements capture quality, and SME triage routing.
 - `39_observer_agent_monitoring`: observer-agent repository, scheduled snapshots, health scoring, incident detection, pressure classification, baseline deviation, SLA risk, and DBA action routing.
 - `40_pgadmin_safe_diagnostics`: pgAdmin Query Tool friendly PostgreSQL 15+ diagnostics for vacuum, checkpoints, pg_stat_io fallback, pg_stat_statements, CloudWatch-style metrics, HA, WAL/archive, observer health, root-cause queue, backup evidence, and SME routing.
-- `41_aws_rds_aurora_postgresql`: metric-by-metric deep-dive routing for all 83 current CloudWatch metrics applicable to RDS PostgreSQL or Aurora PostgreSQL.
+- `41_aws_rds_aurora_postgresql`: exact routing for 83 RDS/Aurora service metrics plus 4 Database Insights load metrics, with focused DBLoad, queue-depth, cache, IOPS, and telemetry-completeness diagnostics.
+- `42_problem_identification_internals`: symptom-first routing and deep diagnostics for lock internals, logical replication/CDC, partition pruning, extensions, PostgreSQL 18 asynchronous I/O, and RLS.
 
 ## Coverage Maps
 

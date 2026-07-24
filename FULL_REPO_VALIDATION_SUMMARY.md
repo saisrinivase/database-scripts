@@ -14,11 +14,11 @@ Purpose: Record repository-wide SQL validation for the PostgreSQL branch.
 
 | Scope | Scripts | Passed | Failed |
 | --- | ---: | ---: | ---: |
-| All repository SQL files | 261 | 261 | 0 |
+| All repository SQL files | 272 | 272 | 0 |
 
 ## What Was Included
 
-- Every tracked SQL script from `00_environment` through `40_pgadmin_safe_diagnostics`.
+- Every tracked SQL script from `00_environment` through `42_problem_identification_internals`.
 - Repository setup scripts.
 - Snapshot/capture scripts.
 - View creation scripts.
@@ -33,6 +33,8 @@ Purpose: Record repository-wide SQL validation for the PostgreSQL branch.
 - Query-text capture-limit and privilege diagnostics.
 - AWS RDS PostgreSQL and Aurora PostgreSQL CloudWatch metric router.
 - Compute/memory/serverless, storage/I/O, WAL/checkpoint, replication, XID/vacuum, backup/capacity, and network metric deep dives.
+- Database Insights DBLoad, disk queue-depth, buffer-cache, read/write IOPS, and telemetry-completeness deep dives.
+- Symptom-first lock, logical replication/CDC, partition-pruning, extension, asynchronous-I/O, and RLS diagnostics.
 - Repository-wide database, table, index, TOAST, and auxiliary-fork size-accounting audit.
 
 ## Hygiene Checks
@@ -54,6 +56,6 @@ Purpose: Record repository-wide SQL validation for the PostgreSQL branch.
 - Some scripts intentionally create repository, lab, trigger, snapshot, or demo objects as part of their documented purpose.
 - Runtime validation was performed on PostgreSQL 18.3. PostgreSQL 15-17 compatibility was cross-checked against official catalog/view documentation and implemented with version-safe server-side guards; separate 15, 16, and 17 servers were not installed in this workspace.
 - `track_activity_query_size` is `1024 B` on the validation server. The query-text audit detected a pgAdmin query at `1023/1024` bytes and correctly reported `POSSIBLY_TRUNCATED`.
-- The AWS router was compared programmatically with the official RDS and Aurora metric references: expected `83`, actual `83`, missing `0`, extra `0`, duplicates `0`.
+- The AWS router contains all `83` official RDS/Aurora PostgreSQL service metrics plus the `4` official Database Insights load metrics: `87` exact routes with no duplicates.
 - `pg_database_size()` totals include table, index, TOAST, catalog, and other database-local storage. Per-database component details still require connecting to that database because `pg_class` and `pg_namespace` are database-local.
 - The size-accounting audit classified every active use of `pg_database_size`, `pg_tablespace_size`, `pg_total_relation_size`, `pg_indexes_size`, and `pg_relation_size`. Index-size calls remain intentionally index-only; table rankings and growth snapshots use the TOAST-inclusive total.

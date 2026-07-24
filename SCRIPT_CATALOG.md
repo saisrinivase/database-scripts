@@ -2,7 +2,7 @@
 
 Purpose: searchable catalog of every SQL script in the postgres branch, with title, purpose, and sample-output coverage.
 
-Total tracked SQL scripts: `261`.
+Total tracked SQL scripts: `272`.
 
 ## Area Counts
 
@@ -49,7 +49,8 @@ Total tracked SQL scripts: `261`.
 | `38_observability_360` | 12 |
 | `39_observer_agent_monitoring` | 10 |
 | `40_pgadmin_safe_diagnostics` | 12 |
-| `41_aws_rds_aurora_postgresql` | 9 |
+| `41_aws_rds_aurora_postgresql` | 13 |
+| `42_problem_identification_internals` | 7 |
 
 ## Scripts
 
@@ -316,6 +317,17 @@ Total tracked SQL scripts: `261`.
 | `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/07_xid_vacuum_wraparound_pressure.sql` | AWS XID Vacuum Wraparound Pressure | Deep-dive MaximumUsedTransactionIDs with freeze, vacuum, worker, and blocker evidence. | yes |
 | `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/08_capacity_backup_billing_correlates.sql` | AWS Capacity Backup Billing Correlates | Correlate storage and backup billing metrics with SQL-visible growth and WAL evidence. | yes |
 | `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/09_network_workload_correlates.sql` | AWS Network Workload Correlates | Correlate network alarms with sessions, tuple volume, COPY, replication, and SQL workload. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/10_database_insights_dbload_deep_dive.sql` | AWS Database Insights DBLoad Deep Dive | Diagnose DBLoad, DBLoadCPU, DBLoadNonCPU, and DBLoadRelativeToNumVCPUs using live PostgreSQL evidence. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/11_disk_queue_depth_deep_dive.sql` | AWS Disk Queue Depth Deep Dive | Diagnose disk and log-volume queue spikes using live waits, I/O timing, WAL, temp, and workload evidence. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/12_buffer_cache_read_write_iops_deep_dive.sql` | AWS Buffer Cache Read Write IOPS Deep Dive | Diagnose cache-hit, read/write IOPS, throughput, and latency with attribution and a short rate sample. | yes |
+| `41_aws_rds_aurora_postgresql` | `41_aws_rds_aurora_postgresql/13_database_telemetry_completeness_audit.sql` | AWS Database Telemetry Completeness Audit | Audit CloudWatch, Database Insights, Enhanced Monitoring, PostgreSQL, logs, events, and application telemetry boundaries. | yes |
+| `42_problem_identification_internals` | `42_problem_identification_internals/01_symptom_to_subsystem_router.sql` | Symptom To Subsystem Router | Convert an observed production symptom into the first evidence query and PostgreSQL internals deep dive. | yes |
+| `42_problem_identification_internals` | `42_problem_identification_internals/02_lock_manager_full_diagnosis.sql` | Lock Manager Full Diagnosis | Detect blocked sessions and expose heavyweight, advisory, predicate, transaction, and fast-path lock pressure. | yes |
+| `42_problem_identification_internals` | `42_problem_identification_internals/03_logical_replication_cdc_health.sql` | Logical Replication CDC Health | Diagnose publication, subscription, logical-slot, synchronization, replica-identity, and CDC readiness. | yes |
+| `42_problem_identification_internals` | `42_problem_identification_internals/04_partition_pruning_maintenance_health.sql` | Partition Pruning Maintenance Health | Detect pruning configuration, leaf imbalance, default partitions, invalid indexes, and maintenance capability. | yes |
+| `42_problem_identification_internals` | `42_problem_identification_internals/05_extension_runtime_health.sql` | Extension Runtime Health | Detect installation and runtime signals for pg_cron, TimescaleDB, Citus, and pgvector. | yes |
+| `42_problem_identification_internals` | `42_problem_identification_internals/06_pg18_async_io_readiness.sql` | PostgreSQL 18 Asynchronous IO Readiness | Detect asynchronous-I/O configuration, pg_stat_io pressure, and PostgreSQL 18 readiness. | yes |
+| `42_problem_identification_internals` | `42_problem_identification_internals/07_row_level_security_policy_health.sql` | Row Level Security Policy Health | Detect RLS tables with missing policies, disabled enforcement, owner bypass, broad scope, and BYPASSRLS roles. | yes |
 
 ## Conventions
 

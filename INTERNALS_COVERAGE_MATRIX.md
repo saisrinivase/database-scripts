@@ -41,6 +41,14 @@ Purpose: Map administration topics to PostgreSQL internals sources and ready-to-
 | Internals keyword routing | Repository keyword map | `16_internals_deep_dive/13_postgres_internals_keyword_coverage_matrix.sql`, `POSTGRES_DIAGNOSTIC_LEARNING_PATH.md` |
 | Cloud and managed-service portability | catalog capability detection, role membership, version gates, provider-only metric classification | `16_internals_deep_dive/17_cloud_portability_capability_matrix.sql`, `38_observability_360/02_cloudwatch_metric_equivalents.sql` |
 | AWS RDS/Aurora CloudWatch metrics | 83 unique PostgreSQL-applicable metrics across compute, memory, storage, WAL, replication, XID, backup, serverless, and network | `41_aws_rds_aurora_postgresql/01_cloudwatch_metric_deep_dive_router.sql`, `41_aws_rds_aurora_postgresql/*.sql` |
+| Database Insights load | `DBLoad`, CPU/non-CPU AAS, waits, SQL, users, applications, hosts | `41_aws_rds_aurora_postgresql/10_database_insights_dbload_deep_dive.sql` |
+| Storage queue, cache, and IOPS spikes | CloudWatch queue/latency plus `pg_stat_io`, cache, WAL, temp, and interval rates | `41_aws_rds_aurora_postgresql/11_disk_queue_depth_deep_dive.sql`, `41_aws_rds_aurora_postgresql/12_buffer_cache_read_write_iops_deep_dive.sql` |
+| Lock manager internals | `pg_locks`, blockers, advisory keys, `SIReadLock`, fast-path locks, predicate settings | `42_problem_identification_internals/02_lock_manager_full_diagnosis.sql` |
+| Logical replication and CDC | `pg_publication*`, `pg_subscription*`, workers, logical slots, replica identity | `42_problem_identification_internals/03_logical_replication_cdc_health.sql` |
+| Partition pruning and maintenance | `pg_partition_tree`, bounds, default leaves, index validity, `enable_partition_pruning`, pg_partman | `42_problem_identification_internals/04_partition_pruning_maintenance_health.sql` |
+| Extension runtime internals | pg_cron, TimescaleDB, Citus, pgvector catalogs and capability guards | `42_problem_identification_internals/05_extension_runtime_health.sql` |
+| PostgreSQL 18 asynchronous I/O | `io_method`, I/O concurrency/combine settings, version-normalized `pg_stat_io` | `42_problem_identification_internals/06_pg18_async_io_readiness.sql` |
+| Row-level security | `relrowsecurity`, `relforcerowsecurity`, `pg_policies`, role bypass behavior | `42_problem_identification_internals/07_row_level_security_policy_health.sql` |
 | Query text capture and truncation | `track_activity_query_size`, `track_activities`, `compute_query_id`, role visibility, `pg_stat_statements` readiness | `16_internals_deep_dive/18_query_text_capture_limits.sql` |
 | Dependency graph internals | `pg_depend` | `16_internals_deep_dive/04_dependency_fanout_objects.sql` |
 | Object type inventory | `pg_class`, `pg_proc`, `pg_type`, `pg_tablespace`, `pg_trigger`, `information_schema.*` | `29_object_inventory_health/01_object_type_inventory.sql` |

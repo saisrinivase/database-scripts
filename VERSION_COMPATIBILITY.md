@@ -61,6 +61,7 @@ These scripts use plain SQL, temporary tables, temporary functions, catalog chec
 - `39_observer_agent_monitoring` stores SQL-visible observer snapshots in schema `dba_observer`; run the repository setup script first.
 - `40_pgadmin_safe_diagnostics` uses plain SQL and session-local `pg_temp` helper functions for optional feature/version handling. It is intended for pgAdmin Query Tool and command-line execution.
 - `41_aws_rds_aurora_postgresql` uses PostgreSQL 15+ stable views and server-side optional-column/view detection. AWS-only host and service values are explicitly separated from SQL correlations.
+- `42_problem_identification_internals` uses PostgreSQL 15+ catalogs with capability guards for optional extensions, subscriptions, partitions, pg_stat_io, and PostgreSQL 18 asynchronous-I/O settings.
 
 ## Important Execution Note
 

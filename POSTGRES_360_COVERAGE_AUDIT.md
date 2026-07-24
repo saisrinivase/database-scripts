@@ -48,7 +48,7 @@ PostgreSQL catalog SQL cannot portably expose every host/cloud metric. These sti
 The repository now handles this explicitly instead of pretending SQL can see everything:
 
 - Use `38_observability_360/02_cloudwatch_metric_equivalents.sql` to map SQL-visible metrics to CloudWatch-style names.
-- Use `41_aws_rds_aurora_postgresql/01_cloudwatch_metric_deep_dive_router.sql` for all 83 current PostgreSQL-applicable CloudWatch metric names and their focused deep-dive scripts.
+- Use `41_aws_rds_aurora_postgresql/01_cloudwatch_metric_deep_dive_router.sql` for all 83 current PostgreSQL-applicable RDS/Aurora service metrics plus 4 Database Insights load metrics and their focused deep-dive scripts.
 - Use `36_cloud_provider_signals/05_cloud_incident_window_checklist.sql` when provider console evidence is required.
 
 ## Gap Status After This Pass

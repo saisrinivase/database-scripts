@@ -30,6 +30,7 @@ Goal: Quickly answer whether the issue is locks, waits, SQL, IO, WAL, vacuum, re
 | Need CloudWatch-style SQL-visible metrics | `38_observability_360/02_cloudwatch_metric_equivalents.sql` | `38_observability_360/03_stat_view_coverage_check.sql` |
 | Need immediate action queue | `39_observer_agent_monitoring/04_active_incident_detector.sql` | `39_observer_agent_monitoring/06_top_root_cause_action_queue.sql` |
 | pgAdmin copy/paste workflow | `40_pgadmin_safe_diagnostics/01_pgadmin_compatibility_audit.sql` | Pick the matching `40_pgadmin_safe_diagnostics/*` script |
+| Symptom is known but subsystem is unclear | `42_problem_identification_internals/01_symptom_to_subsystem_router.sql` | Run the focused script returned by the router |
 
 ## Level 3: Core Troubleshooting Routes
 
@@ -41,6 +42,7 @@ Goal: Quickly answer whether the issue is locks, waits, SQL, IO, WAL, vacuum, re
 | Who is blocking whom? | `06_activity_locks/02_blocking_and_blocked_sessions.sql`, `27_high_speed_tuning/02_waits_and_blocking_details.sql` |
 | Are long transactions hurting vacuum or concurrency? | `06_activity_locks/03_long_running_transactions.sql`, `14_connection_workload/02_idle_in_transaction_risk.sql` |
 | What internal subsystem does the wait point to? | `16_internals_deep_dive/10_wait_event_internals_live_map.sql` |
+| Are advisory, predicate, transaction, or fast-path locks involved? | `42_problem_identification_internals/02_lock_manager_full_diagnosis.sql` |
 
 ### Query Performance
 
@@ -101,6 +103,7 @@ Goal: Quickly answer whether the issue is locks, waits, SQL, IO, WAL, vacuum, re
 | Is archive/PITR configured and healthy? | `30_backup_restore_pitr_dr/01_backup_pitr_configuration_health.sql`, `30_backup_restore_pitr_dr/02_wal_archiving_gap_and_lag.sql` |
 | Do we have restore evidence? | `30_backup_restore_pitr_dr/03_restore_to_timestamp_quick_test.sql`, `30_backup_restore_pitr_dr/05_backup_restore_evidence_contract.sql` |
 | What are RPO/RTO signals? | `30_backup_restore_pitr_dr/04_dr_rto_rpo_replication_evidence.sql`, `36_cloud_provider_signals/03_replica_lag_failover_signals.sql` |
+| Is logical replication or CDC stopped, lagging, or retaining WAL? | `42_problem_identification_internals/03_logical_replication_cdc_health.sql` |
 
 ## Level 4: Pro Internals Keyword Map
 
@@ -122,6 +125,9 @@ Use these when the basic symptom route points to PostgreSQL internals.
 | checkpoint/bgwriter | requested checkpoints, write/sync duration, buffer cleaning, and backend fallback | `16_internals_deep_dive/16_checkpoint_background_writer_pressure_15_plus.sql` |
 | cloud portability | available SQL diagnostics, privilege gaps, and provider-only metrics | `16_internals_deep_dive/17_cloud_portability_capability_matrix.sql` |
 | AWS CloudWatch alarm | exact RDS/Aurora PostgreSQL metric name to deep-dive SQL or AWS-only path | `41_aws_rds_aurora_postgresql/01_cloudwatch_metric_deep_dive_router.sql` |
+| DBLoad/DBLoadNonCPU | Database Insights AAS split by CPU, waits, SQL, user, application, and host | `41_aws_rds_aurora_postgresql/10_database_insights_dbload_deep_dive.sql` |
+| DiskQueueDepth | AWS queue metric correlated with PostgreSQL I/O waits, latency, WAL, temp, and workload | `41_aws_rds_aurora_postgresql/11_disk_queue_depth_deep_dive.sql` |
+| BufferCacheHitRatio/ReadIOPS/WriteIOPS | cache attribution and a short PostgreSQL I/O rate sample | `41_aws_rds_aurora_postgresql/12_buffer_cache_read_write_iops_deep_dive.sql` |
 | SQL text truncation | server capture limit, hidden query text, query ID, and pg_stat_statements readiness | `16_internals_deep_dive/18_query_text_capture_limits.sql` |
 | pageinspect/amcheck/pg_visibility | deep inspection extension readiness | `16_internals_deep_dive/11_internal_extension_readiness.sql` |
 | full keyword coverage | searchable keyword-to-script map | `16_internals_deep_dive/13_postgres_internals_keyword_coverage_matrix.sql` |
