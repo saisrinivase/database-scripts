@@ -33,6 +33,7 @@ script	result	duration_ms	error
 07_vacuum_bloat/03_freeze_age_risk.sql	PASS	19	-
 07_vacuum_bloat/04_dead_tuples_hotspots.sql	PASS	25	-
 07_vacuum_bloat/05_vacuum_progress.sql	FAIL	14	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/07_vacuum_bloat/05_vacuum_progress.sql:23: ERROR: cannot execute CREATE TABLE in a read-only transaction
+07_vacuum_bloat/06_pgstattuple_safe_bloat_candidates.sql	PASS	1	-
 08_replication_ha/01_primary_replication_status.sql	PASS	15	-
 08_replication_ha/02_standby_replay_status.sql	PASS	12	-
 08_replication_ha/03_replication_slots_health.sql	PASS	14	-
@@ -179,6 +180,7 @@ script	result	duration_ms	error
 31_logging_error_signatures/02_error_signature_indicators.sql	PASS	16	-
 31_logging_error_signatures/03_slow_query_log_vs_pgss_correlation.sql	FAIL	14	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/31_logging_error_signatures/03_slow_query_log_vs_pgss_correlation.sql:9: ERROR: cannot execute DROP TABLE in a read-only transaction
 31_logging_error_signatures/04_lock_wait_deadlock_signatures.sql	PASS	16	-
+31_logging_error_signatures/05_pgaudit_readiness_and_configuration.sql	PASS	1	-
 32_upgrade_patch_readiness/01_version_upgrade_path_overview.sql	PASS	13	-
 32_upgrade_patch_readiness/02_extension_version_drift_dependencies.sql	PASS	19	-
 32_upgrade_patch_readiness/03_preupgrade_invalid_objects_gate.sql	PASS	17	-

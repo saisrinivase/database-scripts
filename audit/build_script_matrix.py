@@ -159,6 +159,8 @@ def classify(
         prerequisites.append("PostgreSQL 17+ or guarded fallback")
     if contains(sql, r"\bpgstattuple|pgstatindex\b"):
         prerequisites.append("pgstattuple extension")
+    if contains(sql, r"\bpgaudit\b"):
+        prerequisites.append("pgAudit package/preload for audit events")
     if contains(sql, r"\bbt_index_|verify_heapam\b"):
         prerequisites.append("amcheck extension")
     if contains(sql, r"\bpg_visibility\b"):

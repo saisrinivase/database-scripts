@@ -1,6 +1,6 @@
 # PostgreSQL Scripts Production-Readiness Audit
 
-Audit date: 2026-08-18
+Audit date: 2026-08-19
 
 Repository branch: `postgres`
 
@@ -9,7 +9,7 @@ Local validation engine: PostgreSQL 18.3
 
 ## Outcome
 
-All 272 SQL scripts were inventoried and assigned execution placement, scale
+All 274 SQL scripts were inventoried and assigned execution placement, scale
 confidence, prerequisites, risk flags, and three runtime results in
 `script-safety-matrix.tsv`.
 
@@ -22,9 +22,9 @@ filesystem size traversal, data scans, interval sampling, or destructive labs.
 
 | Gate | Result | What it proves |
 | --- | ---: | --- |
-| Disposable database with 20 s statement, 1 s lock, and 256 MB temp limits | 271 pass, 1 deliberately skipped | Syntax/runtime and prerequisite workflow on PostgreSQL 18.3 |
-| Read-only transaction after prerequisites | 211 pass, 61 fail as writer-only | Physical-reader compatibility and mutation detection |
-| Read-only `pg_monitor` role | 207 pass, 65 fail | Least-privilege compatibility and explicit elevated requirements |
+| Disposable database with 20 s statement, 1 s lock, and 256 MB temp limits | 273 pass, 1 deliberately skipped | Syntax/runtime and prerequisite workflow on PostgreSQL 18.3 |
+| Read-only transaction after prerequisites | 213 pass, 61 fail as writer-only | Physical-reader compatibility and mutation detection |
+| Read-only `pg_monitor` role | 209 pass, 65 fail | Least-privilege compatibility and explicit elevated requirements |
 
 The skipped script is
 `05_partitioning/07_partition_lab_generate_5gb_timeseries.sql`. It drops and
@@ -36,12 +36,12 @@ prohibited on production writer and reader instances.
 | Placement | Scripts | Meaning |
 | --- | ---: | --- |
 | `WRITER_ONLY` | 61 | Persistent/session DDL or writes; read-only execution rejected |
-| `WRITER_REQUIRED` | 20 | Writer-local DML, vacuum, XID, WAL, or maintenance state is authoritative |
+| `WRITER_REQUIRED` | 21 | Writer-local DML, vacuum, XID, WAL, or maintenance state is authoritative |
 | `WRITER_PREFERRED` | 16 | Primary-side WAL/archive/cluster evidence |
 | `READER_PREFERRED` | 1 | Standby receive/replay evidence |
 | `RUN_ON_BOTH` | 7 | Compare primary and standby evidence |
 | `TARGET_INSTANCE` | 79 | Runtime statistics are instance-local; run where the workload occurred |
-| `EITHER_METADATA` | 88 | Metadata may be offloaded to a current reader |
+| `EITHER_METADATA` | 89 | Metadata may be offloaded to a current reader |
 
 Important: `pg_stat_activity`, `pg_stat_statements`, table/index access counters,
 wait events, and I/O counters are instance-local. Running those scripts on a
@@ -51,8 +51,8 @@ reader does not diagnose writer workload.
 
 | Confidence | 10 TB | 50 TB |
 | --- | ---: | ---: |
-| High | 240 | 77 |
-| Medium-high | 27 | 163 |
+| High | 242 | 78 |
+| Medium-high | 27 | 164 |
 | Medium | 0 | 27 |
 | Low | 2 | 2 |
 | Not production eligible | 3 | 3 |
@@ -103,6 +103,22 @@ at 10 TB or 50 TB. They also require explicit access to `pg_largeobject`, which
 3. `01_database_size/01_databases_size.sql` repeatedly invoked
    `pg_database_size()` for each database. It now evaluates the filesystem size
    once per database and documents low-load-window/timeout guidance.
+
+## Extension diagnostics added
+
+- `07_vacuum_bloat/06_pgstattuple_safe_bloat_candidates.sql` ranks candidates
+  from writer-local statistics and generates opt-in `pgstattuple_approx()`
+  commands. It never invokes `pgstattuple()` or scans table data automatically.
+- `31_logging_error_signatures/05_pgaudit_readiness_and_configuration.sql`
+  reports package, preload, database-extension, and GUC readiness without
+  failing when pgAudit is absent. Audit events must be retrieved from the
+  PostgreSQL external log destination; pgAudit does not store an event table.
+
+Both scripts passed normal, read-only, and `pg_monitor` execution. In addition,
+`pgstattuple_approx()` was exercised directly against the 312 MB
+`pgbenchc_test.public.pgbench_accounts` table. pgAudit was not installed because
+the package is unavailable in the local PostgreSQL 18.3 installation and adding
+it would require a server package, preload configuration, and restart.
 
 ## Known privilege requirements
 
