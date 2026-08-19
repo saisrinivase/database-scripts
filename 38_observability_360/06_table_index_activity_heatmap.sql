@@ -4,7 +4,7 @@ Purpose: Rank tables by read/write pressure, dead tuples, sequential scans, inde
 Area: Observability 360
 Usage: Use after the instance dashboard points to table/index, vacuum, or scan pressure.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
-Notes: Read-only. Statistics are cumulative since stats reset.
+Notes: Read-only. Statistics are cumulative since stats reset. Uses relation OIDs so pg_monitor does not need USAGE on every user schema.
 */
 WITH index_reads AS (
     SELECT
@@ -15,12 +15,17 @@ WITH index_reads AS (
         sum(idx_tup_fetch) AS index_tuples_fetched
     FROM pg_stat_user_indexes
     GROUP BY schemaname, relname
+), table_activity AS (
+    SELECT
+        t.*,
+        pg_total_relation_size(t.relid) AS total_bytes
+    FROM pg_stat_user_tables t
 )
 SELECT
     t.schemaname,
     t.relname AS table_name,
-    pg_total_relation_size(format('%I.%I', t.schemaname, t.relname)::regclass) AS total_bytes,
-    pg_size_pretty(pg_total_relation_size(format('%I.%I', t.schemaname, t.relname)::regclass)) AS total_size,
+    t.total_bytes,
+    pg_size_pretty(t.total_bytes) AS total_size,
     t.n_live_tup,
     t.n_dead_tup,
     round(100.0 * t.n_dead_tup / NULLIF(t.n_live_tup + t.n_dead_tup, 0), 2) AS dead_tuple_pct,
@@ -35,10 +40,10 @@ SELECT
     round(100.0 * t.n_tup_hot_upd / NULLIF(t.n_tup_upd, 0), 2) AS hot_update_pct,
     greatest(t.last_vacuum, t.last_autovacuum) AS last_vacuum_any,
     greatest(t.last_analyze, t.last_autoanalyze) AS last_analyze_any
-FROM pg_stat_user_tables t
+FROM table_activity t
 LEFT JOIN index_reads i ON i.schemaname = t.schemaname AND i.relname = t.relname
 ORDER BY
-    pg_total_relation_size(format('%I.%I', t.schemaname, t.relname)::regclass) DESC,
+    t.total_bytes DESC,
     t.n_dead_tup DESC
 LIMIT 100;
 

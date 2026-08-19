@@ -2,9 +2,9 @@
 PostgreSQL DBA Script: Databases Size
 Purpose: Rank all databases by total size and expose heap, index, and TOAST usage for the connected database.
 Area: Database Size
-Usage: Connect to each database when its component breakdown is needed; PostgreSQL relation catalogs are database-local.
+Usage: Connect to each database when its component breakdown is needed; PostgreSQL relation catalogs are database-local. On very large or file-dense clusters, run during a low-load window with a statement timeout.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
-Notes: pg_database_size() already includes table, index, TOAST, and catalog storage. Component columns are exact only for the connected database and remain NULL for other databases.
+Notes: pg_database_size() already includes table, index, TOAST, and catalog storage. It is evaluated once per database here, but still traverses database storage. Component columns are exact only for the connected database and remain NULL for other databases.
 */
 WITH relation_sizes AS (
     SELECT
@@ -29,11 +29,16 @@ connected_database AS (
         coalesce(sum(toast_bytes), 0)::bigint AS toast_bytes,
         coalesce(sum(relation_total_bytes), 0)::bigint AS user_relations_total_bytes
     FROM relation_sizes
+), database_sizes AS (
+    SELECT
+        d.datname,
+        pg_database_size(d.datname) AS size_bytes
+    FROM pg_database d
 )
 SELECT
     d.datname AS database_name,
-    pg_database_size(d.datname) AS size_bytes,
-    pg_size_pretty(pg_database_size(d.datname)) AS size_pretty,
+    d.size_bytes,
+    pg_size_pretty(d.size_bytes) AS size_pretty,
     d.datname = current_database() AS is_connected_database,
     CASE WHEN d.datname = current_database() THEN c.table_heap_bytes END AS table_heap_bytes,
     CASE WHEN d.datname = current_database() THEN pg_size_pretty(c.table_heap_bytes) END AS table_heap_pretty,
@@ -43,7 +48,7 @@ SELECT
     CASE WHEN d.datname = current_database() THEN pg_size_pretty(c.toast_bytes) END AS toast_pretty,
     CASE
         WHEN d.datname = current_database()
-        THEN round(100.0 * c.toast_bytes / NULLIF(pg_database_size(d.datname), 0), 2)
+        THEN round(100.0 * c.toast_bytes / NULLIF(d.size_bytes, 0), 2)
     END AS toast_pct_of_database,
     CASE
         WHEN d.datname = current_database()
@@ -55,17 +60,17 @@ SELECT
     END AS user_relations_total_pretty,
     CASE
         WHEN d.datname = current_database()
-        THEN greatest(pg_database_size(d.datname) - c.user_relations_total_bytes, 0)
+        THEN greatest(d.size_bytes - c.user_relations_total_bytes, 0)
     END AS catalogs_and_other_bytes,
     CASE
         WHEN d.datname = current_database()
-        THEN pg_size_pretty(greatest(pg_database_size(d.datname) - c.user_relations_total_bytes, 0))
+        THEN pg_size_pretty(greatest(d.size_bytes - c.user_relations_total_bytes, 0))
     END AS catalogs_and_other_pretty,
     CASE
         WHEN d.datname = current_database() THEN 'BREAKDOWN_AVAILABLE'
         ELSE 'CONNECT_TO_DATABASE_FOR_BREAKDOWN'
     END AS breakdown_status
-FROM pg_database d
+FROM database_sizes d
 CROSS JOIN connected_database c
 ORDER BY size_bytes DESC;
 

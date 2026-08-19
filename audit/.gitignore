@@ -1,0 +1,5 @@
+results-*/logs/
+results-readonly/
+results-readonly-pgss/
+results-disposable/
+results-pg-monitor/

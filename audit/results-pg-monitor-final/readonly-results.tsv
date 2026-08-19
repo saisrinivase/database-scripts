@@ -1,0 +1,273 @@
+script	result	duration_ms	error
+00_environment/01_server_instance_overview.sql	PASS	18	-
+00_environment/02_extensions_installed.sql	PASS	16	-
+00_environment/03_database_catalog_overview.sql	PASS	22	-
+01_database_size/01_databases_size.sql	PASS	46	-
+01_database_size/02_current_database_size_breakdown.sql	PASS	16	-
+01_database_size/03_tablespaces_size.sql	PASS	31	-
+02_table_storage/01_table_size_breakdown.sql	PASS	15	-
+02_table_storage/02_top_largest_tables.sql	PASS	15	-
+02_table_storage/03_table_growth_baseline_snapshot.sql	PASS	20	-
+02_table_storage/04_relation_storage_parameters.sql	PASS	15	-
+03_index_analysis/01_index_size_and_usage.sql	PASS	37	-
+03_index_analysis/02_unused_indexes_candidates.sql	PASS	18	-
+03_index_analysis/03_duplicate_indexes.sql	PASS	32	-
+03_index_analysis/04_index_maintenance_candidates.sql	PASS	20	-
+04_toast_lob_blob/01_tables_with_toast.sql	PASS	19	-
+04_toast_lob_blob/02_toast_heavy_tables.sql	PASS	23	-
+04_toast_lob_blob/03_large_objects_summary.sql	FAIL	15	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/04_toast_lob_blob/03_large_objects_summary.sql:13: ERROR: permission denied for table pg_largeobject
+04_toast_lob_blob/04_top_large_objects.sql	FAIL	14	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/04_toast_lob_blob/04_top_large_objects.sql:17: ERROR: permission denied for table pg_largeobject
+05_partitioning/01_partitioned_tables_overview.sql	PASS	20	-
+05_partitioning/02_partition_size_distribution.sql	PASS	17	-
+05_partitioning/03_partitions_without_indexes.sql	PASS	16	-
+05_partitioning/04_partitioning_recommendation_candidates.sql	PASS	26	-
+05_partitioning/05_partition_sme_decision_scorecard.sql	PASS	45	-
+05_partitioning/06_partition_target_table_deep_advisor.sql	FAIL	15	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/05_partitioning/06_partition_target_table_deep_advisor.sql:253: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+05_partitioning/07_partition_lab_generate_5gb_timeseries.sql	FAIL	14	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/05_partitioning/07_partition_lab_generate_5gb_timeseries.sql:9: ERROR: cannot execute DROP TABLE in a read-only transaction
+06_activity_locks/01_active_sessions.sql	PASS	15	-
+06_activity_locks/02_blocking_and_blocked_sessions.sql	PASS	15	-
+06_activity_locks/03_long_running_transactions.sql	PASS	15	-
+06_activity_locks/04_wait_events_summary.sql	PASS	26	-
+07_vacuum_bloat/01_table_bloat_estimate.sql	PASS	19	-
+07_vacuum_bloat/02_autovacuum_table_status.sql	PASS	18	-
+07_vacuum_bloat/03_freeze_age_risk.sql	PASS	19	-
+07_vacuum_bloat/04_dead_tuples_hotspots.sql	PASS	25	-
+07_vacuum_bloat/05_vacuum_progress.sql	FAIL	14	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/07_vacuum_bloat/05_vacuum_progress.sql:23: ERROR: cannot execute CREATE TABLE in a read-only transaction
+08_replication_ha/01_primary_replication_status.sql	PASS	15	-
+08_replication_ha/02_standby_replay_status.sql	PASS	12	-
+08_replication_ha/03_replication_slots_health.sql	PASS	14	-
+08_replication_ha/04_wal_generation_rate.sql	PASS	21	-
+09_security_roles/01_roles_and_membership.sql	PASS	18	-
+09_security_roles/02_high_privilege_roles.sql	PASS	15	-
+09_security_roles/03_table_grants_by_role.sql	PASS	23	-
+09_security_roles/04_default_privileges.sql	PASS	18	-
+10_maintenance_monitoring/01_bgwriter_checkpoint_stats.sql	FAIL	14	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/10_maintenance_monitoring/01_bgwriter_checkpoint_stats.sql:23: ERROR: cannot execute CREATE TABLE in a read-only transaction
+10_maintenance_monitoring/02_cache_hit_ratio.sql	PASS	24	-
+10_maintenance_monitoring/03_top_statements_pg_stat_statements.sql	PASS	85	-
+10_maintenance_monitoring/04_non_default_config.sql	PASS	14	-
+10_maintenance_monitoring/05_connection_capacity.sql	PASS	13	-
+11_performance_tuning/01_top_queries_by_total_exec_time.sql	PASS	61	-
+11_performance_tuning/02_top_queries_by_mean_exec_time.sql	PASS	15	-
+11_performance_tuning/03_temp_file_heavy_queries.sql	PASS	15	-
+11_performance_tuning/04_io_bound_query_candidates.sql	PASS	54	-
+11_performance_tuning/05_performance_related_settings.sql	PASS	13	-
+11_performance_tuning/06_function_hotspots.sql	PASS	12	-
+11_performance_tuning/07_top_10_cpu_intensive_queries_pgadmin.sql	PASS	57	-
+11_performance_tuning/08_top_10_temp_disk_spill_queries_pgadmin.sql	PASS	15	-
+11_performance_tuning/09_top_10_memory_pressure_queries_pgadmin.sql	PASS	16	-
+11_performance_tuning/10_active_top_10_runtime_pressure_pgadmin.sql	PASS	12	-
+12_planner_statistics/01_tables_needing_analyze.sql	PASS	12	-
+12_planner_statistics/02_seq_scan_hotspots.sql	PASS	14	-
+12_planner_statistics/03_column_stats_profile.sql	PASS	18	-
+12_planner_statistics/04_extended_stats_candidates.sql	PASS	14	-
+12_planner_statistics/05_autovacuum_analyze_settings_by_table.sql	PASS	11	-
+12_planner_statistics/06_planner_cost_settings.sql	PASS	11	-
+13_io_wal_checkpoints/01_database_io_profile.sql	PASS	11	-
+13_io_wal_checkpoints/02_table_io_hotspots.sql	PASS	14	-
+13_io_wal_checkpoints/03_index_io_hotspots.sql	PASS	11	-
+13_io_wal_checkpoints/04_wal_archiver_health.sql	PASS	10	-
+13_io_wal_checkpoints/05_checkpoint_pressure_indicators.sql	FAIL	10	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/13_io_wal_checkpoints/05_checkpoint_pressure_indicators.sql:23: ERROR: cannot execute CREATE TABLE in a read-only transaction
+13_io_wal_checkpoints/06_temp_file_usage_by_database.sql	PASS	15	-
+13_io_wal_checkpoints/07_pg_stat_io_overview_pg16_plus.sql	FAIL	12	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/13_io_wal_checkpoints/07_pg_stat_io_overview_pg16_plus.sql:24: ERROR: cannot execute CREATE TABLE in a read-only transaction
+14_connection_workload/01_connections_by_user_app_db.sql	PASS	14	-
+14_connection_workload/02_idle_in_transaction_risk.sql	PASS	13	-
+14_connection_workload/03_connection_state_distribution.sql	PASS	14	-
+14_connection_workload/04_role_connection_limit_risk.sql	PASS	15	-
+14_connection_workload/05_backend_type_distribution.sql	PASS	18	-
+14_connection_workload/06_prepared_transactions_status.sql	PASS	27	-
+15_capacity_forecasting/01_create_capacity_repository.sql	FAIL	15	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/15_capacity_forecasting/01_create_capacity_repository.sql:9: ERROR: cannot execute CREATE SCHEMA in a read-only transaction
+15_capacity_forecasting/02_capture_database_size_snapshot.sql	FAIL	17	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/15_capacity_forecasting/02_capture_database_size_snapshot.sql:15: ERROR: cannot execute INSERT in a read-only transaction
+15_capacity_forecasting/03_capture_table_size_snapshot.sql	FAIL	18	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/15_capacity_forecasting/03_capture_table_size_snapshot.sql:24: ERROR: cannot execute INSERT in a read-only transaction
+15_capacity_forecasting/04_capture_index_size_snapshot.sql	FAIL	17	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/15_capacity_forecasting/04_capture_index_size_snapshot.sql:24: ERROR: cannot execute INSERT in a read-only transaction
+15_capacity_forecasting/05_capture_connection_snapshot.sql	FAIL	16	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/15_capacity_forecasting/05_capture_connection_snapshot.sql:25: ERROR: cannot execute INSERT in a read-only transaction
+15_capacity_forecasting/06_capture_wal_snapshot.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/15_capacity_forecasting/06_capture_wal_snapshot.sql:22: ERROR: cannot execute INSERT in a read-only transaction
+15_capacity_forecasting/07_database_growth_report.sql	PASS	23	-
+15_capacity_forecasting/08_table_growth_report.sql	PASS	19	-
+16_internals_deep_dive/01_database_xid_multixact_age.sql	PASS	15	-
+16_internals_deep_dive/02_relation_filenode_mapping.sql	PASS	18	-
+16_internals_deep_dive/03_system_catalog_size_profile.sql	PASS	43	-
+16_internals_deep_dive/04_dependency_fanout_objects.sql	PASS	13	-
+16_internals_deep_dive/05_fsm_vm_toast_size_breakdown.sql	PASS	13	-
+16_internals_deep_dive/06_visibility_and_freeze_profile.sql	PASS	13	-
+16_internals_deep_dive/07_toast_compression_storage_policy.sql	PASS	40	-
+16_internals_deep_dive/08_relation_forks_persistence_map.sql	PASS	17	-
+16_internals_deep_dive/09_slru_control_checkpoint_internals.sql	PASS	12	-
+16_internals_deep_dive/10_wait_event_internals_live_map.sql	PASS	13	-
+16_internals_deep_dive/11_internal_extension_readiness.sql	PASS	18	-
+16_internals_deep_dive/12_backend_memory_contexts_snapshot.sql	PASS	17	-
+16_internals_deep_dive/13_postgres_internals_keyword_coverage_matrix.sql	PASS	13	-
+16_internals_deep_dive/14_vacuum_internal_pressure_dashboard.sql	PASS	30	-
+16_internals_deep_dive/15_wal_write_path_pressure_dashboard.sql	PASS	18	-
+16_internals_deep_dive/16_checkpoint_background_writer_pressure_15_plus.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/16_internals_deep_dive/16_checkpoint_background_writer_pressure_15_plus.sql:211: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+16_internals_deep_dive/17_cloud_portability_capability_matrix.sql	PASS	19	-
+16_internals_deep_dive/18_query_text_capture_limits.sql	PASS	33	-
+17_execution_plans/01_plan_capture_prerequisites.sql	PASS	17	-
+17_execution_plans/02_explain_analyze_template.sql	PASS	16	-
+17_execution_plans/03_generate_explain_for_top_queries.sql	PASS	35	-
+17_execution_plans/04_plan_red_flag_candidates.sql	PASS	34	-
+18_long_queries_full_scans/01_active_long_queries.sql	PASS	16	-
+18_long_queries_full_scans/02_long_queries_from_statements.sql	PASS	54	-
+18_long_queries_full_scans/03_short_vs_long_query_distribution.sql	PASS	15	-
+18_long_queries_full_scans/04_full_scan_hotspot_tables.sql	PASS	14	-
+19_dml_optimization/01_write_heavy_tables.sql	PASS	14	-
+19_dml_optimization/02_hot_update_efficiency.sql	PASS	18	-
+19_dml_optimization/03_missing_fk_supporting_indexes.sql	PASS	18	-
+19_dml_optimization/04_dml_bloat_pressure.sql	PASS	17	-
+20_design_matters/01_tables_without_primary_keys.sql	PASS	16	-
+20_design_matters/02_wide_tables_profile.sql	PASS	19	-
+20_design_matters/03_overindexed_tables.sql	PASS	19	-
+20_design_matters/04_high_nullability_columns.sql	PASS	18	-
+21_configuration_parameters/01_core_performance_settings.sql	PASS	25	-
+21_configuration_parameters/02_wal_checkpoint_settings.sql	PASS	18	-
+21_configuration_parameters/03_autovacuum_settings.sql	PASS	16	-
+21_configuration_parameters/04_connection_timeout_settings.sql	PASS	19	-
+21_configuration_parameters/05_parameter_deviation_necessity_report.sql	PASS	30	-
+22_application_orm_performance/01_n_plus_one_query_candidates.sql	PASS	31	-
+22_application_orm_performance/02_select_star_candidates.sql	PASS	27	-
+22_application_orm_performance/03_chatty_small_result_queries.sql	PASS	20	-
+22_application_orm_performance/04_app_idle_in_transaction_risk.sql	PASS	32	-
+23_functions_dynamic_sql/01_function_execution_hotspots.sql	PASS	18	-
+23_functions_dynamic_sql/02_dynamic_sql_function_inventory.sql	PASS	20	-
+23_functions_dynamic_sql/03_volatile_and_security_definer_functions.sql	PASS	20	-
+23_functions_dynamic_sql/04_trigger_function_inventory.sql	PASS	17	-
+24_complex_filter_search/01_like_ilike_query_candidates.sql	PASS	53	-
+24_complex_filter_search/02_jsonb_array_column_inventory.sql	PASS	16	-
+24_complex_filter_search/03_gin_gist_brin_index_inventory.sql	PASS	17	-
+24_complex_filter_search/04_full_text_search_inventory.sql	PASS	16	-
+25_oltp_olap_goals/01_workload_signature_oltp_vs_olap.sql	PASS	44	-
+25_oltp_olap_goals/02_oltp_latency_goal_candidates.sql	PASS	18	-
+25_oltp_olap_goals/03_olap_throughput_candidates.sql	PASS	20	-
+25_oltp_olap_goals/04_mixed_workload_pressure.sql	PASS	14	-
+26_physical_cloud_diagnostics/01_instance_platform_fingerprint.sql	PASS	16	-
+26_physical_cloud_diagnostics/02_io_latency_profile.sql	PASS	15	-
+26_physical_cloud_diagnostics/03_checkpoint_fsync_pressure.sql	FAIL	12	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/26_physical_cloud_diagnostics/03_checkpoint_fsync_pressure.sql:22: ERROR: cannot execute CREATE TABLE in a read-only transaction
+26_physical_cloud_diagnostics/04_replication_slot_wal_retention_risk.sql	PASS	15	-
+27_high_speed_tuning/01_bottleneck_overview_dashboard.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/27_high_speed_tuning/01_bottleneck_overview_dashboard.sql:40: ERROR: cannot execute CREATE TABLE in a read-only transaction
+27_high_speed_tuning/02_waits_and_blocking_details.sql	PASS	18	-
+27_high_speed_tuning/03_missing_index_candidates_from_scan_pressure.sql	PASS	21	-
+27_high_speed_tuning/04_missing_fk_index_candidates.sql	PASS	22	-
+27_high_speed_tuning/05_parameter_tuning_advisor.sql	PASS	30	-
+27_high_speed_tuning/06_query_tuning_action_queue.sql	PASS	103	-
+28_pgss_resource_attribution/01_pgss_query_resource_percent.sql	PASS	50	-
+28_pgss_resource_attribution/02_pgss_resource_percent_by_database.sql	PASS	15	-
+28_pgss_resource_attribution/03_pgss_resource_percent_by_user.sql	PASS	15	-
+28_pgss_resource_attribution/04_pgss_query_infra_tier_classification.sql	PASS	54	-
+29_object_inventory_health/01_object_type_inventory.sql	PASS	19	-
+29_object_inventory_health/02_table_pk_fk_health.sql	PASS	19	-
+29_object_inventory_health/03_tables_missing_primary_key.sql	PASS	16	-
+29_object_inventory_health/04_missing_fk_supporting_indexes.sql	PASS	21	-
+29_object_inventory_health/05_missing_join_column_indexes.sql	PASS	19	-
+29_object_inventory_health/06_identifier_casing_risks.sql	PASS	18	-
+29_object_inventory_health/07_sequence_ownership_health.sql	PASS	14	-
+29_object_inventory_health/08_trigger_inventory.sql	PASS	15	-
+29_object_inventory_health/09_grant_exposure_audit.sql	PASS	37	-
+29_object_inventory_health/10_function_procedure_inventory.sql	PASS	15	-
+29_object_inventory_health/11_partition_health.sql	PASS	18	-
+29_object_inventory_health/12_user_defined_type_inventory.sql	PASS	23	-
+29_object_inventory_health/13_insert_copy_activity.sql	PASS	20	-
+29_object_inventory_health/14_fdw_inventory.sql	PASS	16	-
+29_object_inventory_health/15_oracle_package_synonym_mapping.sql	PASS	18	-
+29_object_inventory_health/16_kettle_etl_activity_signals.sql	PASS	17	-
+29_object_inventory_health/17_object_bloat_hotspots.sql	PASS	19	-
+29_object_inventory_health/18_object_query_hotspots_pgss.sql	FAIL	14	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/29_object_inventory_health/18_object_query_hotspots_pgss.sql:20: ERROR: cannot execute CREATE TABLE in a read-only transaction
+30_backup_restore_pitr_dr/01_backup_pitr_configuration_health.sql	PASS	32	-
+30_backup_restore_pitr_dr/02_wal_archiving_gap_and_lag.sql	PASS	17	-
+30_backup_restore_pitr_dr/03_restore_to_timestamp_quick_test.sql	PASS	13	-
+30_backup_restore_pitr_dr/04_dr_rto_rpo_replication_evidence.sql	PASS	16	-
+30_backup_restore_pitr_dr/05_backup_restore_evidence_contract.sql	FAIL	12	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/30_backup_restore_pitr_dr/05_backup_restore_evidence_contract.sql:9: ERROR: cannot execute DROP TABLE in a read-only transaction
+31_logging_error_signatures/01_logging_configuration_sanity.sql	PASS	18	-
+31_logging_error_signatures/02_error_signature_indicators.sql	PASS	16	-
+31_logging_error_signatures/03_slow_query_log_vs_pgss_correlation.sql	FAIL	14	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/31_logging_error_signatures/03_slow_query_log_vs_pgss_correlation.sql:9: ERROR: cannot execute DROP TABLE in a read-only transaction
+31_logging_error_signatures/04_lock_wait_deadlock_signatures.sql	PASS	16	-
+32_upgrade_patch_readiness/01_version_upgrade_path_overview.sql	PASS	13	-
+32_upgrade_patch_readiness/02_extension_version_drift_dependencies.sql	PASS	19	-
+32_upgrade_patch_readiness/03_preupgrade_invalid_objects_gate.sql	PASS	17	-
+32_upgrade_patch_readiness/04_collation_version_mismatch_risk.sql	PASS	55	-
+32_upgrade_patch_readiness/05_postupgrade_query_regression_watchlist_pgss.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/32_upgrade_patch_readiness/05_postupgrade_query_regression_watchlist_pgss.sql:9: ERROR: cannot execute DROP TABLE in a read-only transaction
+32_upgrade_patch_readiness/06_config_file_unknown_or_deprecated_gucs.sql	FAIL	15	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/32_upgrade_patch_readiness/06_config_file_unknown_or_deprecated_gucs.sql:30: ERROR: permission denied for view pg_file_settings
+33_bgwriter_memory_pressure/01_bgwriter_checkpointer_pressure.sql	FAIL	15	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/33_bgwriter_memory_pressure/01_bgwriter_checkpointer_pressure.sql:24: ERROR: cannot execute CREATE TABLE in a read-only transaction
+33_bgwriter_memory_pressure/02_wal_writer_archiver_pressure.sql	FAIL	15	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/33_bgwriter_memory_pressure/02_wal_writer_archiver_pressure.sql:9: ERROR: cannot execute DROP TABLE in a read-only transaction
+33_bgwriter_memory_pressure/03_autovacuum_worker_pressure.sql	PASS	20	-
+33_bgwriter_memory_pressure/04_parallel_worker_pressure.sql	PASS	17	-
+33_bgwriter_memory_pressure/05_temp_spill_work_mem_pressure.sql	FAIL	23	 step_01_database_temp_pressure | database_scripts_sme_audit | 4MB | 64MB | 128MB | 15 | 32 MB | 4582.96 | | LOW_SPILL_PRESSURE (1 row) psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/33_bgwriter_memory_pressure/05_temp_spill_work_mem_pressure.sql:53: ERROR: cannot execute CREATE TABLE in a read-only transaction
+34_consistency_integrity_checks/01_invalid_indexes_and_constraints.sql	PASS	20	-
+34_consistency_integrity_checks/02_checksum_status_and_failures.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/34_consistency_integrity_checks/02_checksum_status_and_failures.sql:9: ERROR: cannot execute DROP TABLE in a read-only transaction
+34_consistency_integrity_checks/03_toast_catalog_consistency_signals.sql	PASS	19	-
+34_consistency_integrity_checks/04_amcheck_readiness_and_candidate_commands.sql	PASS	20	-
+34_consistency_integrity_checks/05_xid_visibility_integrity_risk.sql	PASS	19	-
+35_pooler_proxy_diagnostics/01_connection_saturation_queue_risk.sql	PASS	17	-
+35_pooler_proxy_diagnostics/02_connection_distribution_by_app_user.sql	PASS	16	-
+35_pooler_proxy_diagnostics/03_prepared_statement_pooling_risk.sql	PASS	14	-
+35_pooler_proxy_diagnostics/04_tx_pooling_incompatible_patterns_pgss.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/35_pooler_proxy_diagnostics/04_tx_pooling_incompatible_patterns_pgss.sql:17: ERROR: cannot execute CREATE TABLE in a read-only transaction
+35_pooler_proxy_diagnostics/05_pooler_proxy_inventory_signals.sql	PASS	33	-
+36_cloud_provider_signals/01_managed_service_fingerprint.sql	PASS	20	-
+36_cloud_provider_signals/02_parameter_pending_restart_drift.sql	PASS	19	-
+36_cloud_provider_signals/03_replica_lag_failover_signals.sql	PASS	19	-
+36_cloud_provider_signals/04_storage_iops_temp_wal_pressure.sql	FAIL	16	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/36_cloud_provider_signals/04_storage_iops_temp_wal_pressure.sql:9: ERROR: cannot execute DROP TABLE in a read-only transaction
+36_cloud_provider_signals/05_cloud_incident_window_checklist.sql	PASS	14	-
+37_object_lifecycle_capacity/01_create_lifecycle_repository.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/37_object_lifecycle_capacity/01_create_lifecycle_repository.sql:9: ERROR: cannot execute CREATE SCHEMA in a read-only transaction
+37_object_lifecycle_capacity/02_create_ddl_event_triggers.sql	FAIL	12	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/37_object_lifecycle_capacity/02_create_ddl_event_triggers.sql:10: ERROR: cannot execute CREATE SCHEMA in a read-only transaction
+37_object_lifecycle_capacity/03_create_snapshot_procedures.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/37_object_lifecycle_capacity/03_create_snapshot_procedures.sql:9: ERROR: cannot execute CREATE SCHEMA in a read-only transaction
+37_object_lifecycle_capacity/04_capture_snapshot_now.sql	FAIL	18	 p_notes ) RETURNING run_id" PL/pgSQL function dba_metrics.sp_capture_operational_snapshot(text,text) line 13 at SQL statement
+37_object_lifecycle_capacity/05_create_index_lifecycle_views.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/37_object_lifecycle_capacity/05_create_index_lifecycle_views.sql:12: ERROR: cannot execute CREATE SCHEMA in a read-only transaction
+37_object_lifecycle_capacity/06_create_table_modification_views.sql	FAIL	12	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/37_object_lifecycle_capacity/06_create_table_modification_views.sql:9: ERROR: cannot execute CREATE SCHEMA in a read-only transaction
+37_object_lifecycle_capacity/07_create_growth_views.sql	FAIL	12	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/37_object_lifecycle_capacity/07_create_growth_views.sql:9: ERROR: cannot execute CREATE SCHEMA in a read-only transaction
+37_object_lifecycle_capacity/08_create_action_advisory_views.sql	FAIL	21	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/37_object_lifecycle_capacity/08_create_action_advisory_views.sql:9: ERROR: cannot execute CREATE SCHEMA in a read-only transaction
+37_object_lifecycle_capacity/09_scheduler_runbook.sql	PASS	16	-
+37_object_lifecycle_capacity/10_monthly_capacity_report.sql	FAIL	15	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/37_object_lifecycle_capacity/10_monthly_capacity_report.sql:17: ERROR: cannot execute CREATE TABLE in a read-only transaction
+37_object_lifecycle_capacity/11_index_usage_lab_create_use_drop_demo.sql	FAIL	15	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/37_object_lifecycle_capacity/11_index_usage_lab_create_use_drop_demo.sql:9: ERROR: cannot execute CREATE SCHEMA in a read-only transaction
+37_object_lifecycle_capacity/12_table_modification_tracking_demo.sql	FAIL	14	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/37_object_lifecycle_capacity/12_table_modification_tracking_demo.sql:9: ERROR: cannot execute CREATE SCHEMA in a read-only transaction
+38_observability_360/01_instance_health_360_dashboard.sql	FAIL	12	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/38_observability_360/01_instance_health_360_dashboard.sql:19: ERROR: cannot execute CREATE TABLE in a read-only transaction
+38_observability_360/02_cloudwatch_metric_equivalents.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/38_observability_360/02_cloudwatch_metric_equivalents.sql:18: ERROR: cannot execute CREATE TABLE in a read-only transaction
+38_observability_360/03_stat_view_coverage_check.sql	PASS	17	-
+38_observability_360/04_wait_event_hotspots.sql	PASS	29	-
+38_observability_360/05_database_activity_metrics.sql	PASS	16	-
+38_observability_360/06_table_index_activity_heatmap.sql	PASS	27	-
+38_observability_360/07_wal_checkpoint_archiver_dashboard.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/38_observability_360/07_wal_checkpoint_archiver_dashboard.sql:18: ERROR: cannot execute CREATE TABLE in a read-only transaction
+38_observability_360/08_autovacuum_vacuum_analyze_progress.sql	PASS	22	-
+38_observability_360/09_replication_and_slot_dashboard.sql	PASS	15	-
+38_observability_360/10_query_capture_quality_pgss.sql	FAIL	12	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/38_observability_360/10_query_capture_quality_pgss.sql:15: ERROR: cannot execute CREATE TABLE in a read-only transaction
+38_observability_360/11_growth_and_capacity_snapshot_now.sql	PASS	41	-
+38_observability_360/12_sme_triage_command_router.sql	PASS	11	-
+39_observer_agent_monitoring/01_create_observer_repository.sql	FAIL	12	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/39_observer_agent_monitoring/01_create_observer_repository.sql:9: ERROR: cannot execute CREATE SCHEMA in a read-only transaction
+39_observer_agent_monitoring/02_capture_observer_snapshot.sql	FAIL	24	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/39_observer_agent_monitoring/02_capture_observer_snapshot.sql:276: ERROR: cannot execute SELECT in a read-only transaction
+39_observer_agent_monitoring/03_health_score_dashboard.sql	FAIL	24	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/39_observer_agent_monitoring/03_health_score_dashboard.sql:9: ERROR: cannot execute DROP TABLE in a read-only transaction
+39_observer_agent_monitoring/04_active_incident_detector.sql	PASS	27	-
+39_observer_agent_monitoring/05_wait_lock_io_wal_classifier.sql	PASS	23	-
+39_observer_agent_monitoring/06_top_root_cause_action_queue.sql	FAIL	22	----------+------------+----------------+---------------+----------+--------+------------- (0 rows) psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/39_observer_agent_monitoring/06_top_root_cause_action_queue.sql:105: ERROR: cannot execute DROP TABLE in a read-only transaction
+39_observer_agent_monitoring/07_baseline_deviation_report.sql	FAIL	12	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/39_observer_agent_monitoring/07_baseline_deviation_report.sql:9: ERROR: cannot execute DROP TABLE in a read-only transaction
+39_observer_agent_monitoring/08_sla_risk_dashboard.sql	PASS	21	-
+39_observer_agent_monitoring/09_generate_agent_summary.sql	FAIL	22	 4 | Next best route: run 39_observer_agent_monitoring/04_active_incident_detector.sql, then 06_top_root_cause_action_queue.sql. (4 rows) psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/39_observer_agent_monitoring/09_generate_agent_summary.sql:54: ERROR: cannot execute DROP TABLE in a read-only transaction
+39_observer_agent_monitoring/10_observer_scheduler_runbook.sql	PASS	14	-
+40_pgadmin_safe_diagnostics/01_pgadmin_compatibility_audit.sql	PASS	14	-
+40_pgadmin_safe_diagnostics/02_pgadmin_safe_vacuum_progress.sql	PASS	18	-
+40_pgadmin_safe_diagnostics/03_pgadmin_safe_checkpoint_bgwriter.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/40_pgadmin_safe_diagnostics/03_pgadmin_safe_checkpoint_bgwriter.sql:46: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+40_pgadmin_safe_diagnostics/04_pgadmin_safe_pg_stat_io_overview.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/40_pgadmin_safe_diagnostics/04_pgadmin_safe_pg_stat_io_overview.sql:89: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+40_pgadmin_safe_diagnostics/05_pgadmin_safe_pg_stat_statements_quality.sql	FAIL	13	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/40_pgadmin_safe_diagnostics/05_pgadmin_safe_pg_stat_statements_quality.sql:102: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+40_pgadmin_safe_diagnostics/06_pgadmin_safe_cloudwatch_metric_equivalents.sql	FAIL	12	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/40_pgadmin_safe_diagnostics/06_pgadmin_safe_cloudwatch_metric_equivalents.sql:98: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+40_pgadmin_safe_diagnostics/07_pgadmin_safe_replication_ha_dashboard.sql	PASS	16	-
+40_pgadmin_safe_diagnostics/08_pgadmin_safe_wal_checkpoint_archiver.sql	FAIL	34	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/40_pgadmin_safe_diagnostics/08_pgadmin_safe_wal_checkpoint_archiver.sql:88: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+40_pgadmin_safe_diagnostics/09_pgadmin_safe_observer_health_dashboard.sql	PASS	25	-
+40_pgadmin_safe_diagnostics/10_pgadmin_safe_root_cause_action_queue.sql	FAIL	15	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/40_pgadmin_safe_diagnostics/10_pgadmin_safe_root_cause_action_queue.sql:119: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+40_pgadmin_safe_diagnostics/11_pgadmin_safe_backup_restore_evidence.sql	FAIL	15	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/40_pgadmin_safe_diagnostics/11_pgadmin_safe_backup_restore_evidence.sql:78: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+40_pgadmin_safe_diagnostics/12_pgadmin_safe_sme_diagnosis_router.sql	PASS	15	-
+41_aws_rds_aurora_postgresql/01_cloudwatch_metric_deep_dive_router.sql	PASS	17	-
+41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql	FAIL	21	-----+---------+---------+------------------+-------------+--------------+-------+-----------+-----------------+------------+---------------------+---------------- (0 rows) psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/41_aws_rds_aurora_postgresql/02_compute_memory_serverless_pressure.sql:149: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+41_aws_rds_aurora_postgresql/03_connections_commits_deadlocks.sql	PASS	23	-
+41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql	FAIL	24	--------------+-----------------+------------+------------------+-------------------+---------------------- (0 rows) psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/41_aws_rds_aurora_postgresql/04_storage_io_cache_temp_pressure.sql:116: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql	FAIL	34	 wal_log_volume | 790546 | 5304 | 0.67 | 105139623 | 100 MB | 7423 | 0 | 0 | | | 0 | 0 bytes | 0 | 2026-07-24 00:35:39.591544-04 | Historical WAL-buffer-full events exist; calculate the interval delta. (1 row) psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/41_aws_rds_aurora_postgresql/05_wal_checkpoint_log_volume_pressure.sql:107: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+41_aws_rds_aurora_postgresql/06_replication_slots_global_database_pressure.sql	PASS	18	-
+41_aws_rds_aurora_postgresql/07_xid_vacuum_wraparound_pressure.sql	PASS	30	-
+41_aws_rds_aurora_postgresql/08_capacity_backup_billing_correlates.sql	PASS	37	-
+41_aws_rds_aurora_postgresql/09_network_workload_correlates.sql	FAIL	15	------------------+-------------+-------+------------+----------+-----------+-----------+------------+-------------------------------+------------ (0 rows) psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/41_aws_rds_aurora_postgresql/09_network_workload_correlates.sql:113: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+41_aws_rds_aurora_postgresql/10_database_insights_dbload_deep_dive.sql	PASS	13	-
+41_aws_rds_aurora_postgresql/11_disk_queue_depth_deep_dive.sql	FAIL	13	 walwriter | Activity | WalWriterMain | 1 | 100.00 | | | LOG_VOLUME_OR_WAL_PATH (1 row) psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/41_aws_rds_aurora_postgresql/11_disk_queue_depth_deep_dive.sql:85: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+41_aws_rds_aurora_postgresql/12_buffer_cache_read_write_iops_deep_dive.sql	FAIL	22	 dba_observer | observer_run_log | 0 | 0 | | 16 kB | COMPARE_INTERVAL_DELTA (18 rows) psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/41_aws_rds_aurora_postgresql/12_buffer_cache_read_write_iops_deep_dive.sql:89: ERROR: cannot execute CREATE FUNCTION in a read-only transaction
+41_aws_rds_aurora_postgresql/13_database_telemetry_completeness_audit.sql	PASS	14	-
+42_problem_identification_internals/01_symptom_to_subsystem_router.sql	PASS	13	-
+42_problem_identification_internals/02_lock_manager_full_diagnosis.sql	PASS	21	-
+42_problem_identification_internals/03_logical_replication_cdc_health.sql	FAIL	18	------------------+-------------+------------+-----------------------+------------------+------------------------+----------- (0 rows) psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/42_problem_identification_internals/03_logical_replication_cdc_health.sql:74: ERROR: permission denied for table pg_subscription
+42_problem_identification_internals/04_partition_pruning_maintenance_health.sql	PASS	20	-
+42_problem_identification_internals/05_extension_runtime_health.sql	FAIL	12	psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/42_problem_identification_internals/05_extension_runtime_health.sql:15: ERROR: cannot execute CREATE TABLE in a read-only transaction
+42_problem_identification_internals/06_pg18_async_io_readiness.sql	FAIL	15	 track_wal_io_timing | on | | superuser | configuration file | f | Enables WAL I/O timing evidence. (9 rows) psql:/Users/saiendla/Documents/MCPPostgres/database-scripts-audit/42_problem_identification_internals/06_pg18_async_io_readiness.sql:67: ERROR: cannot execute CREATE TABLE in a read-only transaction
+42_problem_identification_internals/07_row_level_security_policy_health.sql	PASS	18	-
