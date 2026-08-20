@@ -1,6 +1,6 @@
 /*
 PostgreSQL DBA Script: IO Bound Query Candidates
-Purpose: Flag queries with high physical read pressure relative to cache hits.
+Purpose: Flag queries with high PostgreSQL shared-buffer miss pressure and available block-read timing for I/O corroboration.
 Area: Performance Tuning
 Usage: Requires pg_stat_statements; use with EXPLAIN plans.
        Optional filter:
@@ -9,7 +9,7 @@ Usage: Requires pg_stat_statements; use with EXPLAIN plans.
        -- AND snapshot_ts >= timestamp '2026-05-10 09:00:00'
        -- AND snapshot_ts <  timestamp '2026-05-10 10:00:00'
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
-Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
+Notes: Read-only. shared_blks_read counts PostgreSQL buffer misses, not guaranteed physical storage I/O because the OS cache may satisfy reads. Correlate interval deltas, blk_read_time, wait events, and OS/cloud storage metrics.
 */
 WITH params AS (
     SELECT coalesce(nullif(current_setting('pgdiag.min_io_pct', true), '')::numeric, 0) AS min_io_pct
@@ -22,6 +22,7 @@ base AS (
         mean_exec_time,
         shared_blks_hit,
         shared_blks_read,
+        shared_blk_read_time,
         local_blks_hit,
         local_blks_read,
         temp_blks_read,
@@ -34,21 +35,27 @@ totals AS (
     FROM base
 )
 SELECT
+    psi.stats_reset AS statistics_since,
+    clock_timestamp() - psi.stats_reset AS statistics_age,
+    current_setting('track_io_timing') AS track_io_timing,
     queryid,
     calls,
     total_exec_time,
     mean_exec_time,
     shared_blks_read,
     shared_blks_hit,
+    round(shared_blk_read_time::numeric, 2) AS cumulative_shared_blk_read_time_ms,
+    round((shared_blk_read_time / NULLIF(shared_blks_read, 0))::numeric, 4) AS avg_timed_ms_per_shared_read,
     round(100.0 * shared_blks_read / NULLIF(t.all_shared_reads, 0), 2) AS pct_io_read_load,
     round(100.0 * shared_blks_read / NULLIF(shared_blks_read + shared_blks_hit, 0), 2) AS shared_read_pct,
     temp_blks_written,
     query_snippet
 FROM base
 CROSS JOIN totals t
+CROSS JOIN pg_stat_statements_info psi
 WHERE calls >= 20
   AND round(100.0 * shared_blks_read / NULLIF(t.all_shared_reads, 0), 2) >= (SELECT min_io_pct FROM params)
-ORDER BY shared_read_pct DESC NULLS LAST, total_exec_time DESC
+ORDER BY shared_blks_read DESC, shared_blk_read_time DESC, total_exec_time DESC
 LIMIT 10;
 
 

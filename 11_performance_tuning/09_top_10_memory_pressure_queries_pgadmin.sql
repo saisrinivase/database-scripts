@@ -1,6 +1,6 @@
 /*
 PostgreSQL DBA Script: Top 10 Memory Pressure Queries PgAdmin
-Purpose: Identify the top SQL statements spilling to temporary files using plain PostgreSQL statistics views.
+Purpose: Identify SQL statements with temp-file spill pressure; this is not a measurement of total query memory allocation.
 Area: Performance Tuning
 Usage: Run in pgAdmin, psql, or any SQL client after pg_stat_statements is installed in the current database.
        Optional filter:
@@ -25,6 +25,8 @@ totals AS (
     FROM base
 )
 SELECT
+    psi.stats_reset AS statistics_since,
+    clock_timestamp() - psi.stats_reset AS statistics_age,
     coalesce(r.rolname, s.userid::text) AS user_name,
     coalesce(d.datname, s.dbid::text) AS database_name,
     s.queryid,
@@ -33,7 +35,7 @@ SELECT
     s.temp_blks_read,
     s.temp_blks_written,
     (s.temp_blks_read + s.temp_blks_written) AS temp_blks_total,
-    round((100.0 * (s.temp_blks_read + s.temp_blks_written) / NULLIF(t.total_temp_blks, 0))::numeric, 2) AS pct_memory_spill_load,
+    round((100.0 * (s.temp_blks_read + s.temp_blks_written) / NULLIF(t.total_temp_blks, 0))::numeric, 2) AS pct_temp_spill_load,
     pg_size_pretty(((s.temp_blks_read + s.temp_blks_written) * current_setting('block_size')::bigint)) AS temp_total_pretty,
     pg_size_pretty((s.temp_blks_written * current_setting('block_size')::bigint)) AS temp_written_pretty,
     round((((s.temp_blks_read + s.temp_blks_written) * current_setting('block_size')::numeric) / NULLIF(s.calls, 0)), 2) AS temp_bytes_per_call,
@@ -52,6 +54,7 @@ SELECT
     regexp_replace(s.query, '\s+', ' ', 'g') AS query_sample
 FROM base s
 CROSS JOIN totals t
+CROSS JOIN pg_stat_statements_info psi
 LEFT JOIN pg_roles r ON r.oid = s.userid
 LEFT JOIN pg_database d ON d.oid = s.dbid
 WHERE round((100.0 * (s.temp_blks_read + s.temp_blks_written) / NULLIF(t.total_temp_blks, 0))::numeric, 2) >= (SELECT min_memory_pct FROM params)
@@ -59,7 +62,7 @@ ORDER BY temp_blks_total DESC, s.total_exec_time DESC
 LIMIT 10;
 
 -- SAMPLE_OUTPUT_BEGIN
--- user_name | database_name | queryid | query_text | calls | temp_blks_written | temp_blks_total | pct_memory_spill_load | temp_total_pretty | temp_bytes_per_call | sme_diagnosis
+-- user_name | database_name | queryid | query_text | calls | temp_blks_written | temp_blks_total | pct_temp_spill_load | temp_total_pretty | temp_bytes_per_call | sme_diagnosis
 -- ----------+---------------+---------+------------+-------+-------------------+-----------------+-----------------------+-------------------+---------------------+---------------------------------------------
 -- app_user  | appdb         | 987654  | SELECT ... |    24 |           8388608 |         8388608 |                 40.50 | 64 GB             |       2863311530.67 | Few large spill events; inspect plan...
 -- SAMPLE_OUTPUT_END

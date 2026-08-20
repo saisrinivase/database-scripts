@@ -1,0 +1,7 @@
+database	size	classification	scripts_attempted	pass	prerequisite_not_met	sql_defect
+pgbench_test	30 GB	REPRESENTATIVE_PGBENCH	213	213	0	0
+pgbenchc_test	17 GB	REPRESENTATIVE_PGBENCH	213	210	3	0
+postgres	214 MB	ADMIN_DATABASE	213	213	0	0
+database_scripts_sme_audit	24 MB	FULLY_PROVISIONED_AUDIT	213	213	0	0
+ai_workbench_sched_drop_1779041613100582000	10 MB	TRANSIENT_WORKBENCH	213	186	27	0
+ai_workbench_sched_drop_1779041644209523000	10 MB	TRANSIENT_WORKBENCH	213	186	27	0

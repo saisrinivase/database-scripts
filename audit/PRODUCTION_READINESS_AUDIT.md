@@ -13,6 +13,11 @@ All 274 SQL scripts were inventoried and assigned execution placement, scale
 confidence, prerequisites, risk flags, and three runtime results in
 `script-safety-matrix.tsv`.
 
+The matrix now also records `evidence_basis`, `interpretation_limit`, and
+`validation_level`. This prevents cumulative counters, sampled estimates,
+point-in-time snapshots, and provider correlates from being presented as exact
+root-cause proof.
+
 This audit does not claim that a small local database proves 50 TB performance.
 The 10 TB and 50 TB confidence columns classify the work performed by each
 script: bounded statistics/catalog reads, object-count-proportional work,
@@ -156,3 +161,18 @@ depth increases. Never run the complete repository as one production batch.
 PostgreSQL 15, 16, and 17 were statically reviewed but were not available for
 runtime execution in this workspace. Therefore, this audit does not label those
 versions runtime-certified; version-specific CI remains a required follow-up.
+
+## Cross-database and workload certification
+
+The 213 reader-safe scripts were executed across all six connectable,
+non-template local databases: 1,221 of 1,278 attempts passed and 57 reported
+missing per-database prerequisites. There were no new SQL defects. A controlled
+30-second pgbench workload on the 17-GB database completed 685,123 transactions
+at 22,843 TPS with no failed transactions; wait, statement-time, I/O, and temp
+spill diagnostics were inspected during the workload. See
+`CROSS_DATABASE_CERTIFICATION.md` for scope and limitations.
+
+The 61 writer-only scripts were not run across every database because they
+create repositories, capture data, perform maintenance, or run labs. They were
+kept in the isolated disposable-database gate; the destructive 5-GiB lab was
+not executed.

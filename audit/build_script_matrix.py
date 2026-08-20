@@ -188,6 +188,46 @@ def classify(
     if explain_analyze:
         risk_flags.append("EXECUTES_QUERY")
 
+    scenario_validated = {
+        "06_activity_locks/04_wait_events_summary.sql",
+        "07_vacuum_bloat/06_pgstattuple_safe_bloat_candidates.sql",
+        "11_performance_tuning/01_top_queries_by_total_exec_time.sql",
+        "11_performance_tuning/04_io_bound_query_candidates.sql",
+        "28_pgss_resource_attribution/01_pgss_query_resource_percent.sql",
+    }
+    if rel in lab_scripts or scale_class == "PROHIBITED_PRODUCTION":
+        evidence_basis = "LAB_WORKFLOW"
+        interpretation_limit = "Use only in an isolated disposable database."
+        validation_level = "LAB_ONLY"
+    elif rel.startswith("41_aws_rds_aurora_postgresql/"):
+        evidence_basis = "SQL_SIGNAL_PLUS_EXTERNAL_PROVIDER_EVIDENCE"
+        interpretation_limit = "SQL cannot prove AWS storage, billing, host, or historical DBLoad metrics; correlate the same time window in AWS telemetry."
+        validation_level = "ENVIRONMENT_DEPENDENT"
+    elif contains(sql, r"\bpg_stat_statements\b"):
+        evidence_basis = "CUMULATIVE_PG_STAT_STATEMENTS"
+        interpretation_limit = "Values cover the period since each entry/statistics reset; use interval snapshots for incident-window rates and percentages."
+        validation_level = "SCENARIO_VALIDATED" if rel in scenario_validated else "RUNTIME_VERIFIED"
+    elif contains(sql, r"\b(pg_stat_activity|pg_locks|pg_stat_progress_)\b"):
+        evidence_basis = "LIVE_INSTANCE_SNAPSHOT"
+        interpretation_limit = "Point-in-time evidence can miss intermittent events; repeat or sample and correlate with logs."
+        validation_level = "SCENARIO_VALIDATED" if rel in scenario_validated else "RUNTIME_VERIFIED"
+    elif contains(sql, r"\b(pg_stat_(?:user|all)_(?:tables|indexes)|pg_statio_|pg_stat_database|pg_stat_io|pg_stat_wal)\b") and not contains(sql, r"\b(n_live_tup|n_dead_tup|reltuples|most_common_vals|histogram_bounds)\b"):
+        evidence_basis = "CUMULATIVE_INSTANCE_COUNTER"
+        interpretation_limit = "Counter totals are not current rates; calculate deltas across a known interval and account for resets."
+        validation_level = "RUNTIME_VERIFIED"
+    elif contains(sql, r"\b(n_live_tup|n_dead_tup|reltuples|most_common_vals|histogram_bounds)\b"):
+        evidence_basis = "PLANNER_OR_MAINTENANCE_ESTIMATE"
+        interpretation_limit = "Statistics are sampled/estimated and may be stale; confirm ANALYZE recency and targeted evidence before action."
+        validation_level = "SCENARIO_VALIDATED" if rel in scenario_validated else "RUNTIME_VERIFIED"
+    elif contains(sql, r"\bdba_(?:metrics|observer)\."):
+        evidence_basis = "REPOSITORY_HISTORY"
+        interpretation_limit = "Accuracy depends on repository setup, capture cadence, retention, and uninterrupted collection."
+        validation_level = "ENVIRONMENT_DEPENDENT"
+    else:
+        evidence_basis = "CATALOG_OR_CONFIGURATION_FACT"
+        interpretation_limit = "Current database/instance state only; provider, OS, application, and historical context may still be required."
+        validation_level = "RUNTIME_VERIFIED"
+
     return [
         rel,
         placement,
@@ -201,6 +241,9 @@ def classify(
         disposable_results.get(rel, "NOT_RUN"),
         "FAIL" if rel in reader_incompatible else "PASS",
         pg_monitor_results.get(rel, "NOT_RUN"),
+        evidence_basis,
+        interpretation_limit,
+        validation_level,
     ]
 
 
@@ -217,6 +260,7 @@ def main() -> None:
             "confidence_10tb", "confidence_50tb", "scale_reason",
             "prerequisites", "risk_flags", "disposable_runtime",
             "read_only_runtime", "pg_monitor_runtime",
+            "evidence_basis", "interpretation_limit", "validation_level",
         ])
         writer.writerows(
             classify(path, reader_incompatible, disposable_results, pg_monitor_results)
