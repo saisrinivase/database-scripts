@@ -176,3 +176,23 @@ The 61 writer-only scripts were not run across every database because they
 create repositories, capture data, perform maintenance, or run labs. They were
 kept in the isolated disposable-database gate; the destructive 5-GiB lab was
 not executed.
+
+## Severity and confidence transparency
+
+Severity words are now inventoried from active SQL rather than comments or
+sample output. Of 274 scripts, 86 contain active severity/advisory keywords:
+five use configurable overrides, 50 use hard-coded thresholds, six use
+state/boolean rules, and 25 contain advisory labels without a mechanically
+traceable CASE threshold. The registry assigns rule-evaluation confidence and a
+separate, deliberately conservative root-cause confidence.
+
+The primary active incident detector now returns the measured value, exact
+threshold expression, observation window, rule confidence, and root-cause
+confidence in every incident row. A controlled blocked-row scenario produced
+`CRITICAL`, `metric_value = 1`, `threshold_expression = waiting_locks > 0`,
+`rule_confidence = HIGH`, and `root_cause_confidence = LOW`, verifying both the
+positive detection path and the intended confidence distinction. All other
+mechanically inventoried thresholds remain marked review-required until
+baselined and semantically approved for the
+target environment. See `SEVERITY_AND_CONFIDENCE_STANDARD.md` and
+`severity-filter-confidence-registry.tsv`.

@@ -102,12 +102,15 @@ all_metrics AS (
 SELECT *
 FROM (
     SELECT 'CRITICAL' AS severity, 'blocking_locks' AS incident_type, 'locks.waiting' AS metric_name, waiting_locks AS metric_value,
+           'waiting_locks > 0' AS threshold_expression, 'live snapshot' AS observation_window,
+           'HIGH' AS rule_confidence, 'LOW' AS root_cause_confidence,
            'Blocked lock requests are active.' AS evidence,
            'Identify blockers immediately; cancel/terminate only after confirming business impact.' AS recommended_action,
            '06_activity_locks/02_blocking_and_blocked_sessions.sql' AS next_script
     FROM all_metrics WHERE waiting_locks > 0
     UNION ALL
     SELECT 'CRITICAL', 'archive_failure', 'archive.failed_count', archive_failed_count,
+           'archive_failed_count > 0', 'cumulative since statistics reset', 'MEDIUM', 'LOW',
            'WAL archiver failures are present.',
            'Protect PITR first: inspect archive destination, permissions, command, and storage.',
            '13_io_wal_checkpoints/04_wal_archiver_health.sql'
@@ -115,18 +118,21 @@ FROM (
     UNION ALL
     SELECT CASE WHEN connections_used_pct >= 90 THEN 'CRITICAL' ELSE 'WARN' END,
            'connection_saturation', 'connections.used_pct', connections_used_pct,
+           'WARN >= 75%; CRITICAL >= 90%', 'live snapshot', 'HIGH', 'LOW',
            'Connection usage is high versus max_connections.',
            'Check pooler/app connection behavior and idle sessions.',
            '14_connection_workload/01_connections_by_user_app_db.sql'
     FROM all_metrics WHERE connections_used_pct >= 75
     UNION ALL
     SELECT 'WARN', 'transaction_hygiene', 'transactions.over_15m', transactions_over_15m,
+           'transaction age > 15 minutes; count > 0', 'live snapshot', 'HIGH', 'LOW',
            'Long transactions can block vacuum and cause bloat.',
            'Find oldest transactions and application owners.',
            '06_activity_locks/03_long_running_transactions.sql'
     FROM all_metrics WHERE transactions_over_15m > 0
     UNION ALL
     SELECT 'WARN', 'long_queries', 'queries.over_5m', long_queries_over_5m,
+           'active query age > 5 minutes; count > 0', 'live snapshot', 'HIGH', 'LOW',
            'Long active queries are running.',
            'Check wait events and execution plans for the long queries.',
            '18_long_queries_full_scans/01_active_long_queries.sql'
@@ -134,6 +140,7 @@ FROM (
     UNION ALL
     SELECT CASE WHEN max_slot_retained_wal_bytes >= 10737418240 THEN 'CRITICAL' ELSE 'WARN' END,
            'slot_wal_retention', 'slots.retained_wal_bytes', max_slot_retained_wal_bytes,
+           'WARN >= 1 GiB; CRITICAL >= 10 GiB', 'live snapshot', 'HIGH', 'LOW',
            'Replication slots are retaining WAL.',
            'Check inactive logical/physical slots and downstream consumers.',
            '08_replication_ha/03_replication_slots_health.sql'
@@ -141,6 +148,7 @@ FROM (
     UNION ALL
     SELECT CASE WHEN max_replica_lag_seconds >= 300 THEN 'CRITICAL' ELSE 'WARN' END,
            'replication_lag', 'replication.max_lag_seconds', max_replica_lag_seconds,
+           'WARN >= 60 seconds; CRITICAL >= 300 seconds', 'live snapshot', 'HIGH', 'LOW',
            'Replica lag is above observer threshold.',
            'Check standby replay, receiver status, network, and write pressure.',
            '38_observability_360/09_replication_and_slot_dashboard.sql'
@@ -148,6 +156,7 @@ FROM (
     UNION ALL
     SELECT CASE WHEN max_database_xid_age >= 1500000000 THEN 'CRITICAL' ELSE 'WARN' END,
            'xid_wraparound', 'xid.database_age', max_database_xid_age,
+           'WARN >= 1,000,000,000; CRITICAL >= 1,500,000,000 XIDs', 'live snapshot', 'HIGH', 'LOW',
            'Database XID age is high.',
            'Prioritize wraparound prevention and long transaction cleanup.',
            '16_internals_deep_dive/01_database_xid_multixact_age.sql'
@@ -155,6 +164,7 @@ FROM (
     UNION ALL
     SELECT CASE WHEN autovacuum_backlog_tables >= 10 THEN 'CRITICAL' ELSE 'WARN' END,
            'autovacuum_backlog', 'autovacuum.backlog_tables', autovacuum_backlog_tables,
+           'WARN > 0 tables; CRITICAL >= 10 tables', 'live estimated statistics', 'MEDIUM', 'LOW',
            'Vacuum/analyze backlog tables are present.',
            'Review autovacuum workers, table reloptions, dead tuples, and stale statistics.',
            '38_observability_360/08_autovacuum_vacuum_analyze_progress.sql'
@@ -165,8 +175,8 @@ ORDER BY
     incident_type;
 
 -- SAMPLE_OUTPUT_BEGIN
--- severity | incident_type       | metric_name              | metric_value | evidence
--- ---------+---------------------+--------------------------+--------------+------------------------------------------
--- CRITICAL | blocking_locks      | locks.waiting            |            2 | Blocked lock requests are active.
--- WARN     | transaction_hygiene | transactions.over_15m    |            1 | Long transactions can block vacuum...
+-- severity | incident_type       | metric_name           | metric_value | threshold_expression                  | observation_window | rule_confidence | root_cause_confidence
+-- ---------+---------------------+-----------------------+--------------+---------------------------------------+--------------------+-----------------+----------------------
+-- CRITICAL | blocking_locks      | locks.waiting         |            2 | waiting_locks > 0                     | live snapshot      | HIGH            | LOW
+-- WARN     | transaction_hygiene | transactions.over_15m |            1 | transaction age > 15 minutes; count>0 | live snapshot      | HIGH            | LOW
 -- SAMPLE_OUTPUT_END

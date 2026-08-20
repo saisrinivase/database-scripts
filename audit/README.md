@@ -38,3 +38,9 @@ python3 audit/parse_cross_database_log.py appdb /tmp/appdb-readonly.log /tmp/app
 The parser evaluates every error between script markers. It does not trust only
 the last command status because a multi-statement script can encounter an early
 error and later finish with a successful statement.
+
+`SEVERITY_AND_CONFIDENCE_STANDARD.md` defines the meaning of severity and
+confidence. `build_severity_registry.py` generates
+`severity-filter-confidence-registry.tsv`, exposing the active labels,
+conditions, row filters, overrides, evidence basis, confidence, limitations,
+and manual-review status for every SQL script.
