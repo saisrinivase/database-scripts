@@ -24,9 +24,10 @@ Measurement boundaries:
 
 Safe interpretation:
 1. Use priority and priority_reason to choose what to investigate first.
-2. Use primary_finding and evidence_summary to understand the measured reason.
-3. Perform recommended_next_test with representative bind values.
-4. Apply possible_fix_after_validation only when the execution plan proves it is appropriate.
+2. Use primary_finding to understand the measured reason.
+3. Perform recommended_action with representative bind values before applying a change.
+
+The default result intentionally contains only the columns needed for incident triage.
 */
 
 WITH params AS (
@@ -139,63 +140,14 @@ ranked AS (
 SELECT
     r.investigation_rank,
     'P' || r.priority_number AS priority,
-    CASE
-        WHEN r.workload_time_pct >= 10
-            THEN format('Consumes %s%% of captured application statement time.', round(r.workload_time_pct::numeric, 2))
-        WHEN r.temp_blocks * r.block_size_bytes >= 10::numeric * 1024 * 1024 * 1024
-            THEN format('Generated %s cumulative temp I/O.', pg_size_pretty((r.temp_blocks * r.block_size_bytes)::bigint))
-        WHEN r.max_exec_time >= 60000
-            THEN format('Observed maximum execution was %s seconds.', round((r.max_exec_time / 1000)::numeric, 2))
-        WHEN r.logical_blocks_per_call >= 100000
-            THEN format('Processes %s cached/read shared blocks per call.', round(r.logical_blocks_per_call, 0))
-        WHEN r.mean_exec_time >= 1000
-            THEN format('Average execution is %s ms.', round(r.mean_exec_time::numeric, 2))
-        WHEN r.workload_time_pct >= 2
-            THEN format('Consumes %s%% of captured application statement time.', round(r.workload_time_pct::numeric, 2))
-        WHEN r.calls >= 10000
-            THEN format('Executed %s times in the statistics window.', r.calls)
-        WHEN r.runtime_cv >= 1
-            THEN format('Runtime coefficient of variation is %s.', round(r.runtime_cv::numeric, 2))
-        ELSE 'Lower measured impact than higher-priority rows in this report.'
-    END AS priority_reason,
     coalesce(db.datname, r.dbid::text) AS database_name,
-    coalesce(usr.rolname, r.userid::text) AS user_name,
     r.queryid,
     r.calls,
-    round(r.workload_calls_pct::numeric, 2) AS workload_calls_pct,
-    round(r.total_exec_time::numeric, 2) AS cumulative_exec_ms,
     round(r.workload_time_pct::numeric, 2) AS workload_exec_time_pct,
-    round(r.mean_exec_time::numeric, 4) AS mean_exec_ms,
-    round(r.min_exec_time::numeric, 4) AS min_exec_ms,
+    round(r.mean_exec_time::numeric, 2) AS mean_exec_ms,
     round(r.max_exec_time::numeric, 2) AS max_exec_ms,
-    round(r.stddev_exec_time::numeric, 2) AS stddev_exec_ms,
-    round(r.runtime_cv::numeric, 2) AS runtime_cv,
-    r.rows,
-    round(r.rows_per_call, 2) AS rows_per_call,
-    r.logical_shared_blocks,
-    round(r.logical_blocks_per_call, 2) AS logical_blocks_per_call,
-    round(r.logical_blocks_pct::numeric, 2) AS logical_blocks_pct,
-    pg_size_pretty((r.logical_shared_blocks * r.block_size_bytes)::bigint) AS logical_page_access_byte_equivalent,
-    round(100.0 * r.shared_blks_hit / NULLIF(r.logical_shared_blocks, 0), 2) AS shared_buffer_hit_pct,
-    r.temp_blocks,
-    round(r.temp_blocks_per_call, 2) AS temp_blocks_per_call,
-    round(r.temp_blocks_pct::numeric, 2) AS temp_blocks_pct,
+    round(r.logical_blocks_per_call, 0) AS logical_blocks_per_call,
     pg_size_pretty((r.temp_blocks * r.block_size_bytes)::bigint) AS cumulative_temp_io,
-    pg_size_pretty(coalesce(r.wal_bytes, 0)::bigint) AS cumulative_wal,
-    round(r.measured_block_io_ms::numeric, 2) AS measured_block_io_ms,
-    round((100.0 * r.measured_block_io_ms / NULLIF(r.total_exec_time, 0))::numeric, 2) AS measured_io_vs_exec_pct,
-    round(r.non_io_elapsed_proxy_ms::numeric, 2) AS non_io_elapsed_proxy_ms,
-    r.io_timing_enabled,
-    r.plans,
-    round((r.plans::numeric / NULLIF(r.calls, 0)), 4) AS plans_per_call,
-    round(r.total_plan_time::numeric, 2) AS cumulative_plan_ms,
-    r.planning_timing_enabled,
-    r.jit_functions,
-    r.parameter_marker_count,
-    r.referenced_view_name_count,
-    r.single_function_call_shape,
-    r.uses_distinct,
-    r.uses_expression_ordering,
     CASE
         WHEN r.temp_blocks * r.block_size_bytes >= 10::numeric * 1024 * 1024 * 1024
             THEN 'LARGE_TEMP_SPILL'
@@ -215,17 +167,25 @@ SELECT
             THEN 'HIGH_FREQUENCY_OVERHEAD'
         ELSE 'HIGH_DATABASE_TIME_REQUIRES_PLAN'
     END AS primary_finding,
-    concat_ws(
-        '; ',
-        format('time_share=%s%%', round(r.workload_time_pct::numeric, 2)),
-        format('calls=%s', r.calls),
-        format('mean_ms=%s', round(r.mean_exec_time::numeric, 2)),
-        format('max_ms=%s', round(r.max_exec_time::numeric, 2)),
-        format('logical_blocks_per_call=%s', round(r.logical_blocks_per_call, 0)),
-        format('rows_per_call=%s', round(r.rows_per_call, 2)),
-        format('temp_io=%s', pg_size_pretty((r.temp_blocks * r.block_size_bytes)::bigint)),
-        format('runtime_cv=%s', round(r.runtime_cv::numeric, 2))
-    ) AS evidence_summary,
+    CASE
+        WHEN r.workload_time_pct >= 10
+            THEN format('Consumes %s%% of captured application statement time.', round(r.workload_time_pct::numeric, 2))
+        WHEN r.temp_blocks * r.block_size_bytes >= 10::numeric * 1024 * 1024 * 1024
+            THEN format('Generated %s cumulative temp I/O.', pg_size_pretty((r.temp_blocks * r.block_size_bytes)::bigint))
+        WHEN r.max_exec_time >= 60000
+            THEN format('Observed maximum execution was %s seconds.', round((r.max_exec_time / 1000)::numeric, 2))
+        WHEN r.logical_blocks_per_call >= 100000
+            THEN format('Processes %s cached/read shared blocks per call.', round(r.logical_blocks_per_call, 0))
+        WHEN r.mean_exec_time >= 1000
+            THEN format('Average execution is %s ms.', round(r.mean_exec_time::numeric, 2))
+        WHEN r.workload_time_pct >= 2
+            THEN format('Consumes %s%% of captured application statement time.', round(r.workload_time_pct::numeric, 2))
+        WHEN r.calls >= 10000
+            THEN format('Executed %s times in the statistics window.', r.calls)
+        WHEN r.runtime_cv >= 1
+            THEN format('Runtime coefficient of variation is %s.', round(r.runtime_cv::numeric, 2))
+        ELSE 'Lower measured impact than higher-priority rows in this report.'
+    END AS priority_reason,
     CASE
         WHEN r.temp_blocks > 0
             THEN 'Run EXPLAIN (ANALYZE, BUFFERS, WAL, SETTINGS, VERBOSE) with representative binds. Locate Sort/Hash nodes reporting Disk, excessive batches, rows removed, or actual rows far above estimates.'
@@ -240,39 +200,14 @@ SELECT
         WHEN r.runtime_cv >= 1
             THEN 'Capture plans for known fast and slow bind sets. Compare row estimates, join order, scan type, cache reads, and custom versus generic plan behavior.'
         ELSE 'Correlate this statistics window with CloudWatch CPUUtilization/DBLoadCPU, then capture EXPLAIN (ANALYZE, BUFFERS, SETTINGS, VERBOSE) for a representative execution.'
-    END AS recommended_next_test,
-    CASE
-        WHEN r.temp_blocks > 0
-            THEN 'Reduce rows before sort/hash by correcting joins, predicates, indexes, or estimates. Consider query/role-level work_mem only after the plan proves the spill operator and concurrency budget is safe.'
-        WHEN r.single_function_call_shape
-            THEN 'Tune the internal SQL first. On PostgreSQL 15-17, also verify SQL-function inlining or benchmark a semantically equivalent PL/pgSQL implementation; PostgreSQL 18 adds SQL-function plan caching.'
-        WHEN r.uses_distinct AND r.rows_per_call >= 100
-            THEN 'Correct join cardinality or use a semantics-preserving EXISTS/pre-aggregation approach if the plan proves row multiplication. Remove DISTINCT only after result-equivalence testing.'
-        WHEN r.uses_expression_ordering
-            THEN 'Reduce the input row set first. Consider a matching expression index only when the exact immutable expression, ordering, selectivity, and write cost are validated by the plan.'
-        WHEN r.logical_blocks_per_call >= 100000
-            THEN 'Correct the proven high-buffer plan node with selective join/filter indexes, rewritten predicates, extended statistics, or view simplification. Do not infer a missing index from this report alone.'
-        WHEN r.calls >= 10000 AND r.mean_exec_time < 25
-            THEN 'Reduce avoidable calls through application caching or batching when semantics permit; otherwise tune the proven internal plan.'
-        ELSE 'Apply only the change supported by the captured plan and validate with before/after interval deltas under equivalent load.'
-    END AS possible_fix_after_validation,
-    CASE
-        WHEN NOT r.io_timing_enabled THEN 'LOW_IO_SEPARATION_TRACK_IO_TIMING_OFF'
-        WHEN r.measured_block_io_ms > r.total_exec_time * 0.50 THEN 'IO_DOMINANT_NOT_CPU_PROOF'
-        WHEN r.single_function_call_shape THEN 'MEDIUM_OUTER_CALL_ONLY_INTERNAL_SQL_HIDDEN'
-        ELSE 'MEDIUM_CPU_CANDIDATE_REQUIRES_HOST_CORRELATION'
-    END AS attribution_confidence,
-    r.pgss_stats_reset,
-    clock_timestamp() - r.pgss_stats_reset AS statistics_window_age,
+    END AS recommended_action,
     regexp_replace(r.query, '\s+', ' ', 'g') AS complete_query_text
 FROM ranked r
-LEFT JOIN pg_roles usr ON usr.oid = r.userid
 LEFT JOIN pg_database db ON db.oid = r.dbid
 WHERE r.investigation_rank <= (SELECT max_rows FROM params)
 ORDER BY r.investigation_rank;
 
 -- SAMPLE_OUTPUT_BEGIN
--- rank | priority | priority_reason                   | primary_finding          | logical_blocks_per_call | recommended_next_test
--- 1    | P1       | Consumes 17.00% of captured...    | HIGH_CACHED_PAGE_CHURN   | 602459                  | Run EXPLAIN (ANALYZE...)
--- 2    | P1       | Generated 36 GB cumulative...    | LARGE_TEMP_SPILL         | 5375924                 | Run EXPLAIN (ANALYZE...)
+-- rank | priority | queryid | time_pct | mean_ms | logical_blocks_per_call | temp_io | primary_finding        | recommended_action
+-- 1    | P1       | 123456  | 17.00    | 738.36  | 602465                  | 0 bytes | HIGH_CACHED_PAGE_CHURN | Run EXPLAIN (ANALYZE...)
 -- SAMPLE_OUTPUT_END
