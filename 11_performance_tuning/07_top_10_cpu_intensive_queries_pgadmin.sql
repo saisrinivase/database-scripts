@@ -23,7 +23,7 @@ Measurement boundaries:
   interval, reset counters immediately before an approved test or store before/after snapshots.
 
 Safe interpretation:
-1. Use priority and priority_reason to choose what to investigate first.
+1. Use priority and the measured impact columns to choose what to investigate first.
 2. Use primary_finding to understand the measured reason.
 3. Perform recommended_action with representative bind values before applying a change.
 
@@ -140,7 +140,6 @@ ranked AS (
 SELECT
     r.investigation_rank,
     'P' || r.priority_number AS priority,
-    coalesce(db.datname, r.dbid::text) AS database_name,
     r.queryid,
     r.calls,
     round(r.workload_time_pct::numeric, 2) AS workload_exec_time_pct,
@@ -168,25 +167,6 @@ SELECT
         ELSE 'HIGH_DATABASE_TIME_REQUIRES_PLAN'
     END AS primary_finding,
     CASE
-        WHEN r.workload_time_pct >= 10
-            THEN format('Consumes %s%% of captured application statement time.', round(r.workload_time_pct::numeric, 2))
-        WHEN r.temp_blocks * r.block_size_bytes >= 10::numeric * 1024 * 1024 * 1024
-            THEN format('Generated %s cumulative temp I/O.', pg_size_pretty((r.temp_blocks * r.block_size_bytes)::bigint))
-        WHEN r.max_exec_time >= 60000
-            THEN format('Observed maximum execution was %s seconds.', round((r.max_exec_time / 1000)::numeric, 2))
-        WHEN r.logical_blocks_per_call >= 100000
-            THEN format('Processes %s cached/read shared blocks per call.', round(r.logical_blocks_per_call, 0))
-        WHEN r.mean_exec_time >= 1000
-            THEN format('Average execution is %s ms.', round(r.mean_exec_time::numeric, 2))
-        WHEN r.workload_time_pct >= 2
-            THEN format('Consumes %s%% of captured application statement time.', round(r.workload_time_pct::numeric, 2))
-        WHEN r.calls >= 10000
-            THEN format('Executed %s times in the statistics window.', r.calls)
-        WHEN r.runtime_cv >= 1
-            THEN format('Runtime coefficient of variation is %s.', round(r.runtime_cv::numeric, 2))
-        ELSE 'Lower measured impact than higher-priority rows in this report.'
-    END AS priority_reason,
-    CASE
         WHEN r.temp_blocks > 0
             THEN 'Run EXPLAIN (ANALYZE, BUFFERS, WAL, SETTINGS, VERBOSE) with representative binds. Locate Sort/Hash nodes reporting Disk, excessive batches, rows removed, or actual rows far above estimates.'
         WHEN r.single_function_call_shape
@@ -203,7 +183,6 @@ SELECT
     END AS recommended_action,
     regexp_replace(r.query, '\s+', ' ', 'g') AS complete_query_text
 FROM ranked r
-LEFT JOIN pg_database db ON db.oid = r.dbid
 WHERE r.investigation_rank <= (SELECT max_rows FROM params)
 ORDER BY r.investigation_rank;
 
