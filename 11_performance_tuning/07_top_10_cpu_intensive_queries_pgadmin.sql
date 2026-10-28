@@ -5,6 +5,8 @@ Purpose: Prioritize statements for CPU investigation using measured pg_stat_stat
 Area: Performance Tuning
 Compatibility: PostgreSQL 15+ with pg_stat_statements.
 Usage: Run in pgAdmin Query Tool, psql, or another SQL client.
+Sample Output: See SAMPLE_OUTPUT_BEGIN at the bottom for the compact result shape.
+Notes: Read-only. This ranks CPU investigation candidates; it does not measure host CPU by query.
 
 Optional session filters:
   SELECT set_config('pgdiag.min_workload_time_pct', '0', false);

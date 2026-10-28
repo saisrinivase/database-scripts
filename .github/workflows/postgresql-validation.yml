@@ -1,0 +1,63 @@
+name: PostgreSQL Diagnostic Validation
+
+on:
+  pull_request:
+  push:
+    branches: [postgres]
+  workflow_dispatch:
+
+jobs:
+  diagnostics:
+    name: PostgreSQL ${{ matrix.pg }} diagnostics
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pg: ['15', '16', '17', '18']
+    services:
+      postgres:
+        image: postgres:${{ matrix.pg }}
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: database_scripts_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d database_scripts_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install --yes postgresql-client
+      - name: Enforce repository SQL contracts
+        run: python3 43_enterprise_diagnostic_harness/lint_sql_contracts.py
+      - name: Validate non-stateful diagnostics with rollback
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: >-
+          python3 43_enterprise_diagnostic_harness/validate_diagnostics.py
+          --database database_scripts_ci
+          --report-dir _validation_runs/pg${{ matrix.pg }}-safe
+      - name: Validate stateful workflows in disposable database
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: >-
+          python3 43_enterprise_diagnostic_harness/validate_stateful_workflows.py
+          --database database_scripts_ci
+          --confirm-ephemeral
+          --report _validation_runs/pg${{ matrix.pg }}-stateful.json
+      - name: Upload validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: postgresql-${{ matrix.pg }}-validation
+          path: _validation_runs/
+          if-no-files-found: warn
