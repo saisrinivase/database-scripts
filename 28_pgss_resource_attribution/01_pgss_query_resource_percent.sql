@@ -15,22 +15,22 @@ base AS (
         s.calls,
         s.total_exec_time,
         s.mean_exec_time,
-        coalesce(s.shared_blk_read_time, 0)
-        + coalesce(s.shared_blk_write_time, 0)
-        + coalesce(s.local_blk_read_time, 0)
-        + coalesce(s.local_blk_write_time, 0)
-        + coalesce(s.temp_blk_read_time, 0)
-        + coalesce(s.temp_blk_write_time, 0) AS io_time,
+        coalesce((to_jsonb(s)->>'shared_blk_read_time')::numeric, (to_jsonb(s)->>'blk_read_time')::numeric, 0)
+        + coalesce((to_jsonb(s)->>'shared_blk_write_time')::numeric, (to_jsonb(s)->>'blk_write_time')::numeric, 0)
+        + coalesce((to_jsonb(s)->>'local_blk_read_time')::numeric, 0)
+        + coalesce((to_jsonb(s)->>'local_blk_write_time')::numeric, 0)
+        + coalesce((to_jsonb(s)->>'temp_blk_read_time')::numeric, 0)
+        + coalesce((to_jsonb(s)->>'temp_blk_write_time')::numeric, 0) AS io_time,
         coalesce(s.temp_blks_written, 0) * current_setting('block_size')::bigint AS temp_bytes_written,
         CASE WHEN cfg.io_timing_enabled THEN greatest(
             s.total_exec_time
             - (
-                coalesce(s.shared_blk_read_time, 0)
-                + coalesce(s.shared_blk_write_time, 0)
-                + coalesce(s.local_blk_read_time, 0)
-                + coalesce(s.local_blk_write_time, 0)
-                + coalesce(s.temp_blk_read_time, 0)
-                + coalesce(s.temp_blk_write_time, 0)
+                coalesce((to_jsonb(s)->>'shared_blk_read_time')::numeric, (to_jsonb(s)->>'blk_read_time')::numeric, 0)
+                + coalesce((to_jsonb(s)->>'shared_blk_write_time')::numeric, (to_jsonb(s)->>'blk_write_time')::numeric, 0)
+                + coalesce((to_jsonb(s)->>'local_blk_read_time')::numeric, 0)
+                + coalesce((to_jsonb(s)->>'local_blk_write_time')::numeric, 0)
+                + coalesce((to_jsonb(s)->>'temp_blk_read_time')::numeric, 0)
+                + coalesce((to_jsonb(s)->>'temp_blk_write_time')::numeric, 0)
             ),
             0
         ) END AS non_io_elapsed_proxy_time,

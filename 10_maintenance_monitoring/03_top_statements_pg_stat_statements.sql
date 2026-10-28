@@ -26,21 +26,21 @@ statement_base AS (
         s.local_blks_written,
         s.temp_blks_read,
         s.temp_blks_written,
-        coalesce(s.shared_blk_read_time, 0)
-            + coalesce(s.shared_blk_write_time, 0)
-            + coalesce(s.local_blk_read_time, 0)
-            + coalesce(s.local_blk_write_time, 0)
-            + coalesce(s.temp_blk_read_time, 0)
-            + coalesce(s.temp_blk_write_time, 0) AS io_time_ms,
+        coalesce((to_jsonb(s)->>'shared_blk_read_time')::numeric, (to_jsonb(s)->>'blk_read_time')::numeric, 0)
+            + coalesce((to_jsonb(s)->>'shared_blk_write_time')::numeric, (to_jsonb(s)->>'blk_write_time')::numeric, 0)
+            + coalesce((to_jsonb(s)->>'local_blk_read_time')::numeric, 0)
+            + coalesce((to_jsonb(s)->>'local_blk_write_time')::numeric, 0)
+            + coalesce((to_jsonb(s)->>'temp_blk_read_time')::numeric, 0)
+            + coalesce((to_jsonb(s)->>'temp_blk_write_time')::numeric, 0) AS io_time_ms,
         CASE WHEN cfg.io_timing_enabled THEN greatest(
             s.total_exec_time
             - (
-                coalesce(s.shared_blk_read_time, 0)
-                + coalesce(s.shared_blk_write_time, 0)
-                + coalesce(s.local_blk_read_time, 0)
-                + coalesce(s.local_blk_write_time, 0)
-                + coalesce(s.temp_blk_read_time, 0)
-                + coalesce(s.temp_blk_write_time, 0)
+                coalesce((to_jsonb(s)->>'shared_blk_read_time')::numeric, (to_jsonb(s)->>'blk_read_time')::numeric, 0)
+                + coalesce((to_jsonb(s)->>'shared_blk_write_time')::numeric, (to_jsonb(s)->>'blk_write_time')::numeric, 0)
+                + coalesce((to_jsonb(s)->>'local_blk_read_time')::numeric, 0)
+                + coalesce((to_jsonb(s)->>'local_blk_write_time')::numeric, 0)
+                + coalesce((to_jsonb(s)->>'temp_blk_read_time')::numeric, 0)
+                + coalesce((to_jsonb(s)->>'temp_blk_write_time')::numeric, 0)
             ),
             0
         ) END AS non_io_elapsed_proxy_ms,

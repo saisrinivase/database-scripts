@@ -16,19 +16,23 @@ WITH params AS (
 ),
 base AS (
     SELECT
-        queryid,
-        calls,
-        total_exec_time,
-        mean_exec_time,
-        shared_blks_hit,
-        shared_blks_read,
-        shared_blk_read_time,
-        local_blks_hit,
-        local_blks_read,
-        temp_blks_read,
-        temp_blks_written,
-        regexp_replace(query, '\s+', ' ', 'g') AS query_snippet
-    FROM pg_stat_statements
+        s.queryid,
+        s.calls,
+        s.total_exec_time,
+        s.mean_exec_time,
+        s.shared_blks_hit,
+        s.shared_blks_read,
+        coalesce(
+            (to_jsonb(s)->>'shared_blk_read_time')::numeric,
+            (to_jsonb(s)->>'blk_read_time')::numeric,
+            0
+        ) AS shared_blk_read_time,
+        s.local_blks_hit,
+        s.local_blks_read,
+        s.temp_blks_read,
+        s.temp_blks_written,
+        regexp_replace(s.query, '\s+', ' ', 'g') AS query_snippet
+    FROM pg_stat_statements s
 ),
 totals AS (
     SELECT sum(shared_blks_read) AS all_shared_reads

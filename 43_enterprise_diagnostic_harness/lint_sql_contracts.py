@@ -23,6 +23,10 @@ MISLEADING_EXECUTABLE_LABELS = {
     "pct_memory_spill": re.compile(r"\bpct_memory_spill\b", re.IGNORECASE),
     "memory-tier temp-spill label": re.compile(r"['\"]MEMORY(?:/|-)?(?:TEMP-)?SPILL", re.IGNORECASE),
 }
+VERSION_FRAGILE_PGSS_TIMING = re.compile(
+    r"\b\w+\.(?:shared|local|temp)_blk_(?:read|write)_time\b",
+    re.IGNORECASE,
+)
 
 
 def sql_files() -> list[Path]:
@@ -53,6 +57,10 @@ def main() -> int:
         for label, pattern in MISLEADING_EXECUTABLE_LABELS.items():
             if pattern.search(executable):
                 failures.append(f"{relative}: misleading executable label: {label}")
+        if "pg_stat_statements" in executable.lower() and VERSION_FRAGILE_PGSS_TIMING.search(executable):
+            failures.append(
+                f"{relative}: direct version-specific pg_stat_statements I/O timing column; use a catalog-safe fallback"
+            )
 
     if failures:
         print("Repository contract check failed:", file=sys.stderr)
