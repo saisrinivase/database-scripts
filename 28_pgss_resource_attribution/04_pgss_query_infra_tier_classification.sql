@@ -1,17 +1,20 @@
 /*
 PostgreSQL DBA Script: Pg Stat Statements Query Infra Tier Classification
-Purpose: Classify queries into infra pressure tiers (CPU/IO/Memory spill) using percentages.
+Purpose: Classify queries by elapsed-time, measured-I/O, and temp-spill contribution using percentages.
 Area: PGSS Resource Attribution
-Usage: Requires pg_stat_statements.
+Usage: Requires pg_stat_statements. Enable track_io_timing before the observation window for timing-derived tiers.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
-Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
+Notes: Read-only. Non-I/O elapsed time is a CPU-candidate proxy, not measured CPU. Temp writes measure spill I/O, not allocated RAM.
 */
-WITH q AS (
+WITH settings AS (
+    SELECT current_setting('track_io_timing') = 'on' AS io_timing_enabled
+),
+q AS (
     SELECT
         s.queryid,
         s.calls,
         s.total_exec_time,
-        greatest(
+        CASE WHEN cfg.io_timing_enabled THEN greatest(
             s.total_exec_time
             - (
                 coalesce(s.shared_blk_read_time, 0)
@@ -22,7 +25,8 @@ WITH q AS (
                 + coalesce(s.temp_blk_write_time, 0)
             ),
             0
-        ) AS cpu_proxy_time,
+        ) END AS non_io_elapsed_proxy_time,
+        cfg.io_timing_enabled,
         coalesce(s.shared_blk_read_time, 0)
         + coalesce(s.shared_blk_write_time, 0)
         + coalesce(s.local_blk_read_time, 0)
@@ -32,11 +36,12 @@ WITH q AS (
         coalesce(s.temp_blks_written, 0) * current_setting('block_size')::bigint AS temp_bytes,
         s.query AS query_snippet
     FROM pg_stat_statements s
+    CROSS JOIN settings cfg
 ),
 t AS (
     SELECT
         sum(total_exec_time) AS tot_exec,
-        sum(cpu_proxy_time) AS tot_cpu,
+        sum(non_io_elapsed_proxy_time) AS tot_non_io_proxy,
         sum(io_time) AS tot_io,
         sum(temp_bytes) AS tot_temp
     FROM q
@@ -46,13 +51,15 @@ SELECT
     q.calls,
     q.total_exec_time,
     round((100.0 * q.total_exec_time / NULLIF(t.tot_exec, 0))::numeric, 2) AS pct_exec,
-    round((100.0 * q.cpu_proxy_time / NULLIF(t.tot_cpu, 0))::numeric, 2) AS pct_cpu_proxy,
-    round((100.0 * q.io_time / NULLIF(t.tot_io, 0))::numeric, 2) AS pct_io,
-    round((100.0 * q.temp_bytes / NULLIF(t.tot_temp, 0))::numeric, 2) AS pct_memory_spill,
+    q.io_timing_enabled,
+    round((100.0 * q.non_io_elapsed_proxy_time / NULLIF(t.tot_non_io_proxy, 0))::numeric, 2) AS pct_non_io_elapsed_proxy,
+    CASE WHEN q.io_timing_enabled THEN round((100.0 * q.io_time / NULLIF(t.tot_io, 0))::numeric, 2) END AS pct_measured_io_time,
+    round((100.0 * q.temp_bytes / NULLIF(t.tot_temp, 0))::numeric, 2) AS pct_temp_spill,
     CASE
-        WHEN (100.0 * q.temp_bytes / NULLIF(t.tot_temp, 0)) >= 5 THEN 'MEMORY-TIER risk'
-        WHEN (100.0 * q.io_time / NULLIF(t.tot_io, 0)) >= 5 THEN 'IO-TIER risk'
-        WHEN (100.0 * q.cpu_proxy_time / NULLIF(t.tot_cpu, 0)) >= 5 THEN 'CPU-TIER risk'
+        WHEN (100.0 * q.temp_bytes / NULLIF(t.tot_temp, 0)) >= 5 THEN 'TEMP-SPILL tier'
+        WHEN NOT q.io_timing_enabled THEN 'TIMING DATA unavailable'
+        WHEN (100.0 * q.io_time / NULLIF(t.tot_io, 0)) >= 5 THEN 'MEASURED-IO tier'
+        WHEN (100.0 * q.non_io_elapsed_proxy_time / NULLIF(t.tot_non_io_proxy, 0)) >= 5 THEN 'NON-IO elapsed candidate'
         ELSE 'LOW-TIER impact'
     END AS infra_tier,
     q.query_snippet

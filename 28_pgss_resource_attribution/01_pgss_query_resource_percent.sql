@@ -1,13 +1,15 @@
 /*
 PostgreSQL DBA Script: Pg Stat Statements Query Resource Percent
-Purpose: Attribute query resource usage using pg_stat_statements with CPU/IO/memory-spill percentages.
+Purpose: Attribute query elapsed time, measured I/O time, and temp-file spill percentages from pg_stat_statements.
 Area: PGSS Resource Attribution
-Usage: Requires pg_stat_statements and track_io_timing for better IO-to-CPU split.
-Note: CPU is a proxy: total_exec_time minus shared/local/temp block read/write time.
+Usage: Requires pg_stat_statements. Enable track_io_timing before the observation window for timing-derived columns.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
-Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
+Notes: Read-only. Non-I/O elapsed time is only a CPU-candidate proxy, not measured CPU. Temp writes measure spill I/O, not allocated RAM.
 */
-WITH base AS (
+WITH settings AS (
+    SELECT current_setting('track_io_timing') = 'on' AS io_timing_enabled
+),
+base AS (
     SELECT
         s.queryid,
         s.calls,
@@ -20,7 +22,7 @@ WITH base AS (
         + coalesce(s.temp_blk_read_time, 0)
         + coalesce(s.temp_blk_write_time, 0) AS io_time,
         coalesce(s.temp_blks_written, 0) * current_setting('block_size')::bigint AS temp_bytes_written,
-        greatest(
+        CASE WHEN cfg.io_timing_enabled THEN greatest(
             s.total_exec_time
             - (
                 coalesce(s.shared_blk_read_time, 0)
@@ -31,15 +33,17 @@ WITH base AS (
                 + coalesce(s.temp_blk_write_time, 0)
             ),
             0
-        ) AS cpu_proxy_time,
+        ) END AS non_io_elapsed_proxy_time,
+        cfg.io_timing_enabled,
         s.query AS query_snippet
     FROM pg_stat_statements s
+    CROSS JOIN settings cfg
 ),
 totals AS (
     SELECT
         sum(total_exec_time) AS total_exec_time_all,
         sum(io_time) AS total_io_time_all,
-        sum(cpu_proxy_time) AS total_cpu_proxy_time_all,
+        sum(non_io_elapsed_proxy_time) AS total_non_io_proxy_time_all,
         sum(temp_bytes_written) AS total_temp_bytes_all
     FROM base
 )
@@ -48,19 +52,21 @@ SELECT
     b.calls,
     b.total_exec_time,
     b.mean_exec_time,
-    b.cpu_proxy_time,
+    b.io_timing_enabled,
+    b.non_io_elapsed_proxy_time,
     b.io_time,
     b.temp_bytes_written,
     pg_size_pretty(b.temp_bytes_written::bigint) AS temp_pretty,
     round((100.0 * b.total_exec_time / NULLIF(t.total_exec_time_all, 0))::numeric, 2) AS pct_total_exec_time,
-    round((100.0 * b.cpu_proxy_time / NULLIF(t.total_cpu_proxy_time_all, 0))::numeric, 2) AS pct_cpu_proxy_time,
-    round((100.0 * b.io_time / NULLIF(t.total_io_time_all, 0))::numeric, 2) AS pct_io_time,
-    round((100.0 * b.temp_bytes_written / NULLIF(t.total_temp_bytes_all, 0))::numeric, 2) AS pct_memory_spill,
+    round((100.0 * b.non_io_elapsed_proxy_time / NULLIF(t.total_non_io_proxy_time_all, 0))::numeric, 2) AS pct_non_io_elapsed_proxy,
+    CASE WHEN b.io_timing_enabled THEN round((100.0 * b.io_time / NULLIF(t.total_io_time_all, 0))::numeric, 2) END AS pct_measured_io_time,
+    round((100.0 * b.temp_bytes_written / NULLIF(t.total_temp_bytes_all, 0))::numeric, 2) AS pct_temp_spill,
     CASE
-        WHEN b.temp_bytes_written > 0 AND b.temp_bytes_written >= 1024::bigint * 1024 * 1024 THEN 'Memory spill heavy'
-        WHEN b.io_time > b.cpu_proxy_time THEN 'IO heavy'
-        WHEN b.cpu_proxy_time >= b.io_time THEN 'CPU heavy'
-        ELSE 'Mixed'
+        WHEN b.temp_bytes_written >= 1024::bigint * 1024 * 1024 THEN 'Temp spill heavy'
+        WHEN NOT b.io_timing_enabled THEN 'Timing split unavailable; enable track_io_timing'
+        WHEN b.io_time > b.non_io_elapsed_proxy_time THEN 'Measured IO-time heavy'
+        WHEN b.non_io_elapsed_proxy_time >= b.io_time THEN 'Non-IO elapsed-time candidate'
+        ELSE 'Mixed signals'
     END AS dominant_resource_proxy,
     b.query_snippet
 FROM base b

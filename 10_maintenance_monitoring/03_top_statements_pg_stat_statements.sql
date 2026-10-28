@@ -1,12 +1,15 @@
 /*
 PostgreSQL DBA Script: Top Statements Pg Stat Statements
-Purpose: Show the top SQL statements with percentage contribution and CPU/IO/memory/WAL pressure classification.
+Purpose: Show top SQL statements with elapsed-time, measured-I/O, temp-spill, and WAL contribution percentages.
 Area: Maintenance and Monitoring
 Usage: Requires pg_stat_statements extension. Use this as a first query-performance triage screen before running deeper CPU, memory/temp-spill, I/O, or WAL-specific scripts.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
-Notes: Read-only diagnostic. PostgreSQL core does not expose exact historical per-query CPU or memory; CPU and memory below are practical proxies from pg_stat_statements timing, block I/O, temp blocks, and WAL counters.
+Notes: Read-only. PostgreSQL core does not expose historical per-query CPU or allocated RAM. Non-I/O elapsed time is a CPU-candidate proxy only when track_io_timing is on; temp blocks measure spill I/O, not RAM.
 */
-WITH statement_base AS (
+WITH settings AS (
+    SELECT current_setting('track_io_timing') = 'on' AS io_timing_enabled
+),
+statement_base AS (
     SELECT
         s.queryid,
         s.calls,
@@ -29,7 +32,7 @@ WITH statement_base AS (
             + coalesce(s.local_blk_write_time, 0)
             + coalesce(s.temp_blk_read_time, 0)
             + coalesce(s.temp_blk_write_time, 0) AS io_time_ms,
-        greatest(
+        CASE WHEN cfg.io_timing_enabled THEN greatest(
             s.total_exec_time
             - (
                 coalesce(s.shared_blk_read_time, 0)
@@ -40,7 +43,8 @@ WITH statement_base AS (
                 + coalesce(s.temp_blk_write_time, 0)
             ),
             0
-        ) AS cpu_proxy_time_ms,
+        ) END AS non_io_elapsed_proxy_ms,
+        cfg.io_timing_enabled,
         (coalesce(s.temp_blks_read, 0) + coalesce(s.temp_blks_written, 0)) * current_setting('block_size')::bigint AS temp_bytes_total,
         coalesce(s.temp_blks_written, 0) * current_setting('block_size')::bigint AS temp_bytes_written,
         (coalesce(s.shared_blks_read, 0) + coalesce(s.local_blks_read, 0)) * current_setting('block_size')::bigint AS read_bytes,
@@ -48,11 +52,12 @@ WITH statement_base AS (
         coalesce(s.wal_bytes, 0)::numeric AS wal_bytes,
         regexp_replace(s.query, '\s+', ' ', 'g') AS query_snippet
     FROM pg_stat_statements s
+    CROSS JOIN settings cfg
 ),
 totals AS (
     SELECT
         sum(total_exec_time) AS all_exec_ms,
-        sum(cpu_proxy_time_ms) AS all_cpu_proxy_ms,
+        sum(non_io_elapsed_proxy_ms) AS all_non_io_proxy_ms,
         sum(io_time_ms) AS all_io_ms,
         sum(temp_bytes_total) AS all_temp_bytes,
         sum(read_bytes) AS all_read_bytes,
@@ -77,10 +82,11 @@ SELECT
     round(r.mean_exec_time::numeric, 2) AS mean_exec_ms,
     r.rows,
     round((r.rows::numeric / NULLIF(r.calls, 0)), 2) AS rows_per_call,
-    round(r.cpu_proxy_time_ms::numeric, 2) AS cpu_proxy_ms,
-    round((100.0 * r.cpu_proxy_time_ms / NULLIF(t.all_cpu_proxy_ms, 0))::numeric, 2) AS pct_cpu_proxy,
+    r.io_timing_enabled,
+    round(r.non_io_elapsed_proxy_ms::numeric, 2) AS non_io_elapsed_proxy_ms,
+    round((100.0 * r.non_io_elapsed_proxy_ms / NULLIF(t.all_non_io_proxy_ms, 0))::numeric, 2) AS pct_non_io_elapsed_proxy,
     round(r.io_time_ms::numeric, 2) AS io_time_ms,
-    round((100.0 * r.io_time_ms / NULLIF(t.all_io_ms, 0))::numeric, 2) AS pct_io_time,
+    CASE WHEN r.io_timing_enabled THEN round((100.0 * r.io_time_ms / NULLIF(t.all_io_ms, 0))::numeric, 2) END AS pct_measured_io_time,
     pg_size_pretty(r.read_bytes::bigint) AS read_volume,
     round((100.0 * r.read_bytes / NULLIF(t.all_read_bytes, 0))::numeric, 2) AS pct_read_volume,
     pg_size_pretty(r.write_bytes::bigint) AS write_volume,
@@ -99,8 +105,10 @@ SELECT
                  r.temp_bytes_total >= 1024::bigint * 1024 * 1024
                  OR r.temp_bytes_total >= greatest(r.read_bytes, r.write_bytes, r.wal_bytes)
              )
-            THEN 'MEMORY/TEMP-SPILL intensive'
-        WHEN r.io_time_ms > r.cpu_proxy_time_ms
+            THEN 'TEMP-SPILL intensive'
+        WHEN NOT r.io_timing_enabled
+            THEN 'TIMING SPLIT unavailable'
+        WHEN r.io_time_ms > r.non_io_elapsed_proxy_ms
              OR (
                  r.read_bytes > 0
                  AND r.read_bytes >= greatest(r.temp_bytes_total, r.write_bytes, r.wal_bytes)
@@ -112,18 +120,18 @@ SELECT
                  OR r.wal_bytes >= greatest(r.temp_bytes_total, r.read_bytes, r.write_bytes)
              )
             THEN 'WAL/WRITE intensive'
-        WHEN r.cpu_proxy_time_ms >= greatest(r.io_time_ms, 0)
-            THEN 'CPU intensive proxy'
+        WHEN r.non_io_elapsed_proxy_ms >= greatest(r.io_time_ms, 0)
+            THEN 'NON-IO elapsed-time candidate'
         ELSE 'MIXED resource profile'
     END AS dominant_resource_profile,
     CASE
         WHEN r.temp_bytes_total > 0
             THEN 'Check sort/hash spill plans, work_mem scope, row estimates, indexes, and temp file pressure.'
-        WHEN r.io_time_ms > r.cpu_proxy_time_ms OR r.read_bytes > 0
+        WHEN r.io_timing_enabled AND (r.io_time_ms > r.non_io_elapsed_proxy_ms OR r.read_bytes > 0)
             THEN 'Check read-heavy plans, missing indexes, cache hit ratio, pg_stat_io/storage latency, and full scans.'
         WHEN r.wal_bytes > 0 AND (r.shared_blks_dirtied + r.shared_blks_written + r.local_blks_dirtied + r.local_blks_written) > 0
             THEN 'Check write amplification, indexes on write-heavy tables, batch size, checkpoint/WAL pressure, and autovacuum.'
-        ELSE 'Check execution plan, joins, functions, expressions, row estimates, and CPU saturation.'
+        ELSE 'Correlate with host CPU, waits, and EXPLAIN; then check joins, functions, expressions, and row estimates.'
     END AS recommended_next_step,
     'Deep dives: 11_performance_tuning/07_top_10_cpu_intensive_queries_pgadmin.sql; 11_performance_tuning/08_top_10_temp_disk_spill_queries_pgadmin.sql; 11_performance_tuning/09_top_10_memory_pressure_queries_pgadmin.sql; 11_performance_tuning/04_io_bound_query_candidates.sql; 28_pgss_resource_attribution/01_pgss_query_resource_percent.sql' AS followup_scripts,
     r.query_snippet

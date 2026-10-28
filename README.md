@@ -10,11 +10,12 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 4. Use `SCRIPT_CATALOG.md` to search by purpose, or start with `38_observability_360/01_instance_health_360_dashboard.sql` for a CloudWatch-style first look.
 5. Use `POSTGRES_DIAGNOSTIC_LEARNING_PATH.md` when you want a beginner-to-pro diagnosis flow from symptom to exact scripts.
 6. Use coverage maps (`PERFORMANCE_TUNING_COVERAGE.md`, `OBJECT_COVERAGE_MATRIX.md`, `INTERNALS_COVERAGE_MATRIX.md`) for cross-area troubleshooting.
+7. Read `DIAGNOSTIC_ACCURACY_MODEL.md` before interpreting CPU, memory, cumulative-statistics, or heuristic recommendations.
 
 ## Scope
 
 - Coverage: `43` operational folders.
-- Current tracked SQL scripts: `272`.
+- Current tracked SQL scripts: `274`.
 - Script style: every SQL file includes `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes` headers.
 - Goal: any DBA/engineer can open an area and run purpose-specific scripts quickly.
 
@@ -48,7 +49,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `25_oltp_olap_goals`: workload goal alignment and classification.
 - `26_physical_cloud_diagnostics`: physical/cloud root-cause indicators.
 - `27_high_speed_tuning`: fast bottleneck triage, parameter advisor, missing-index detection.
-- `28_pgss_resource_attribution`: pg_stat_statements-based CPU/IO/memory-spill percentage attribution.
+- `28_pgss_resource_attribution`: pg_stat_statements elapsed-time, measured-I/O, and temp-spill attribution; CPU-like results are explicitly labeled as proxies.
 - `29_object_inventory_health`: deep diagnostics for TABLE/VIEW/MVIEW/TABLESPACE/SEQUENCE/INDEX/TRIGGER/GRANT/FUNCTION/PROCEDURE/PARTITION/TYPE/FDW/INSERT-COPY, plus PACKAGE/SYNONYM mapping and KETTLE signals.
 - `30_backup_restore_pitr_dr`: backup/PITR checks, archive readiness, restore-to-timestamp quick test, DR evidence.
 - `31_logging_error_signatures`: logging sanity, error-signature indicators, slow-query/log correlation.
@@ -72,6 +73,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - Beginner-to-pro diagnostic path: `POSTGRES_DIAGNOSTIC_LEARNING_PATH.md`
 - Script catalog: `SCRIPT_CATALOG.md`
 - 360 coverage audit: `POSTGRES_360_COVERAGE_AUDIT.md`
+- Diagnostic evidence and confidence model: `DIAGNOSTIC_ACCURACY_MODEL.md`
 - Fast triage order: `27_high_speed_tuning/README.md`
 - Version compatibility details: `VERSION_COMPATIBILITY.md`
 

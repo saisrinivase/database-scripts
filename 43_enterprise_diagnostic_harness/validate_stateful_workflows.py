@@ -50,6 +50,27 @@ WORKFLOWS = {
         "39_observer_agent_monitoring/10_observer_scheduler_runbook.sql",
     ],
 }
+INTENTIONALLY_EXCLUDED = {
+    "37_object_lifecycle_capacity/11_index_usage_lab_create_use_drop_demo.sql",
+    "37_object_lifecycle_capacity/12_table_modification_tracking_demo.sql",
+}
+
+
+def validate_manifest_coverage() -> None:
+    stateful_areas = {"15_capacity_forecasting", "37_object_lifecycle_capacity", "39_observer_agent_monitoring"}
+    discovered = {
+        path.relative_to(REPO_ROOT).as_posix()
+        for area in stateful_areas
+        for path in (REPO_ROOT / area).glob("*.sql")
+    }
+    declared = {script for scripts in WORKFLOWS.values() for script in scripts}
+    missing = discovered - declared - INTENTIONALLY_EXCLUDED
+    stale = (declared | INTENTIONALLY_EXCLUDED) - discovered
+    if missing or stale:
+        raise ValueError(
+            "Stateful validation manifest mismatch; "
+            f"unclassified={sorted(missing)}, missing_files={sorted(stale)}"
+        )
 
 
 def psql_base(database: str, psql_path: str) -> list[str]:
@@ -92,6 +113,7 @@ def main() -> int:
 
     try:
         ensure_ephemeral(args.database, args.confirm_ephemeral)
+        validate_manifest_coverage()
     except ValueError as exc:
         print(f"Safety check failed: {exc}", file=sys.stderr)
         return 2

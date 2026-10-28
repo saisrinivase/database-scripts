@@ -4,7 +4,7 @@ Purpose: Identify SQL statements with temp-file spill pressure; this is not a me
 Area: Performance Tuning
 Usage: Run in pgAdmin, psql, or any SQL client after pg_stat_statements is installed in the current database.
        Optional filter:
-       SELECT set_config('pgdiag.min_memory_pct','40',false); -- show only SQL >= 40% of temp spill load
+       SELECT set_config('pgdiag.min_temp_spill_pct','40',false); -- show only SQL >= 40% of temp spill load
        -- Optional timestamp placeholders when using your own pg_stat_statements snapshot table:
        -- AND snapshot_ts >= timestamp '2026-05-10 09:00:00'
        -- AND snapshot_ts <  timestamp '2026-05-10 10:00:00'
@@ -13,7 +13,11 @@ Notes: Read-only. Uses only pg_stat_statements, pg_roles, pg_database, and curre
        PostgreSQL does not expose exact historical per-query memory allocation; temp blocks are the strongest SQL-visible spill signal.
 */
 WITH params AS (
-    SELECT coalesce(nullif(current_setting('pgdiag.min_memory_pct', true), '')::numeric, 0) AS min_memory_pct
+    SELECT coalesce(
+        nullif(current_setting('pgdiag.min_temp_spill_pct', true), '')::numeric,
+        nullif(current_setting('pgdiag.min_memory_pct', true), '')::numeric,
+        0
+    ) AS min_temp_spill_pct
 ),
 base AS (
     SELECT s.*
@@ -57,7 +61,7 @@ CROSS JOIN totals t
 CROSS JOIN pg_stat_statements_info psi
 LEFT JOIN pg_roles r ON r.oid = s.userid
 LEFT JOIN pg_database d ON d.oid = s.dbid
-WHERE round((100.0 * (s.temp_blks_read + s.temp_blks_written) / NULLIF(t.total_temp_blks, 0))::numeric, 2) >= (SELECT min_memory_pct FROM params)
+WHERE round((100.0 * (s.temp_blks_read + s.temp_blks_written) / NULLIF(t.total_temp_blks, 0))::numeric, 2) >= (SELECT min_temp_spill_pct FROM params)
 ORDER BY temp_blks_total DESC, s.total_exec_time DESC
 LIMIT 10;
 

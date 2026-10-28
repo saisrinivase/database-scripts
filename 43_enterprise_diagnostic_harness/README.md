@@ -47,6 +47,8 @@ Run this in CI for every supported major version (15, 16, 17, 18) using a least-
 
 The harness validates execution and rollback behavior. It does not prove that an operational recommendation is correct for a workload; validate recommendations with baselines, `EXPLAIN (ANALYZE, BUFFERS)`, change control, and before/after evidence.
 
+See `DIAGNOSTIC_ACCURACY_MODEL.md` for the evidence classes, realistic confidence ranges, and mandatory CPU/memory interpretation boundaries.
+
 ## Stateful workflow validation
 
 `validate_stateful_workflows.py` validates the capacity, lifecycle, and observer repositories in a database that is explicitly marked disposable. These workflows intentionally create schemas, tables, functions, views, and event triggers, so they must never run against a production database.
@@ -59,6 +61,8 @@ dropdb database_scripts_ci
 ```
 
 The GitHub Actions matrix in `.github/workflows/postgresql-validation.yml` runs the SQL contract check, rollback-safe diagnostics, and stateful workflow validation against PostgreSQL 15, 16, 17, and 18.
+
+Routine CI intentionally excludes three resource-heavy demonstrations: the 5GB partition generator and the two object-lifecycle create/use/drop demos. The stateful harness validates that every script in its managed folders is either executed or named in its explicit exclusion set.
 
 ## History-window policy
 
