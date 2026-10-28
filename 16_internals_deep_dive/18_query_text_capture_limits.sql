@@ -27,7 +27,7 @@ SELECT
     END AS purpose,
     CASE
         WHEN name = 'track_activity_query_size'
-         AND pg_size_bytes(setting || coalesce(unit, '')) < 4096
+         AND setting::bigint < 4096
             THEN 'REVIEW: less than 4 KB can truncate long SQL in pg_stat_activity.'
         WHEN name = 'track_activities' AND setting <> 'on'
             THEN 'CRITICAL: current query activity collection is disabled.'

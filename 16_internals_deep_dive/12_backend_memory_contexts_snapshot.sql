@@ -9,7 +9,7 @@ Notes: Read-only diagnostic. pg_backend_memory_contexts shows this session only;
 SELECT
     name AS memory_context,
     ident,
-    array_to_string(path, ' > ') AS context_path,
+    NULL::text AS parent_memory_context,
     level,
     total_bytes,
     pg_size_pretty(total_bytes) AS total_pretty,

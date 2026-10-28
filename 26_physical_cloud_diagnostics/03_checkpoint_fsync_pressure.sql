@@ -34,7 +34,7 @@ BEGIN
                 cp.write_time,
                 cp.sync_time,
                 cp.buffers_written,
-                cp.slru_written,
+                (to_jsonb(cp)->>'slru_written')::numeric AS slru_written,
                 bg.buffers_clean,
                 bg.maxwritten_clean,
                 bg.buffers_alloc,

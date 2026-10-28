@@ -82,7 +82,7 @@ BEGIN
                     cp.write_time AS checkpoint_write_time,
                     cp.sync_time AS checkpoint_sync_time,
                     cp.buffers_written AS buffers_checkpoint,
-                    cp.slru_written,
+                    (to_jsonb(cp)->>'slru_written')::numeric AS slru_written,
                     bgw.buffers_clean,
                     bgw.maxwritten_clean,
                     NULL::numeric AS buffers_backend,

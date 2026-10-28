@@ -52,7 +52,7 @@ BEGIN
         RETURN;
     END IF;
 
-    RETURN QUERY EXECUTE
+    RETURN QUERY EXECUTE format(
     $sql$
         SELECT
             backend_type::text,
@@ -64,7 +64,7 @@ BEGIN
             round(sum(write_time)::numeric, 2) AS write_time_ms,
             sum(extends)::numeric AS extends,
             round(sum(extend_time)::numeric, 2) AS extend_time_ms,
-            sum(coalesce(read_bytes, 0) + coalesce(write_bytes, 0) + coalesce(extend_bytes, 0))::numeric AS total_bytes,
+            %s AS total_bytes,
             sum(evictions)::numeric AS evictions,
             sum(reuses)::numeric AS reuses,
             sum(fsyncs)::numeric AS fsyncs,
@@ -84,7 +84,18 @@ BEGIN
         GROUP BY backend_type, object, context
         ORDER BY (sum(read_time) + sum(write_time) + sum(extend_time) + sum(fsync_time)) DESC NULLS LAST,
                  sum(reads + writes + extends + fsyncs) DESC NULLS LAST
-    $sql$;
+    $sql$,
+    CASE
+        WHEN EXISTS (
+            SELECT 1
+            FROM pg_attribute
+            WHERE attrelid = 'pg_catalog.pg_stat_io'::regclass
+              AND attname = 'read_bytes'
+              AND NOT attisdropped
+        )
+            THEN 'sum(coalesce(read_bytes, 0) + coalesce(write_bytes, 0) + coalesce(extend_bytes, 0))::numeric'
+        ELSE 'NULL::numeric'
+    END);
 END;
 $$;
 
