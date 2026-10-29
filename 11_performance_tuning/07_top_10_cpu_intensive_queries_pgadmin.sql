@@ -1,6 +1,6 @@
 /*
-PostgreSQL DBA Script: Top 10 CPU and Logical Buffer Churn Priorities (pgAdmin safe)
-Purpose: Prioritize CPU investigation candidates using database time, logical-buffer churn, temp spill,
+PostgreSQL DBA Script: Top 10 CPU and Page-Access Priorities (pgAdmin safe)
+Purpose: Prioritize CPU investigation candidates using database time, cumulative page access, temp spill,
          and measured block-I/O evidence without presenting database time as exact host CPU.
 Area: Performance Tuning
 Compatibility: PostgreSQL 15+ with pg_stat_statements.
@@ -20,8 +20,12 @@ Measurement boundaries:
 - total_exec_time is cumulative elapsed execution time, not host CPU time.
 - PostgreSQL core does not retain historical wait-event time by query ID. Non-I/O elapsed time can
   still contain lock/LWLock waits, run-queue delay, extension work, and scheduler delay.
-- shared_blks_hit measures cached 8 kB page accesses. A high hit ratio avoids storage reads but a
-  very large number of hits can still represent substantial scan, join, aggregation, and CPU work.
+- cumulative_page_access = (shared_blks_hit + shared_blks_read) * block_size. It counts every page
+  access, including repeated access to the same cached page. For example, 48 GB means the statement
+  cumulatively accessed the equivalent of 48 GB of pages; it does not mean 48 GB of allocated RAM
+  or 48 GB of physical disk I/O.
+- High repeated page access can come from many calls, broad scans, or nested-loop repetitions. It can
+  consume substantial CPU even when the pages are already cached.
 - Counters cover the interval since pg_stat_statements_info.stats_reset. For an exact load-test
   interval, reset counters immediately before an approved test or store before/after snapshots.
 
@@ -156,30 +160,30 @@ SELECT
     r.calls,
     round((r.total_exec_time / 1000)::numeric, 2) AS cumulative_database_time_s,
     round(r.workload_time_pct::numeric, 2) AS database_time_pct,
-    pg_size_pretty((r.logical_shared_blocks * r.block_size_bytes)::bigint) AS logical_buffer_churn,
-    pg_size_pretty((r.temp_blocks * r.block_size_bytes)::bigint) AS temp_spill_churn,
+    pg_size_pretty((r.logical_shared_blocks * r.block_size_bytes)::bigint) AS cumulative_page_access,
+    pg_size_pretty((r.temp_blocks * r.block_size_bytes)::bigint) AS cumulative_temp_spill,
     CASE
         WHEN r.temp_blocks * r.block_size_bytes >= 10::numeric * 1024 * 1024 * 1024
-            THEN 'LARGE_TEMP_SPILL'
+            THEN 'Large temp-file spill'
         WHEN r.temp_blocks > 0
-            THEN 'TEMP_SPILL_PRESENT'
+            THEN 'Temp-file spill present'
         WHEN r.io_timing_enabled AND r.measured_io_pct_of_exec >= 50
-            THEN 'IO_TIME_DOMINANT_NOT_CPU'
+            THEN 'Measured storage I/O dominates; not a CPU-first candidate'
         WHEN r.single_function_call_shape
-            THEN 'FUNCTION_WRAPPER_REQUIRES_NESTED_SQL'
+            THEN 'Function wrapper; inspect nested SQL'
         WHEN r.logical_blocks_pct >= 10 AND r.logical_shared_blocks >= 100000
-            THEN 'HIGH_LOGICAL_BUFFER_CHURN'
+            THEN 'High repeated page access'
         WHEN r.calls >= 10000 AND r.total_exec_time >= 1000
-            THEN 'HIGH_FREQUENCY_EXECUTION_CHURN'
+            THEN 'High execution-frequency overhead'
         WHEN r.uses_distinct AND r.rows_per_call >= 100
-            THEN 'JOIN_MULTIPLICATION_OR_DEDUP_REVIEW'
+            THEN 'Possible join multiplication or deduplication cost'
         WHEN r.uses_expression_ordering
-            THEN 'EXPRESSION_SORT_REVIEW'
+            THEN 'Expression-based sort review'
         WHEN r.runtime_cv >= 1 AND r.calls >= 20 AND r.mean_exec_time >= 10
-            THEN 'HIGH_RUNTIME_VARIANCE'
+            THEN 'High runtime variation'
         WHEN NOT r.io_timing_enabled
-            THEN 'HIGH_DATABASE_TIME_CPU_UNCONFIRMED'
-        ELSE 'NON_IO_DATABASE_TIME_CPU_CANDIDATE'
+            THEN 'High database time; CPU not confirmed'
+        ELSE 'Non-I/O database-time CPU candidate'
     END AS primary_finding,
     (CASE
         WHEN r.temp_blocks > 0
@@ -189,7 +193,7 @@ SELECT
         WHEN r.single_function_call_shape
             THEN 'Enable pg_stat_statements.track=all for an approved test, identify the nested SQL, run 23_functions_dynamic_sql/05_sql_function_plan_cache_risk.sql, and explain the internal statement with representative binds.'
         WHEN r.logical_blocks_pct >= 10 AND r.logical_shared_blocks >= 100000
-            THEN 'Run EXPLAIN (ANALYZE, BUFFERS, SETTINGS, VERBOSE). Find the node whose actual loops multiplied by buffer accesses drives logical churn; compare estimated and actual rows.'
+            THEN 'Run EXPLAIN (ANALYZE, BUFFERS, SETTINGS, VERBOSE). Find the node whose actual loops multiplied by page accesses drives repeated work; compare estimated and actual rows.'
         WHEN r.calls >= 10000 AND r.total_exec_time >= 1000
             THEN 'Check call rate and batching before changing the plan. Correlate this query ID with DBLoadCPU or host CPU during the same interval.'
         WHEN r.uses_distinct AND r.rows_per_call >= 100
@@ -210,6 +214,6 @@ WHERE r.investigation_rank <= (SELECT max_rows FROM params)
 ORDER BY r.investigation_rank;
 
 -- SAMPLE_OUTPUT_BEGIN
--- rank | priority | database_name | queryid | calls | cumulative_database_time_s | database_time_pct | logical_buffer_churn | temp_spill_churn | primary_finding
--- 1    | P1       | appdb         | 123456  | 12000 | 812.40                     | 17.00             | 48 GB                | 0 bytes          | HIGH_LOGICAL_BUFFER_CHURN
+-- rank | priority | database_name | queryid | calls | cumulative_database_time_s | database_time_pct | cumulative_page_access | cumulative_temp_spill | primary_finding
+-- 1    | P1       | appdb         | 123456  | 12000 | 812.40                     | 17.00             | 48 GB                  | 0 bytes               | High repeated page access
 -- SAMPLE_OUTPUT_END
