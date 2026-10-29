@@ -1,7 +1,7 @@
 /*
-PostgreSQL DBA Script: Top 10 CPU Investigation Priorities (pgAdmin safe)
-Purpose: Prioritize statements for CPU investigation using measured pg_stat_statements evidence
-         without presenting elapsed database time as exact host CPU consumption.
+PostgreSQL DBA Script: Top 10 CPU and Logical Buffer Churn Priorities (pgAdmin safe)
+Purpose: Prioritize CPU investigation candidates using database time, logical-buffer churn, temp spill,
+         and measured block-I/O evidence without presenting database time as exact host CPU.
 Area: Performance Tuning
 Compatibility: PostgreSQL 15+ with pg_stat_statements.
 Usage: Run in pgAdmin Query Tool, psql, or another SQL client.
@@ -11,6 +11,7 @@ Notes: Read-only. This ranks CPU investigation candidates; it does not measure h
 Optional session filters:
   SELECT set_config('pgdiag.min_workload_time_pct', '0', false);
   SELECT set_config('pgdiag.min_calls', '1', false);
+  SELECT set_config('pgdiag.min_total_exec_ms', '0', false);
   SELECT set_config('pgdiag.max_rows', '10', false);
   SELECT set_config('pgdiag.query_filter', '', false);
   SELECT set_config('pgdiag.include_noise', 'off', false);
@@ -29,7 +30,8 @@ Safe interpretation:
 2. Use primary_finding to understand the measured reason.
 3. Perform recommended_action with representative bind values before applying a change.
 
-The default result intentionally contains only the columns needed for incident triage.
+The default result intentionally contains only the columns needed for incident triage. Database name
+is included because the same query ID can occur in multiple databases as separate statistics entries.
 */
 
 WITH params AS (
@@ -40,6 +42,7 @@ WITH params AS (
             0
         ) AS min_workload_time_pct,
         coalesce(nullif(current_setting('pgdiag.min_calls', true), '')::bigint, 1) AS min_calls,
+        coalesce(nullif(current_setting('pgdiag.min_total_exec_ms', true), '')::numeric, 0) AS min_total_exec_ms,
         coalesce(nullif(current_setting('pgdiag.max_rows', true), '')::integer, 10) AS max_rows,
         coalesce(nullif(current_setting('pgdiag.query_filter', true), ''), '') AS query_filter,
         coalesce(nullif(current_setting('pgdiag.include_noise', true), '')::boolean, false) AS include_noise
@@ -47,13 +50,13 @@ WITH params AS (
 settings AS (
     SELECT
         current_setting('track_io_timing') = 'on' AS io_timing_enabled,
-        current_setting('pg_stat_statements.track_planning', true) = 'on' AS planning_timing_enabled,
         (SELECT stats_reset FROM pg_stat_statements_info) AS pgss_stats_reset,
         current_setting('block_size')::numeric AS block_size_bytes
 ),
 base AS (
     SELECT
         s.*,
+        coalesce(d.datname, s.dbid::text) AS database_name,
         coalesce((to_jsonb(s)->>'shared_blk_read_time')::numeric, (to_jsonb(s)->>'blk_read_time')::numeric, 0)
         + coalesce((to_jsonb(s)->>'shared_blk_write_time')::numeric, (to_jsonb(s)->>'blk_write_time')::numeric, 0)
         + coalesce((to_jsonb(s)->>'local_blk_read_time')::numeric, 0)
@@ -62,14 +65,14 @@ base AS (
         + coalesce((to_jsonb(s)->>'temp_blk_write_time')::numeric, 0) AS measured_block_io_ms,
         s.shared_blks_hit + s.shared_blks_read AS logical_shared_blocks,
         s.temp_blks_read + s.temp_blks_written AS temp_blocks,
-        regexp_count(s.query, '\$[0-9]+') AS parameter_marker_count,
-        regexp_count(s.query, '\.vw_', 1, 'i') AS referenced_view_name_count,
         s.query ~* '^\s*select\s+[[:alnum:]_."$]+\s*\(' AND s.query !~* '\sfrom\s' AS single_function_call_shape,
         s.query ~* '\mDISTINCT\M' AS uses_distinct,
         s.query ~* 'order\s+by[^;]*(lower|trim)\s*\(' AS uses_expression_ordering
     FROM pg_stat_statements s
     CROSS JOIN params p
+    LEFT JOIN pg_database d ON d.oid = s.dbid
     WHERE s.calls >= p.min_calls
+      AND s.total_exec_time >= p.min_total_exec_ms
       AND (p.query_filter = '' OR s.query ILIKE '%' || p.query_filter || '%')
       AND (
           p.include_noise
@@ -77,26 +80,25 @@ base AS (
       )
       AND (
           p.include_noise
-          OR s.query !~* '(pg_catalog|information_schema|pg_stat_activity|pg_stat_statements|pg_show_all_settings|pg_settings|pg_backend_pid\(\)|pg_sleep\(|set_config\(|current_schema\(\)|session_user|dba_live\.)'
+          OR s.query !~* '(pg_catalog|information_schema|pg_stat_activity|pg_stat_statements|pg_show_all_settings|pg_settings|pg_temp\.|pg_backend_pid\(\)|pg_sleep\(|set_config\(|current_schema\(\)|session_user|dba_live\.)'
       )
 ),
 totals AS (
     SELECT
         sum(total_exec_time) AS total_exec_time_ms,
-        sum(calls) AS total_calls,
         sum(logical_shared_blocks) AS total_logical_shared_blocks,
-        sum(temp_blocks) AS total_temp_blocks
-    FROM base
+        sum(temp_blocks) AS total_temp_blocks,
+        sum(CASE WHEN cfg.io_timing_enabled THEN greatest(b.total_exec_time - b.measured_block_io_ms, 0) END) AS total_non_io_elapsed_ms
+    FROM base b
+    CROSS JOIN settings cfg
 ),
 scored AS (
     SELECT
         b.*,
         cfg.io_timing_enabled,
-        cfg.planning_timing_enabled,
         cfg.pgss_stats_reset,
         cfg.block_size_bytes,
         100.0 * b.total_exec_time / NULLIF(t.total_exec_time_ms, 0) AS workload_time_pct,
-        100.0 * b.calls / NULLIF(t.total_calls, 0) AS workload_calls_pct,
         100.0 * b.logical_shared_blocks / NULLIF(t.total_logical_shared_blocks, 0) AS logical_blocks_pct,
         100.0 * b.temp_blocks / NULLIF(t.total_temp_blocks, 0) AS temp_blocks_pct,
         b.logical_shared_blocks::numeric / NULLIF(b.calls, 0) AS logical_blocks_per_call,
@@ -104,8 +106,15 @@ scored AS (
         b.rows::numeric / NULLIF(b.calls, 0) AS rows_per_call,
         b.stddev_exec_time / NULLIF(b.mean_exec_time, 0) AS runtime_cv,
         CASE
+            WHEN cfg.io_timing_enabled THEN 100.0 * b.measured_block_io_ms / NULLIF(b.total_exec_time, 0)
+        END AS measured_io_pct_of_exec,
+        CASE
             WHEN cfg.io_timing_enabled THEN greatest(b.total_exec_time - b.measured_block_io_ms, 0)
-        END AS non_io_elapsed_proxy_ms
+        END AS non_io_elapsed_proxy_ms,
+        CASE
+            WHEN cfg.io_timing_enabled THEN 100.0 * greatest(b.total_exec_time - b.measured_block_io_ms, 0)
+                / NULLIF(t.total_non_io_elapsed_ms, 0)
+        END AS non_io_elapsed_share_pct
     FROM base b
     CROSS JOIN totals t
     CROSS JOIN settings cfg
@@ -114,17 +123,17 @@ prioritized AS (
     SELECT
         s.*,
         CASE
-            WHEN s.workload_time_pct >= 10
-              OR s.max_exec_time >= 60000
+            WHEN (s.workload_time_pct >= 20 AND s.total_exec_time >= 1000)
+              OR s.total_exec_time >= 60000
               OR s.temp_blocks * s.block_size_bytes >= 10::numeric * 1024 * 1024 * 1024
                 THEN 1
-            WHEN s.workload_time_pct >= 5
+            WHEN (s.workload_time_pct >= 5 AND s.total_exec_time >= 1000)
               OR s.mean_exec_time >= 1000
-              OR s.logical_blocks_per_call >= 100000
+              OR (s.logical_blocks_pct >= 10 AND s.logical_shared_blocks >= 100000)
                 THEN 2
-            WHEN s.workload_time_pct >= 2
-              OR s.calls >= 10000
-              OR s.runtime_cv >= 1
+            WHEN (s.workload_time_pct >= 2 AND s.total_exec_time >= 500)
+              OR (s.calls >= 10000 AND s.total_exec_time >= 1000)
+              OR (s.runtime_cv >= 1 AND s.calls >= 20 AND s.mean_exec_time >= 10)
                 THEN 3
             ELSE 4
         END AS priority_number
@@ -142,39 +151,47 @@ ranked AS (
 SELECT
     r.investigation_rank,
     'P' || r.priority_number AS priority,
+    r.database_name,
     r.queryid,
     r.calls,
-    round(r.workload_time_pct::numeric, 2) AS workload_exec_time_pct,
-    round(r.mean_exec_time::numeric, 2) AS mean_exec_ms,
-    round(r.max_exec_time::numeric, 2) AS max_exec_ms,
-    round(r.logical_blocks_per_call, 0) AS logical_blocks_per_call,
-    pg_size_pretty((r.temp_blocks * r.block_size_bytes)::bigint) AS cumulative_temp_io,
+    round((r.total_exec_time / 1000)::numeric, 2) AS cumulative_database_time_s,
+    round(r.workload_time_pct::numeric, 2) AS database_time_pct,
+    pg_size_pretty((r.logical_shared_blocks * r.block_size_bytes)::bigint) AS logical_buffer_churn,
+    pg_size_pretty((r.temp_blocks * r.block_size_bytes)::bigint) AS temp_spill_churn,
     CASE
         WHEN r.temp_blocks * r.block_size_bytes >= 10::numeric * 1024 * 1024 * 1024
             THEN 'LARGE_TEMP_SPILL'
         WHEN r.temp_blocks > 0
             THEN 'TEMP_SPILL_PRESENT'
+        WHEN r.io_timing_enabled AND r.measured_io_pct_of_exec >= 50
+            THEN 'IO_TIME_DOMINANT_NOT_CPU'
         WHEN r.single_function_call_shape
             THEN 'FUNCTION_WRAPPER_REQUIRES_NESTED_SQL'
-        WHEN r.logical_blocks_per_call >= 100000 AND r.shared_blks_hit > r.shared_blks_read
-            THEN 'HIGH_CACHED_PAGE_CHURN'
+        WHEN r.logical_blocks_pct >= 10 AND r.logical_shared_blocks >= 100000
+            THEN 'HIGH_LOGICAL_BUFFER_CHURN'
+        WHEN r.calls >= 10000 AND r.total_exec_time >= 1000
+            THEN 'HIGH_FREQUENCY_EXECUTION_CHURN'
         WHEN r.uses_distinct AND r.rows_per_call >= 100
             THEN 'JOIN_MULTIPLICATION_OR_DEDUP_REVIEW'
         WHEN r.uses_expression_ordering
             THEN 'EXPRESSION_SORT_REVIEW'
-        WHEN r.runtime_cv >= 1
+        WHEN r.runtime_cv >= 1 AND r.calls >= 20 AND r.mean_exec_time >= 10
             THEN 'HIGH_RUNTIME_VARIANCE'
-        WHEN r.calls >= 10000 AND r.mean_exec_time < 25
-            THEN 'HIGH_FREQUENCY_OVERHEAD'
-        ELSE 'HIGH_DATABASE_TIME_REQUIRES_PLAN'
+        WHEN NOT r.io_timing_enabled
+            THEN 'HIGH_DATABASE_TIME_CPU_UNCONFIRMED'
+        ELSE 'NON_IO_DATABASE_TIME_CPU_CANDIDATE'
     END AS primary_finding,
-    CASE
+    (CASE
         WHEN r.temp_blocks > 0
             THEN 'Run EXPLAIN (ANALYZE, BUFFERS, WAL, SETTINGS, VERBOSE) with representative binds. Locate Sort/Hash nodes reporting Disk, excessive batches, rows removed, or actual rows far above estimates.'
+        WHEN r.io_timing_enabled AND r.measured_io_pct_of_exec >= 50
+            THEN 'This statement is measured-I/O dominant, so use the I/O diagnostic rather than treating it as CPU. Correlate storage latency and inspect EXPLAIN buffers.'
         WHEN r.single_function_call_shape
             THEN 'Enable pg_stat_statements.track=all for an approved test, identify the nested SQL, run 23_functions_dynamic_sql/05_sql_function_plan_cache_risk.sql, and explain the internal statement with representative binds.'
-        WHEN r.logical_blocks_per_call >= 100000
-            THEN 'Run EXPLAIN (ANALYZE, BUFFERS, SETTINGS, VERBOSE) with representative binds. Find the node whose actual loops multiplied by buffer hits produces the page churn; compare estimated and actual rows at that node.'
+        WHEN r.logical_blocks_pct >= 10 AND r.logical_shared_blocks >= 100000
+            THEN 'Run EXPLAIN (ANALYZE, BUFFERS, SETTINGS, VERBOSE). Find the node whose actual loops multiplied by buffer accesses drives logical churn; compare estimated and actual rows.'
+        WHEN r.calls >= 10000 AND r.total_exec_time >= 1000
+            THEN 'Check call rate and batching before changing the plan. Correlate this query ID with DBLoadCPU or host CPU during the same interval.'
         WHEN r.uses_distinct AND r.rows_per_call >= 100
             THEN 'Explain with representative binds and compare rows before and after DISTINCT. Verify whether one-to-many joins multiply rows and whether every selected column is required.'
         WHEN r.uses_expression_ordering
@@ -182,13 +199,17 @@ SELECT
         WHEN r.runtime_cv >= 1
             THEN 'Capture plans for known fast and slow bind sets. Compare row estimates, join order, scan type, cache reads, and custom versus generic plan behavior.'
         ELSE 'Correlate this statistics window with CloudWatch CPUUtilization/DBLoadCPU, then capture EXPLAIN (ANALYZE, BUFFERS, SETTINGS, VERBOSE) for a representative execution.'
-    END AS recommended_action,
+    END || CASE
+        WHEN clock_timestamp() - r.pgss_stats_reset > interval '7 days'
+            THEN ' Statistics are older than 7 days; use before/after snapshots or an approved reset for current-load attribution.'
+        ELSE ''
+    END) AS recommended_action,
     regexp_replace(r.query, '\s+', ' ', 'g') AS complete_query_text
 FROM ranked r
 WHERE r.investigation_rank <= (SELECT max_rows FROM params)
 ORDER BY r.investigation_rank;
 
 -- SAMPLE_OUTPUT_BEGIN
--- rank | priority | queryid | time_pct | mean_ms | logical_blocks_per_call | temp_io | primary_finding        | recommended_action
--- 1    | P1       | 123456  | 17.00    | 738.36  | 602465                  | 0 bytes | HIGH_CACHED_PAGE_CHURN | Run EXPLAIN (ANALYZE...)
+-- rank | priority | database_name | queryid | calls | cumulative_database_time_s | database_time_pct | logical_buffer_churn | temp_spill_churn | primary_finding
+-- 1    | P1       | appdb         | 123456  | 12000 | 812.40                     | 17.00             | 48 GB                | 0 bytes          | HIGH_LOGICAL_BUFFER_CHURN
 -- SAMPLE_OUTPUT_END
