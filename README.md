@@ -14,8 +14,8 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 
 ## Scope
 
-- Coverage: `43` operational folders.
-- Current tracked SQL scripts: `274`.
+- Coverage: `44` operational folders.
+- Current tracked SQL scripts: `276`.
 - Script style: every SQL file includes `PostgreSQL DBA Script`, `Purpose`, `Area`, `Usage`, `Sample Output`, and `Notes` headers.
 - Goal: any DBA/engineer can open an area and run purpose-specific scripts quickly.
 
@@ -64,6 +64,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - `40_pgadmin_safe_diagnostics`: pgAdmin Query Tool friendly PostgreSQL 15+ diagnostics for vacuum, checkpoints, pg_stat_io fallback, pg_stat_statements, CloudWatch-style metrics, HA, WAL/archive, observer health, root-cause queue, backup evidence, and SME routing.
 - `41_aws_rds_aurora_postgresql`: exact routing for 83 RDS/Aurora service metrics plus 4 Database Insights load metrics, with focused DBLoad, queue-depth, cache, IOPS, and telemetry-completeness diagnostics.
 - `42_problem_identification_internals`: symptom-first routing and deep diagnostics for lock internals, logical replication/CDC, partition pruning, extensions, PostgreSQL 18 asynchronous I/O, and RLS.
+- `44_live_test_monitoring`: bounded local CPU-pressure reproduction and pgAdmin-safe live backend/query identification for PostgreSQL 15+, RDS PostgreSQL, and Aurora PostgreSQL.
 
 ## Coverage Maps
 
