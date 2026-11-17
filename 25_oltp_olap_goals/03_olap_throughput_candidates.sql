@@ -6,6 +6,13 @@ Usage: Candidate list for partitioning, pre-aggregation, or materialized views.
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic unless the script explicitly creates objects, changes settings, or seeds/fixes lab data.
 */
+
+SELECT
+    stats_reset AS pgss_stats_reset,
+    clock_timestamp() - stats_reset AS statistics_age,
+    'All following counters are cumulative since pgss_stats_reset; use snapshots for an incident interval.' AS measurement_boundary
+FROM pg_stat_statements_info;
+
 SELECT
     queryid,
     calls,
@@ -71,48 +78,5 @@ LIMIT 200;
 --   7127220720807722591 |       3 |        1636.255042 |  545.4183473333334 |                3 |               618 |  360000 | INSERT INTO migration_v1_lab.child_transactions (account_id, amount)                                                              +
 --                       |         |                    |                    |                  |                   |         | SELECT                                                                                                                            +
 --                       |         |                    |                    |                  |                   |         |     ($1 + (random() * $2)::int)::bigint,                                                                                          +
---                       |         |                    |                    |                  |                   |         |     round((random() * $3)::numeric, $4)                                                                                           +
---                       |         |                    |                    |                  |                   |         | FROM generate_series($5, $6)
---  -1479418139676470911 |       4 |        1535.621918 |        383.9054795 |                0 |                 0 |       0 | CREATE INDEX idx_v2_sales_ref_b ON migration_v2_lab.sales_catalog (item_ref)
---   4361856503355632769 |       4 | 1521.6664580000001 | 380.41661450000004 |                0 |                 0 |       0 | CREATE INDEX idx_v2_sales_ref_a ON migration_v2_lab.sales_catalog (item_ref)
---   4667898782383165389 |       4 |        1190.093041 |       297.52326025 |                4 |               824 |  480000 | INSERT INTO migration_v2_lab.sales_catalog (item_ref, item_type, price)                                                           +
---                       |         |                    |                    |                  |                   |         | SELECT                                                                                                                            +
---                       |         |                    |                    |                  |                   |         |     $1 || gs,                                                                                                                     +
---                       |         |                    |                    |                  |                   |         |     CASE WHEN gs % $2 = $3 THEN $4 WHEN gs % $5 = $6 THEN $7 WHEN gs % $8 = $9 THEN $10 WHEN gs % $11 = $12 THEN $13 ELSE $14 END,+
---                       |         |                    |                    |                  |                   |         |     round(($15 + random() * $16)::nu
---  -4598960938853719316 |       4 |          1100.3515 | 275.08787499999994 |                4 |                 0 |  100000 | INSERT INTO migration_v1_lab.dml_bloat_table (payload)                                                                            +
---                       |         |                    |                    |                  |                   |         | SELECT repeat(md5(gs::text), $1)                                                                                                  +
---                       |         |                    |                    |                  |                   |         | FROM generate_series($2, $3) AS gs
---  -5938169015537755073 |       4 |        1016.337374 | 254.08434350000002 |                8 |                 0 |  400000 | INSERT INTO migration_v2_lab.partitioned_events (event_date, event_payload)                                                       +
---                       |         |                    |                    |                  |                   |         | SELECT                                                                                                                            +
---                       |         |                    |                    |                  |                   |         |     date $1 + (gs % $2),                                                                                                          +
---                       |         |                    |                    |                  |                   |         |     md5(gs::text)                                                                                                                 +
---                       |         |                    |                    |                  |                   |         | FROM generate_series($3, $4) AS gs
---   1579180460630060410 |       4 |  903.8009159999999 |         225.950229 |                4 |               824 |  480000 | INSERT INTO migration_v2_lab.amount_mapping_risk (source_numeric, target_int4_model)                                              +
---                       |         |                    |                    |                  |                   |         | SELECT                                                                                                                            +
---                       |         |                    |                    |                  |                   |         |     CASE                                                                                                                          +
---                       |         |                    |                    |                  |                   |         |         WHEN gs % $1 = $2 THEN $3 + gs                                                                                            +
---                       |         |                    |                    |                  |                   |         |         WHEN gs % $4 = $5 THEN $6 - gs                                                                                            +
---                       |         |                    |                    |                  |                   |         |         ELSE gs::numeric                                                                                                          +
---                       |         |                    |                    |                  |                   |         |     END,                                                                                                                          +
---                       |         |                    |                    |                  |                   |         |     $7                                                                                                                            +
---                       |         |                    |                    |                  |                   |         | FROM generate_series($8, $9) AS gs
---  -4598960938853719316 |       3 |          835.59025 |  278.5300833333333 |                3 |                 0 |   75000 | INSERT INTO migration_v1_lab.dml_bloat_table (payload)                                                                            +
---                       |         |                    |                    |                  |                   |         | SELECT repeat(md5(gs::text), $1)                                                                                                  +
---                       |         |                    |                    |                  |                   |         | FROM generate_series($2, $3) AS gs
---  -5398677000037045473 |       1 |         802.498625 |         802.498625 |            53105 |                 0 |       0 | CREATE DATABASE script_validation_20260218_172749 TEMPLATE perf_test
---   7127220720807722591 |       1 |         618.777208 |         618.777208 |                1 |               206 |  120000 | INSERT INTO migration_v1_lab.child_transactions (account_id, amount)                                                              +
---                       |         |                    |                    |                  |                   |         | SELECT                                                                                                                            +
---                       |         |                    |                    |                  |                   |         |     ($1 + (random() * $2)::int)::bigint,                                                                                          +
---                       |         |                    |                    |                  |                   |         |     round((random() * $3)::numeric, $4)                                                                                           +
---                       |         |                    |                    |                  |                   |         | FROM generate_series($5, $6)
---  -4598960938853719316 |       1 | 255.13079199999999 | 255.13079199999999 |                1 |                 0 |   25000 | INSERT INTO migration_v1_lab.dml_bloat_table (payload)                                                                            +
---                       |         |                    |                    |                  |                   |         | SELECT repeat(md5(gs::text), $1)                                                                                                  +
---                       |         |                    |                    |                  |                   |         | FROM generate_series($2, $3) AS gs
---  -8708022775858244193 |       4 | 183.60700000000003 |  45.90175000000001 |                0 |              2940 |       0 | CREATE INDEX IF NOT EXISTS idx_v2_order_fact_filter_key                                                                           +
---                       |         |                    |                    |                  |                   |         |     ON migration_v2_lab.order_fact (filter_key)
---   1114623876772974445 |       4 |         146.180208 |          36.545052 |             1336 |              2449 |       0 | CREATE INDEX IF NOT EXISTS idx_v2_child_events_account_id                                                                         +
---                       |         |                    |                    |                  |                   |         |     ON migration_v2_lab.child_events (account_id)
--- (24 rows)
--- 
+-- ... remaining sample rows omitted; run the script for current environment-specific results.
 -- SAMPLE_OUTPUT_END

@@ -30,10 +30,10 @@ SELECT
         WHEN total_bytes >= 50::bigint * 1024 * 1024 * 1024 AND write_volume >= 5000000
             THEN 'Strong candidate'
         WHEN total_bytes >= 20::bigint * 1024 * 1024 * 1024 AND write_volume >= 1000000
-            THEN 'Candidate'
+            THEN 'Candidate; validate pruning predicates, retention operations, maintenance cost, and a representative plan before partitioning.'
         WHEN total_bytes >= 10::bigint * 1024 * 1024 * 1024
-            THEN 'Size-only candidate'
-        ELSE 'Low priority'
+            THEN 'Size-only candidate; validate pruning predicates and operational benefit before partitioning.'
+        ELSE 'Low priority; review only when workload or retention requirements justify partitioning.'
     END AS recommendation
 FROM base
 WHERE NOT relispartition

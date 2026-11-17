@@ -40,9 +40,11 @@ SELECT
     pg_size_pretty(t.total_bytes) AS total_pretty,
     coalesce(e.ext_stats_count, 0) AS ext_stats_count,
     CASE
-        WHEN t.column_count >= 15 AND t.write_volume >= 100000 AND coalesce(e.ext_stats_count, 0) = 0 THEN 'Candidate'
-        WHEN t.column_count >= 25 AND coalesce(e.ext_stats_count, 0) = 0 THEN 'Candidate'
-        ELSE 'Observe'
+        WHEN t.column_count >= 15 AND t.write_volume >= 100000 AND coalesce(e.ext_stats_count, 0) = 0
+            THEN 'Candidate; validate correlated predicates and row-estimate errors with EXPLAIN before creating statistics.'
+        WHEN t.column_count >= 25 AND coalesce(e.ext_stats_count, 0) = 0
+            THEN 'Candidate; inspect workload predicates and EXPLAIN estimates before creating statistics.'
+        ELSE 'Observe; no action without evidence of multi-column estimate errors.'
     END AS recommendation
 FROM table_profile t
 LEFT JOIN ext_stats e

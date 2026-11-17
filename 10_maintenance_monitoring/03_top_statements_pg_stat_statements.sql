@@ -6,6 +6,13 @@ Usage: Requires pg_stat_statements extension. Use this as a first query-performa
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only. PostgreSQL core does not expose historical per-query CPU or allocated RAM. Non-I/O elapsed time is a CPU-candidate proxy only when track_io_timing is on; temp blocks measure spill I/O, not RAM.
 */
+
+SELECT
+    stats_reset AS pgss_stats_reset,
+    clock_timestamp() - stats_reset AS statistics_age,
+    'All following counters are cumulative since pgss_stats_reset; use snapshots for an incident interval.' AS measurement_boundary
+FROM pg_stat_statements_info;
+
 WITH settings AS (
     SELECT current_setting('track_io_timing') = 'on' AS io_timing_enabled
 ),

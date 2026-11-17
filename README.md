@@ -75,6 +75,7 @@ Purpose: Central, area-based SQL script repository for PostgreSQL DBAs.
 - Script catalog: `SCRIPT_CATALOG.md`
 - 360 coverage audit: `POSTGRES_360_COVERAGE_AUDIT.md`
 - Diagnostic evidence and confidence model: `DIAGNOSTIC_ACCURACY_MODEL.md`
+- Per-script benefit, evidence class, prerequisites, and accuracy audit: `SCRIPT_ACCURACY_BENEFIT_AUDIT.md`
 - Fast triage order: `27_high_speed_tuning/README.md`
 - Version compatibility details: `VERSION_COMPATIBILITY.md`
 

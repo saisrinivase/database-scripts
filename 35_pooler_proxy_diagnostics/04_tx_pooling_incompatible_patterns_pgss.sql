@@ -6,6 +6,13 @@ Usage: Requires pg_stat_statements for query-level output. Safe for pgAdmin and 
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic.
 */
+
+SELECT
+    stats_reset AS pgss_stats_reset,
+    clock_timestamp() - stats_reset AS statistics_age,
+    'All following counters are cumulative since pgss_stats_reset; use snapshots for an incident interval.' AS measurement_boundary
+FROM pg_stat_statements_info;
+
 CREATE TEMP TABLE IF NOT EXISTS tx_pooling_incompatible_patterns_result (
     incompatibility_pattern text,
     queryid bigint,

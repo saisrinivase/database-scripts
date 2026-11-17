@@ -11,6 +11,13 @@ Usage: Run in pgAdmin, psql, or any SQL client after pg_stat_statements is insta
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only. Temp blocks are cumulative since pg_stat_statements reset and use the server block_size, usually 8kB.
 */
+
+SELECT
+    stats_reset AS pgss_stats_reset,
+    clock_timestamp() - stats_reset AS statistics_age,
+    'All following counters are cumulative since pgss_stats_reset; use snapshots for an incident interval.' AS measurement_boundary
+FROM pg_stat_statements_info;
+
 WITH params AS (
     SELECT coalesce(nullif(current_setting('pgdiag.min_temp_pct', true), '')::numeric, 0) AS min_temp_pct
 ),

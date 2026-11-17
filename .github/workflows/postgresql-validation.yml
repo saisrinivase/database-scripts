@@ -51,6 +51,8 @@ jobs:
             -c "CREATE EXTENSION IF NOT EXISTS pg_stat_statements"
       - name: Enforce repository SQL contracts
         run: python3 43_enterprise_diagnostic_harness/lint_sql_contracts.py
+      - name: Enforce diagnostic value and accuracy contracts
+        run: python3 43_enterprise_diagnostic_harness/audit_diagnostic_value.py --check --strict
       - name: Validate non-stateful diagnostics with rollback
         env:
           PGHOST: 127.0.0.1

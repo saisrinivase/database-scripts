@@ -6,6 +6,43 @@ Usage: Requires pg_stat_statements for query-level output. Safe for pgAdmin and 
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only diagnostic.
 */
+
+CREATE OR REPLACE FUNCTION pg_temp.pgdiag_pgss_window()
+RETURNS TABLE (
+    pgss_stats_reset timestamptz,
+    statistics_age interval,
+    measurement_boundary text
+)
+LANGUAGE plpgsql
+AS $fn$
+DECLARE
+    v_info_view regclass := coalesce(
+        to_regclass('pg_stat_statements_info'),
+        to_regclass('public.pg_stat_statements_info')
+    );
+BEGIN
+    IF v_info_view IS NULL THEN
+        RETURN QUERY SELECT
+            NULL::timestamptz,
+            NULL::interval,
+            'pg_stat_statements statistics window is unavailable.'::text;
+    ELSE
+        RETURN QUERY EXECUTE format(
+            $query$
+                SELECT
+                    stats_reset,
+                    clock_timestamp() - stats_reset,
+                    %L::text
+                FROM %s
+            $query$,
+            'All pg_stat_statements counters are cumulative since this reset; use snapshots for an incident interval.',
+            v_info_view
+        );
+    END IF;
+END;
+$fn$;
+
+SELECT * FROM pg_temp.pgdiag_pgss_window();
 CREATE TEMP TABLE IF NOT EXISTS object_query_hotspots_pgss_result (
     queryid bigint,
     calls bigint,

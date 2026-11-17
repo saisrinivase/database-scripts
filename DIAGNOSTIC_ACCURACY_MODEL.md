@@ -29,6 +29,8 @@ These are engineering confidence ranges, not statistical guarantees. Permissions
 
 The CI workflow runs every eligible SQL script on PostgreSQL 15, 16, 17, and 18. It enforces pgAdmin compatibility, required purpose/usage/notes/sample-output documentation, stateful workflow isolation, and semantic naming rules for high-risk CPU and memory claims.
 
+`43_enterprise_diagnostic_harness/audit_diagnostic_value.py` also audits every SQL file for its practical benefit, evidence class, confidence boundary, prerequisites, cumulative-window visibility, complete query text, recommendation validation, and sample maintainability. CI runs this audit in strict mode so new `REVIEW` or `BLOCK` findings fail the matrix.
+
 Three deliberately heavy demonstration scripts are excluded from routine CI because they generate large data sets. Their exclusion is explicit in the harness and must not be presented as a passing runtime result.
 
 ## Using the scripts like an SME

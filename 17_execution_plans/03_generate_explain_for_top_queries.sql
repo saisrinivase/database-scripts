@@ -6,6 +6,13 @@ Usage: Requires pg_stat_statements. Replace bind placeholders before use. Add AN
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only. Generated commands intentionally omit ANALYZE because EXPLAIN ANALYZE executes SELECT and DML statements.
 */
+
+SELECT
+    stats_reset AS pgss_stats_reset,
+    clock_timestamp() - stats_reset AS statistics_age,
+    'All following counters are cumulative since pgss_stats_reset; use snapshots for an incident interval.' AS measurement_boundary
+FROM pg_stat_statements_info;
+
 SELECT
     queryid,
     calls,

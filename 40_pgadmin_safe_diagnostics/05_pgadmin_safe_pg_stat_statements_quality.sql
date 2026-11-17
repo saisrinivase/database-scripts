@@ -9,6 +9,43 @@ Sample output:
  top total time | 12345   | 1000  | 245000.33     | 512.00  | 80.50  | Tune highest DB time SQL.
 */
 
+CREATE OR REPLACE FUNCTION pg_temp.pgdiag_pgss_window()
+RETURNS TABLE (
+    pgss_stats_reset timestamptz,
+    statistics_age interval,
+    measurement_boundary text
+)
+LANGUAGE plpgsql
+AS $fn$
+DECLARE
+    v_info_view regclass := coalesce(
+        to_regclass('pg_stat_statements_info'),
+        to_regclass('public.pg_stat_statements_info')
+    );
+BEGIN
+    IF v_info_view IS NULL THEN
+        RETURN QUERY SELECT
+            NULL::timestamptz,
+            NULL::interval,
+            'pg_stat_statements statistics window is unavailable.'::text;
+    ELSE
+        RETURN QUERY EXECUTE format(
+            $query$
+                SELECT
+                    stats_reset,
+                    clock_timestamp() - stats_reset,
+                    %L::text
+                FROM %s
+            $query$,
+            'All pg_stat_statements counters are cumulative since this reset; use snapshots for an incident interval.',
+            v_info_view
+        );
+    END IF;
+END;
+$fn$;
+
+SELECT * FROM pg_temp.pgdiag_pgss_window();
+
 CREATE OR REPLACE FUNCTION pg_temp.pgadmin_pgss_quality()
 RETURNS TABLE (
     section text,

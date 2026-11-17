@@ -21,7 +21,7 @@ SELECT
     CASE
         WHEN d.xact_commit > 0 AND d.temp_bytes > 0 AND d.blks_read > d.blks_hit / 4 THEN 'Mixed workload pressure'
         ELSE 'Normal/Mild'
-    END AS recommendation
+    END AS workload_classification
 FROM pg_stat_database d
 WHERE d.datname NOT IN ('template0', 'template1')
 ORDER BY d.temp_bytes DESC, d.blks_read DESC;

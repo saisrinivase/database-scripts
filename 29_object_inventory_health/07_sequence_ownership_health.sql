@@ -38,7 +38,7 @@ SELECT
     coalesce(a.attname, '') AS owned_by_column,
     CASE WHEN o.sequence_oid IS NULL THEN 'ORPHAN' ELSE 'OWNED' END AS ownership_status,
     CASE
-        WHEN o.sequence_oid IS NULL THEN format('ALTER SEQUENCE %I.%I OWNED BY <schema>.<table>.<column>;', s.schema_name, s.sequence_name)
+        WHEN o.sequence_oid IS NULL THEN format('Review defaults and dependencies, then validate ownership before using: ALTER SEQUENCE %I.%I OWNED BY <schema>.<table>.<column>;', s.schema_name, s.sequence_name)
         ELSE 'OK'
     END AS recommended_action
 FROM sequences s

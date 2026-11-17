@@ -6,6 +6,13 @@ Usage: Requires pg_stat_statements. Enable track_io_timing before the observatio
 Sample Output: See SAMPLE_OUTPUT_BEGIN block at the bottom for a representative result shape.
 Notes: Read-only. Non-I/O elapsed time is a CPU-candidate proxy, not measured CPU. Temp writes measure spill I/O, not allocated RAM.
 */
+
+SELECT
+    stats_reset AS pgss_stats_reset,
+    clock_timestamp() - stats_reset AS statistics_age,
+    'All following counters are cumulative since pgss_stats_reset; use snapshots for an incident interval.' AS measurement_boundary
+FROM pg_stat_statements_info;
+
 WITH settings AS (
     SELECT current_setting('track_io_timing') = 'on' AS io_timing_enabled
 ),

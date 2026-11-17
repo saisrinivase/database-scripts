@@ -59,7 +59,7 @@ SELECT
     object_type,
     object_identity,
     'QUOTED_IDENTIFIER_REQUIRED' AS risk_flag,
-    'Consider renaming to lower_snake_case to reduce query/tooling friction.' AS recommendation
+    'Review application SQL, views, functions, grants, and dependencies before considering a lower_snake_case rename.' AS recommendation
 FROM (
     SELECT * FROM rel_risks
     UNION ALL
